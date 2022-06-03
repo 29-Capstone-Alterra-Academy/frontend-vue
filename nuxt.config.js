@@ -75,6 +75,12 @@ export default {
         },
       },
     },
+    treeShake: true,
+    defaultAssets: {
+      font: {
+        family: 'Poppins'
+      }
+    },
   },
 
   // Build Configuration: https://go.nuxtjs.dev/config-build
