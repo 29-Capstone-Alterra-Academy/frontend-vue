@@ -72,14 +72,39 @@ export default {
       fixed: false,
       items: [
         {
-          icon: 'mdi-apps',
-          title: 'Welcome',
+          icon: 'mdi-home',
+          title: 'Home',
           to: '/',
         },
         {
-          icon: 'mdi-chart-bubble',
-          title: 'Inspire',
-          to: '/inspire',
+          icon: 'mdi-magnify',
+          title: 'Search',
+          to: '/search',
+        },
+        {
+          icon: 'mdi-palette',
+          title: 'Categories',
+          to: '/search',
+        },
+        {
+          icon: 'mdi-account',
+          title: 'Users',
+          to: '/search',
+        },
+        {
+          icon: 'mdi-alert',
+          title: 'Banned',
+          to: '/search',
+        },
+        {
+          icon: 'mdi-cog',
+          title: 'Settings',
+          to: '/search',
+        },
+        {
+          icon: 'mdi-power',
+          title: 'Log Out',
+          to: '/search',
         },
       ],
       miniVariant: false,
