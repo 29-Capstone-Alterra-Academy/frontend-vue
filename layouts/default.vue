@@ -17,7 +17,7 @@
         </v-list-item>
       </v-list>
       <v-spacer />
-      <v-card class="mt-4 mx-auto" shaped style="background-color: white;" max-width="90%">
+      <v-card class="mt-4 mx-auto user-card" shaped style="background-color: white;" max-width="90%">
         <v-card-text>
           <v-row no-gutters>
             <v-col class="justify-content-center" cols="4">
@@ -153,7 +153,7 @@ export default {
 </script>
 
 <style scoped>
-.v-sheet.v-card.v-sheet--shaped {
+.user-card.v-card.v-sheet.v-sheet--shaped {
   border-radius: 24px;
 }
 .navigation-item.v-list-item {
