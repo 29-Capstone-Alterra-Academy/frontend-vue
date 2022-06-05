@@ -8,18 +8,59 @@
       app
     >
       <v-list>
+        <v-list-item>
+          <v-list-item-content>
+            <v-list-item-title class="title text-center"
+              >Alterra</v-list-item-title
+            >
+          </v-list-item-content>
+        </v-list-item>
+      </v-list>
+      <v-spacer />
+      <v-card class="mt-4 mx-auto" shaped style="background-color: white;" max-width="90%">
+        <v-card-text>
+          <v-row no-gutters>
+            <v-col class="justify-content-center" cols="4">
+              <v-icon style="color: black;">mdi-account-circle mdi-2</v-icon>
+            </v-col>
+            <v-col cols="8">
+              <v-row>
+                <v-col cols="7" style="padding-right: 0px;">
+                  <p style="margin: 0; color: #4C4C4C;">John Doe</p>
+                </v-col>
+                <v-col cols="2" style="padding-left: 0px;">
+                  <p style="margin: 0; color: #4C4C4C;">></p>
+                </v-col>
+              </v-row>
+              <p style="margin: 0; color: #B3B3B3;">Admin</p>
+            </v-col>
+          </v-row>
+        </v-card-text>
+      </v-card>
+      <v-spacer />
+      <v-list>
         <v-list-item
           v-for="(item, i) in items"
           :key="i"
           :to="item.to"
+          class="navigation-item"
           router
           exact
+          outlined
         >
           <v-list-item-action>
             <v-icon>{{ item.icon }}</v-icon>
           </v-list-item-action>
           <v-list-item-content>
             <v-list-item-title v-text="item.title" />
+          </v-list-item-content>
+        </v-list-item>
+        <v-list-item class="navigation-item" to="/">
+          <v-list-item-action>
+            <v-icon class="logout">mdi-power</v-icon>
+          </v-list-item-action>
+          <v-list-item-content>
+            <v-list-item-title class="logout" v-text="'Log Out'" />
           </v-list-item-content>
         </v-list-item>
       </v-list>
@@ -101,11 +142,6 @@ export default {
           title: 'Settings',
           to: '/search',
         },
-        {
-          icon: 'mdi-power',
-          title: 'Log Out',
-          to: '/search',
-        },
       ],
       miniVariant: false,
       right: true,
@@ -115,3 +151,25 @@ export default {
   },
 }
 </script>
+
+<style scoped>
+.v-sheet.v-card.v-sheet--shaped {
+  border-radius: 24px;
+}
+.navigation-item.v-list-item {
+  margin-left: 10px;
+  margin-right: 10px;
+}
+.navigation-item.v-list-item--active {
+  border-bottom: 1px solid red;
+}
+.navigation-item.theme--dark.v-list-item--active::before {
+  opacity: 0;
+}
+.logout {
+  color: red;
+}
+.logout.mdi-power.theme--dark {
+  color: red;
+}
+</style>
