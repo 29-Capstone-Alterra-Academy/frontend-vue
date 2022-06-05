@@ -115,7 +115,7 @@ export default {
         {
           icon: 'mdi-home',
           title: 'Home',
-          to: '/',
+          to: '/dashboard',
         },
         {
           icon: 'mdi-magnify',
