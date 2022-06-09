@@ -1,12 +1,17 @@
 <template>
-  <v-row justify="center" style="position: relative;">
+  <v-row justify="center" style="position: relative">
     <v-col cols="7">
       <v-row>
         <v-col cols="12">
           <v-card class="rounded-lg mx-auto" outlined>
             <v-row class="pt-4 pb-0 mr-1 pl-2">
               <v-col cols="11">
-                <v-text-field label="New Post" placeholder="Create New Post" outlined dense></v-text-field>
+                <v-text-field
+                  label="New Post"
+                  placeholder="Create New Post"
+                  outlined
+                  dense
+                ></v-text-field>
               </v-col>
               <v-col cols="1">
                 <div class="text-center mt-1">
@@ -31,63 +36,7 @@
           </v-card>
         </v-col>
         <v-col v-for="thread in threads" :key="thread.id" cols="12">
-          <v-card class="rounded-lg mx-auto" outlined>
-            <v-list-item three-line>
-              <v-list-item-content>
-                <v-row>
-                  <v-col cols="1" style="max-width: none">
-                    <v-img
-                      :src="thread.user.avatar"
-                      class="image-rounded"
-                      width="35"
-                    ></v-img>
-                  </v-col>
-                  <v-col align-self="center" cols="auto">
-                    <div>
-                      {{ thread.user.username }}
-                    </div>
-                  </v-col>
-                  <v-col align-self="center">
-                    <div>
-                      <small class="text--disabled">Posted by @{{thread.user.username}} {{thread.user.timepost}} ago</small>
-                    </div>
-                  </v-col>
-                </v-row>
-                <v-list-item-title class="text-h6 my-2">
-                  {{ thread.slug }}
-                </v-list-item-title>
-                <v-flex class="text-center">
-                  <v-img
-                    :src="thread.image"
-                    class="mx-auto"
-                    max-width="75%"
-                    max-height="75%"
-                  ></v-img>
-                </v-flex>
-              </v-list-item-content>
-            </v-list-item>
-            <v-card-actions class="pa-0">
-              <v-list-item>
-                <v-list-item-content>
-                  <v-col cols="5" class="pa-0">
-                    <v-row>
-                      <v-col justify="center">
-                        <v-icon>mdi-heart</v-icon>
-                        <p class="ma-0" style="width: 50%; display: inline">{{ thread.likes }}</p>
-                      </v-col>
-                      <v-col justify="center">
-                        <v-icon>mdi-message-processing</v-icon>
-                        <p class="ma-0" style="width: 50%; display: inline">{{ Object.keys(thread.comments).length }}</p>
-                      </v-col>
-                      <v-col>
-                        ...
-                      </v-col>
-                    </v-row>
-                  </v-col>
-                </v-list-item-content>
-              </v-list-item>
-            </v-card-actions>
-          </v-card>
+          <PostCard :thread="thread" />
         </v-col>
       </v-row>
     </v-col>
@@ -132,13 +81,23 @@
               <v-list-item-content>
                 <v-row>
                   <v-col cols="12">
-                    <v-btn outlined block small class="rounded-lg text-capitalize text-left p-2">
+                    <v-btn
+                      outlined
+                      block
+                      small
+                      class="rounded-lg text-capitalize text-left p-2"
+                    >
                       <v-icon>mdi-plus</v-icon>
                       Create New Post
                     </v-btn>
                   </v-col>
                   <v-col cols="12">
-                    <v-btn outlined block small class="rounded-lg text-capitalize text-left p-2">
+                    <v-btn
+                      outlined
+                      block
+                      small
+                      class="rounded-lg text-capitalize text-left p-2"
+                    >
                       <v-icon>mdi-plus</v-icon>
                       Create New Topic
                     </v-btn>
@@ -156,191 +115,14 @@
 <script>
 export default {
   name: 'IndexPage',
+  props: {
+    searchPost: {
+      type: String,
+      default: '',
+    },
+  },
   data() {
     return {
-      threads: [
-        {
-          id: 1,
-          slug: 'This is dummy post`s slug',
-          user: {
-            username: 'JohnLeider',
-            avatar: 'https://randomuser.me/api/portraits/women/84.jpg',
-            timepost: '8 hours'
-          },
-          body: 'This is dummy post`s body',
-          image: 'https://cataas.com/cat',
-          likes: 212,
-          comments: [
-            {
-              id: 1,
-              username: 'JohnLeider',
-              body: 'This is dummy post`s comment',
-            },
-            {
-              id: 2,
-              username: 'JohnLeider',
-              body: 'This is dummy post`s comment',
-            },
-            {
-              id: 3,
-              username: 'JohnLeider',
-              body: 'This is dummy post`s comment',
-            },
-            {
-              id: 4,
-              username: 'JohnLeider',
-              body: 'This is dummy post`s comment',
-            },
-            {
-              id: 5,
-              username: 'JohnLeider',
-              body: 'This is dummy post`s comment',
-            },
-            {
-              id: 6,
-              username: 'JohnLeider',
-              body: 'This is dummy post`s comment',
-            },
-          ],
-        },
-        {
-          id: 2,
-          slug: 'This is dummy post`s slug',
-          user: {
-            username: 'DianaPetersen',
-            avatar: 'https://randomuser.me/api/portraits/women/85.jpg',
-            timepost: '10 hours'
-          },
-          body: 'This is dummy post`s body',
-          image: null,
-          likes: 212,
-          comments: [
-            {
-              id: 1,
-              username: 'JohnLeider',
-              body: 'This is dummy post`s comment',
-            },
-          ],
-        },
-        {
-          id: 3,
-          slug: 'This is dummy post`s slug',
-          user: {
-            username: 'JohnLeider',
-            avatar: 'https://randomuser.me/api/portraits/women/84.jpg',
-            timepost: '18 hours'
-          },
-          body: 'This is dummy post`s body',
-          image: 'https://cataas.com/cat',
-          likes: 212,
-          comments: [],
-        },
-        {
-          id: 4,
-          slug: 'This is dummy post`s slug',
-          user: {
-            username: 'JohnLeider',
-            avatar: 'https://randomuser.me/api/portraits/women/84.jpg',
-            timepost: '1 months'
-          },
-          body: 'This is dummy post`s body',
-          image: null,
-          likes: 212,
-          comments: [
-            {
-              id: 1,
-              username: 'JohnLeider',
-              body: 'This is dummy post`s comment',
-            },
-          ],
-        },
-        {
-          id: 5,
-          slug: 'This is dummy post`s slug',
-          user: {
-            username: 'JohnLeider',
-            avatar: 'https://randomuser.me/api/portraits/women/84.jpg',
-            timepost: '1 hours'
-          },
-          body: 'This is dummy post`s body',
-          image: 'https://cataas.com/cat',
-          likes: 212,
-          comments: [
-            {
-              id: 1,
-              username: 'JohnLeider',
-              body: 'This is dummy post`s comment',
-            },
-          ],
-        },
-        {
-          id: 6,
-          slug: 'This is dummy post`s slug',
-          user: {
-            username: 'JohnLeider',
-            avatar: 'https://randomuser.me/api/portraits/women/84.jpg',
-            timepost: '5 hours'
-          },
-          body: 'This is dummy post`s body',
-          image: null,
-          likes: 212,
-          comments: [
-            {
-              id: 1,
-              username: 'JohnLeider',
-              body: 'This is dummy post`s comment',
-            },
-          ],
-        },
-        {
-          id: 7,
-          slug: 'This is dummy post`s slug',
-          user: {
-            username: 'JohnLeider',
-            avatar: 'https://randomuser.me/api/portraits/women/84.jpg',
-            timepost: '8 hours'
-          },
-          body: 'This is dummy post`s body',
-          image: 'https://cataas.com/cat',
-          likes: 212,
-          comments: [
-            {
-              id: 1,
-              username: 'JohnLeider',
-              body: 'This is dummy post`s comment',
-            },
-            {
-              id: 2,
-              username: 'JohnLeider',
-              body: 'This is dummy post`s comment',
-            },
-            {
-              id: 3,
-              username: 'JohnLeider',
-              body: 'This is dummy post`s comment',
-            },
-          ],
-        },
-        {
-          id: 8,
-          slug: 'This is dummy post`s slug',
-          user: {
-            username: 'JohnLeider',
-            avatar: 'https://randomuser.me/api/portraits/women/84.jpg',
-            timepost: '6 hours'
-          },
-          body: 'This is dummy post`s body',
-          image: null,
-          likes: 212,
-          comments: [
-            {
-              id: 1,
-              username: 'JohnLeider',
-              body: 'This is dummy post`s comment',
-            },
-          ],
-        },
-      ],
       topics: [
         {
           id: 1,
@@ -354,6 +136,16 @@ export default {
         },
       ],
     }
+  },
+  computed: {
+    threads() {
+      if (this.searchPost) {
+        return this.$store.state.threads.lists.filter((item) => {
+          return item.slug.toLowerCase().includes(this.searchPost.toLowerCase())
+        })
+      }
+      return this.$store.state.threads.lists
+    },
   },
 }
 </script>
