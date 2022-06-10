@@ -105,7 +105,12 @@ export default {
       items: [
         {
           icon: 'mdi-home',
-          title: 'Home',
+          title: 'Main Page',
+          to: '/',
+        },
+        {
+          icon: 'mdi-cog',
+          title: 'cog',
           to: '/dashboard',
         },
         {
