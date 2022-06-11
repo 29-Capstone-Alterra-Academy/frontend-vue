@@ -1,5 +1,5 @@
 <template>
-  <v-card class="rounded-lg mx-auto" outlined @click="toDetails(thread.id)">
+  <v-card class="rounded-lg mx-auto" outlined>
     <v-list-item three-line>
       <v-list-item-content>
         <v-row>
@@ -75,11 +75,6 @@ export default {
     topic: {
       type: Object,
       required: true,
-    },
-  },
-  methods: {
-    toDetails(id) {
-      this.$router.push(`/dashboard/${id}`)
     },
   },
 }

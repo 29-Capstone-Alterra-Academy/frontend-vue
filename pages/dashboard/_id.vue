@@ -2,40 +2,11 @@
   <v-row justify="center" style="position: relative">
     <v-col cols="7">
       <v-row>
-        <v-col cols="12" class="pt-3 py-1">
-          <v-btn
-            outlined
-            block
-            class="rounded-lg text-capitalize"
-            to="/create-post"
-          >
-            <div class="mr-auto">
-              <v-icon>mdi-plus</v-icon>
-              Create New Post
-            </div>
-          </v-btn>
-        </v-col>
-        <v-col cols="12" class="py-1">
-          <v-card class="rounded-lg mx-auto py-3 px-3" outlined>
-            <v-row>
-              <v-col cols="auto">
-                <v-btn outlined class="text-capitalize rounded-lg" color="info">
-                  <v-icon>mdi-fire</v-icon>Rekomendasi
-                </v-btn>
-              </v-col>
-              <v-col cols="auto">
-                <v-btn outlined class="text-capitalize rounded-lg"
-                  >Mengikuti</v-btn
-                >
-              </v-col>
-            </v-row>
-          </v-card>
-        </v-col>
         <v-col
           v-for="thread in threads"
           :key="thread.id"
           cols="12"
-          class="py-1"
+          class="pt-3 py-1"
         >
           <section
             v-for="topic in topics.filter(
@@ -43,7 +14,7 @@
             )"
             :key="topic.id"
           >
-            <PostCard :thread="thread" :topic="topic" />
+            <PostCardComment :thread="thread" :topic="topic"/>
           </section>
         </v-col>
       </v-row>
@@ -173,14 +144,9 @@ export default {
   },
   computed: {
     threads() {
-      if (this.searchPost) {
+      if (this.$route.params.id) {
         return this.$store.state.threads.lists.filter((item) => {
-          return (
-            item.slug.toLowerCase().includes(this.searchPost.toLowerCase()) ||
-            item.user.username
-              .toLowerCase()
-              .includes(this.searchPost.toLowerCase())
-          )
+          return item.id.toString().includes(this.$route.params.id)
         })
       }
       return this.$store.state.threads.lists

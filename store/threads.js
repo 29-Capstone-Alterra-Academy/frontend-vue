@@ -2,6 +2,7 @@ export const state = () => ({
   lists: [
     {
       id: 1,
+      topic_id: 2,
       slug: 'This is dummy post`s slug',
       user: {
         username: 'JohnLeider',
@@ -46,6 +47,7 @@ export const state = () => ({
     },
     {
       id: 2,
+      topic_id: 1,
       slug: 'This is dummy post`s slug',
       user: {
         username: 'DianaPetersen',
@@ -65,6 +67,7 @@ export const state = () => ({
     },
     {
       id: 3,
+      topic_id: 2,
       slug: 'This is dummy post`s slug',
       user: {
         username: 'JohnLeider',
@@ -97,6 +100,7 @@ export const state = () => ({
     },
     {
       id: 5,
+      topic_id: 2,
       slug: 'This is dummy post`s slug',
       user: {
         username: 'JohnLeider',
@@ -116,6 +120,7 @@ export const state = () => ({
     },
     {
       id: 6,
+      topic_id: 1,
       slug: 'This is dummy post`s slug',
       user: {
         username: 'JohnLeider',
@@ -135,6 +140,7 @@ export const state = () => ({
     },
     {
       id: 7,
+      topic_id: 2,
       slug: 'This is dummy post`s slug',
       user: {
         username: 'JohnLeider',
@@ -164,6 +170,7 @@ export const state = () => ({
     },
     {
       id: 8,
+      topic_id: 1,
       slug: 'This is dummy post`s slug',
       user: {
         username: 'JohnLeider',
@@ -183,6 +190,7 @@ export const state = () => ({
     },
     {
       id: 9,
+      topic_id: 1,
       slug: 'Search demo',
       user: {
         username: 'JohnLeider',
