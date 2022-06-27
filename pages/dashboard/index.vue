@@ -18,34 +18,47 @@
         <v-col cols="12" class="py-1">
           <v-card class="rounded-lg mx-auto py-3 px-3" outlined>
             <v-row>
-              <v-col cols="auto">
-                <v-btn outlined class="text-capitalize rounded-lg" color="info">
-                  <v-icon>mdi-fire</v-icon>Rekomendasi
-                </v-btn>
-              </v-col>
-              <v-col cols="auto">
-                <v-btn outlined class="text-capitalize rounded-lg"
-                  >Mengikuti</v-btn
+              <v-tabs v-model="tab" class="ma-2 ml-4" hide-slider>
+                <v-tab
+                  v-for="item in items"
+                  :key="item.tab"
+                  class="rounded-lg text-capitalize px-1 mr-3"
+                  style="min-width: 0px"
                 >
-              </v-col>
+                  <v-col cols="auto">
+                    <v-spacer />
+                    <v-icon>{{ item.icon }}</v-icon
+                    >{{ item.tab }}
+                  </v-col>
+                </v-tab>
+              </v-tabs>
             </v-row>
           </v-card>
         </v-col>
-        <v-col
-          v-for="thread in threads"
-          :key="thread.id"
-          cols="12"
-          class="py-1"
-        >
-          <section
-            v-for="topic in topics.filter(
-              (topic) => topic.id === thread.topic_id
-            )"
-            :key="topic.id"
-          >
-            <PostCard :thread="thread" :topic="topic" />
-          </section>
-        </v-col>
+        <v-tabs-items v-model="tab">
+          <v-tab-item v-for="item in items" :key="item.tab">
+            <section v-if="item.tab == `Rekomendasi`">
+              <v-col
+                v-for="thread in threads"
+                :key="thread.id"
+                cols="12"
+                class="py-1"
+              >
+                <PostCard :thread="thread" />
+              </v-col>
+            </section>
+            <section v-if="item.tab == `Mengikuti`">
+              <v-col
+                v-for="thread in threads"
+                :key="thread.id"
+                cols="12"
+                class="py-1"
+              >
+                <PostCard :thread="thread" />
+              </v-col>
+            </section>
+          </v-tab-item>
+        </v-tabs-items>
       </v-row>
     </v-col>
     <v-col cols="4" style="width: 373.75px">
@@ -56,22 +69,43 @@
               <v-list-item-content>
                 <h4 class="text-capitalize mb-3">Hot Topic</h4>
                 <v-row>
-                  <v-col v-for="topic in topics" :key="topic.id" cols="12">
+                  <v-col
+                    v-for="(topic, index) in topics"
+                    :key="topic.id"
+                    cols="12"
+                  >
                     <v-row>
-                      <v-col cols="1" class="pr-0" style="max-width: 2rem">
-                        <div class="text-overline">{{ topic.id }}.</div>
-                      </v-col>
-                      <v-col cols="1" class="px-2" style="max-width: none">
-                        <v-img
-                          :src="topic.image"
-                          class="image-rounded"
-                          width="30"
-                        ></v-img>
-                      </v-col>
-                      <v-col class="pl-0">
-                        <div class="text-overline">
-                          {{ topic.name }}
-                        </div>
+                      <v-col>
+                        <router-link
+                          :to="`/topic/${topic.name}`"
+                          style="text-decoration: none; color: black"
+                        >
+                          <v-row>
+                            <v-col
+                              cols="1"
+                              class="pr-0"
+                              style="max-width: 2rem"
+                            >
+                              <div class="text-overline">{{ index + 1 }}.</div>
+                            </v-col>
+                            <v-col
+                              cols="1"
+                              class="px-2"
+                              style="max-width: none"
+                            >
+                              <v-img
+                                :src="topic.profile_image"
+                                class="rounded-circle"
+                                width="30"
+                              ></v-img>
+                            </v-col>
+                            <v-col class="pl-0">
+                              <div class="text-overline">
+                                {{ topic.name }}
+                              </div>
+                            </v-col>
+                          </v-row>
+                        </router-link>
                       </v-col>
                       <v-col cols="2" style="max-width: 10rem">
                         <v-btn class="text-capitalize">Follow</v-btn>
@@ -90,23 +124,44 @@
                 <h4 class="text-capitalize mb-3">Hot Contributors</h4>
                 <v-row>
                   <v-col
-                    v-for="contributor in contributors"
+                    v-for="(contributor, index) in users"
                     :key="contributor.id"
                     cols="12"
                   >
                     <v-row>
-                      <v-col cols="1" class="pr-0" style="max-width: 2rem">
-                        <div class="text-overline">{{ contributor.id }}.</div>
-                      </v-col>
-                      <v-col cols="1" class="px-2" style="max-width: none">
-                        <v-img
-                          :src="contributor.image"
-                          class="image-rounded"
-                          width="30"
-                        ></v-img>
-                      </v-col>
-                      <v-col class="pl-0" align-self="center">
-                        <div class="text-p">@{{ contributor.username }}</div>
+                      <v-col>
+                        <router-link
+                          :to="`/user/${contributor.username}`"
+                          style="text-decoration: none; color: black"
+                        >
+                          <v-row>
+                            <v-col
+                              cols="1"
+                              class="pr-0"
+                              style="max-width: 2rem"
+                            >
+                              <div class="text-overline">
+                                {{ index + 1 }}.
+                              </div>
+                            </v-col>
+                            <v-col
+                              cols="1"
+                              class="px-2"
+                              style="max-width: none"
+                            >
+                              <v-img
+                                :src="contributor.profile_image"
+                                class="rounded-circle"
+                                width="30"
+                              ></v-img>
+                            </v-col>
+                            <v-col class="pl-0" align-self="center">
+                              <div class="text-p">
+                                @{{ contributor.username }}
+                              </div>
+                            </v-col>
+                          </v-row>
+                        </router-link>
                       </v-col>
                       <v-col cols="2" style="max-width: 10rem">
                         <v-btn class="text-capitalize">Follow</v-btn>
@@ -147,8 +202,14 @@
 </template>
 
 <script>
+import PostCard from "~/components/cards/PostCard"
+
 export default {
   name: 'IndexPage',
+  components: {
+    PostCard,
+  },
+  middleware: 'authenticated',
   props: {
     searchPost: {
       type: String,
@@ -157,33 +218,23 @@ export default {
   },
   data() {
     return {
-      contributors: [
-        {
-          id: 1,
-          username: 'chupachups',
-          image: 'https://randomuser.me/api/portraits/women/50.jpg',
-        },
-        {
-          id: 2,
-          username: 'marsonmark',
-          image: 'https://randomuser.me/api/portraits/women/81.jpg',
-        },
-      ],
+      tab: null,
+      items: [{ tab: 'Rekomendasi', icon: 'mdi-fire' }, { tab: 'Mengikuti' }],
     }
   },
   computed: {
     threads() {
       if (this.searchPost) {
-        return this.$store.state.threads.lists.filter((item) => {
+        return this.$store.state.lists.threads.filter((item) => {
           return (
-            item.slug.toLowerCase().includes(this.searchPost.toLowerCase()) ||
-            item.user.username
+            item.title.toLowerCase().includes(this.searchPost.toLowerCase()) ||
+            item.author.username
               .toLowerCase()
               .includes(this.searchPost.toLowerCase())
           )
         })
       }
-      return this.$store.state.threads.lists
+      return this.$store.state.lists.threads
     },
     topics() {
       // if (this.searchPost) {
@@ -191,8 +242,16 @@ export default {
       //     return item.name.toLowerCase().includes(this.searchPost.toLowerCase())
       //   })
       // }
-      return this.$store.state.topics.lists
+      return this.$store.state.lists.topics
     },
+    users() {
+      return this.$store.state.lists.users
+    },
+  },
+  created() {
+    this.$store.dispatch('lists/fetchThreads')
+    this.$store.dispatch('lists/fetchTopics')
+    this.$store.dispatch('lists/fetchUsers')
   },
 }
 </script>
@@ -200,5 +259,13 @@ export default {
 <style scoped>
 .image-rounded.theme--dark {
   border-radius: 50%;
+}
+.v-tab {
+  border: 1px solid #e0e0e0;
+  border-radius: 15px;
+}
+.v-tab.v-tab--active {
+  border: 1px solid black;
+  border-radius: 15px;
 }
 </style>

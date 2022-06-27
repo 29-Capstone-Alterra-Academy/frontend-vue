@@ -1,71 +1,105 @@
 <template>
   <v-app dark>
-    <v-app-bar clipped fixed app>
+    <v-navigation-drawer v-model="drawer" temporary app color="primary">
+      <v-list>
+        <v-list-item>
+          <v-list-item-content>
+            <v-list-item-title class="title">City Bike</v-list-item-title>
+          </v-list-item-content>
+        </v-list-item>
+      </v-list>
+
+      <v-divider />
+
+      <v-list dense>
+        <AuthButtonSide :items="items" />
+      </v-list>
+    </v-navigation-drawer>
+
+    <v-app-bar app clipped fixed class="">
+      <v-toolbar-title>
+        <v-img
+          src="/Logo.svg"
+          class=""
+          width="110"
+        ></v-img>
+      </v-toolbar-title>
+      <v-spacer />
+      <v-app-bar-nav-icon
+        v-if="isXs"
+        class="mr-4"
+        @click.stop="drawer = !drawer"
+      />
+      <AuthButton v-else :items="items" />
+      <v-spacer />
       <v-menu offset-y>
-        <template #activator="{ on }">
-          <v-btn v-model="current" class="px-10" color="primary" dark v-on="on" >{{ current }}</v-btn>
+        <template #activator="{ on, attrs }">
+          <v-card class="rounded-lg px-2" outlined v-bind="attrs" v-on="on">
+            <v-list-item>
+              <v-row justify="center" align="center">
+                <v-col cols="auto" style="width: 200px">
+                  <v-row align="center" class="pa-0">
+                    <v-col cols="1" class="pa-0" style="max-width: none">
+                      <v-img
+                        src="https://randomuser.me/api/portraits/women/84.jpg"
+                        class="rounded-circle"
+                        width="30"
+                      ></v-img>
+                    </v-col>
+                    <v-col cols="auto">
+                      <v-row>
+                        <v-col cols="12" class="pa-0">
+                          <div class="text-capitalize caption">
+                            {{ profile.username }}
+                          </div>
+                        </v-col>
+                        <v-col cols="12" class="pa-0">
+                          <div class="text-capitalize text--disabled caption">
+                            User
+                          </div>
+                        </v-col>
+                      </v-row>
+                    </v-col>
+                  </v-row>
+                </v-col>
+                <v-col cols="auto" class="pa-0">
+                  <v-icon>mdi-menu-down</v-icon>
+                </v-col>
+              </v-row>
+            </v-list-item>
+          </v-card>
         </template>
         <v-list>
-          <v-list-item
-            v-for="(item, index) in items"
-            :key="index"
-            :to="item.to"
-            :current="item.title"
-            class="navigation-item"
-          >
-            <v-list-item-action>
-              <v-icon>{{ item.icon }}</v-icon>
-            </v-list-item-action>
+          <v-list-item>
             <v-list-item-content>
-              <v-list-item-title v-text="item.title" />
+              <v-list-item-title
+                class="text--disabled body-2"
+                v-text="`User Options`"
+              />
             </v-list-item-content>
           </v-list-item>
-          <v-list-item class="navigation-item" to="/">
-            <v-list-item-action>
-              <v-icon class="logout">mdi-power</v-icon>
-            </v-list-item-action>
+          <v-list-item to="/">
             <v-list-item-content>
-              <v-list-item-title class="logout" v-text="'Log Out'" />
+              <v-list-item-title class="body-1" v-text="`Profile`" />
             </v-list-item-content>
           </v-list-item>
         </v-list>
-      </v-menu>
-      <v-spacer />
-      <v-text-field
-        v-model="search"
-        clearable
-        flat
-        solo-inverted
-        hide-details
-        prepend-inner-icon="mdi-magnify"
-        label="Search"
-      ></v-text-field>
-      <v-spacer />
-      <v-menu offset-y>
-        <template #activator="{ on }">
-          <v-btn v-model="current" class="px-10" color="primary" dark v-on="on" >User</v-btn>
-        </template>
         <v-list>
-          <v-list-item
-            v-for="(item, index) in items"
-            :key="index"
-            :to="item.to"
-            :current="item.title"
-            class="navigation-item"
-          >
-            <v-list-item-action>
-              <v-icon>{{ item.icon }}</v-icon>
-            </v-list-item-action>
+          <v-divider />
+        </v-list>
+        <v-list>
+          <v-list-item to="/">
             <v-list-item-content>
-              <v-list-item-title v-text="item.title" />
+              <v-list-item-title class="body-2" v-text="`Settings`" />
             </v-list-item-content>
           </v-list-item>
-          <v-list-item class="navigation-item" to="/">
-            <v-list-item-action>
-              <v-icon class="logout">mdi-power</v-icon>
-            </v-list-item-action>
+          <v-list-item @click="handleLogout">
             <v-list-item-content>
-              <v-list-item-title class="logout" v-text="'Log Out'" />
+              <v-list-item-title
+                class="body-2"
+                style="color: red"
+                v-text="`Logout`"
+              />
             </v-list-item-content>
           </v-list-item>
         </v-list>
@@ -86,32 +120,46 @@
         </v-list-item>
       </v-list>
     </v-navigation-drawer>
-    <v-footer :absolute="!fixed" app>
+    <v-footer app>
       <span>&copy; {{ new Date().getFullYear() }}</span>
     </v-footer>
   </v-app>
 </template>
 
 <script>
+import { mapMutations } from 'vuex'
+import AuthButton from "~/components/navbar/AuthButton";
+import AuthButtonSide from "~/components/navbar/AuthButtonSide";
+
 export default {
   name: 'DefaultLayout',
+  components: {
+    AuthButton,
+    AuthButtonSide
+  },
+  middleware: 'authenticated',
+  model: {
+    prop: 'value',
+    event: 'input',
+  },
+  props: {
+    value: {
+      type: String,
+      default() {
+        return 'Home'
+      },
+    },
+  },
   data() {
     return {
-      clipped: false,
-      drawer: false,
-      fixed: false,
-      current: '',
-      search: "",
+      drawer: null,
+      isXs: false,
+      search: '',
       items: [
         {
           icon: 'mdi-home',
-          title: 'Main Page',
+          title: 'Home',
           to: '/',
-        },
-        {
-          icon: 'mdi-cog',
-          title: 'cog',
-          to: '/dashboard',
         },
         {
           icon: 'mdi-magnify',
@@ -120,22 +168,7 @@ export default {
         },
         {
           icon: 'mdi-palette',
-          title: 'Categories',
-          to: '/search',
-        },
-        {
-          icon: 'mdi-account',
-          title: 'Users',
-          to: '/search',
-        },
-        {
-          icon: 'mdi-alert',
-          title: 'Banned',
-          to: '/search',
-        },
-        {
-          icon: 'mdi-cog',
-          title: 'Settings',
+          title: 'Ranking',
           to: '/search',
         },
       ],
@@ -144,14 +177,41 @@ export default {
       rightDrawer: false,
     }
   },
-  watch: {
-    'current'(value) {
-      this.current = value
+  computed: {
+    route() {
+      return this.$route.path
+    },
+    param() {
+      return this.$store.state.layouts.layout
+    },
+    topics() {
+      if (this.param) {
+        return this.$store.state.lists.topics.filter((item) => {
+          return item.id.toString().includes(this.param)
+        })
+      }
+      return this.$store.state.lists.topics
+    },
+    profile() {
+      return this.$store.state.auth.profile
     },
   },
+  created() {
+    this.$store.dispatch('lists/fetchThreads')
+    this.$store.dispatch('lists/fetchTopics')
+    this.$store.dispatch('lists/fetchUsers')
+  },
   methods: {
-    currentPage(value) {
-      this.current = value
+    ...mapMutations('auth', ['logout']),
+    handleLogout() {
+      fetch('https://virtserver.swaggerhub.com/etrnal70/nomizo/1.0.0/logout', {
+        method: 'POST',
+        headers: {
+          accept: '*/*',
+        },
+      })
+      this.logout()
+      this.$forceUpdate()
     },
   },
 }

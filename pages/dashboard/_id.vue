@@ -8,14 +8,7 @@
           cols="12"
           class="pt-3 py-1"
         >
-          <section
-            v-for="topic in topics.filter(
-              (topic) => topic.id === thread.topic_id
-            )"
-            :key="topic.id"
-          >
-            <PostCardComment :thread="thread" :topic="topic"/>
-          </section>
+          <SinglePostCard :thread="thread" />
         </v-col>
       </v-row>
     </v-col>
@@ -25,29 +18,13 @@
           <v-card class="rounded-lg" outlined>
             <v-list-item three-line>
               <v-list-item-content>
-                <h4 class="text-capitalize mb-3">Hot Topic</h4>
+                <h4 class="font-weight-medium mb-3">Tentang Topik Ini</h4>
+                <div class="pb-1">
+                  <v-divider />
+                </div>
                 <v-row>
-                  <v-col v-for="topic in topics" :key="topic.id" cols="12">
-                    <v-row>
-                      <v-col cols="1" class="pr-0" style="max-width: 2rem">
-                        <div class="text-overline">{{ topic.id }}.</div>
-                      </v-col>
-                      <v-col cols="1" class="px-2" style="max-width: none">
-                        <v-img
-                          :src="topic.image"
-                          class="image-rounded"
-                          width="30"
-                        ></v-img>
-                      </v-col>
-                      <v-col class="pl-0">
-                        <div class="text-overline">
-                          {{ topic.name }}
-                        </div>
-                      </v-col>
-                      <v-col cols="2" style="max-width: 10rem">
-                        <v-btn class="text-capitalize">Follow</v-btn>
-                      </v-col>
-                    </v-row>
+                  <v-col v-for="(thread, index) in threads" :key="index" cols="12">
+                    <CurrentTopic :topic="thread.topic"/>
                   </v-col>
                 </v-row>
               </v-list-item-content>
@@ -58,33 +35,22 @@
           <v-card class="rounded-lg" outlined>
             <v-list-item three-line>
               <v-list-item-content>
-                <h4 class="text-capitalize mb-3">Hot Contributors</h4>
-                <v-row>
-                  <v-col
-                    v-for="contributor in contributors"
-                    :key="contributor.id"
-                    cols="12"
-                  >
+                <h4 class="font-weight-medium mb-3">Moderators</h4>
+                    <div class="pb-5">
+                      <v-divider />
+                    </div>
                     <v-row>
-                      <v-col cols="1" class="pr-0" style="max-width: 2rem">
-                        <div class="text-overline">{{ contributor.id }}.</div>
-                      </v-col>
-                      <v-col cols="1" class="px-2" style="max-width: none">
-                        <v-img
-                          :src="contributor.image"
-                          class="image-rounded"
-                          width="30"
-                        ></v-img>
-                      </v-col>
-                      <v-col class="pl-0" align-self="center">
-                        <div class="text-p">@{{ contributor.username }}</div>
-                      </v-col>
-                      <v-col cols="2" style="max-width: 10rem">
-                        <v-btn class="text-capitalize">Follow</v-btn>
+                      <v-col
+                        v-for="contributor in users"
+                        :key="contributor.id"
+                        cols="12"
+                        class="py-0"
+                      >
+                        <div class="pb-1 text-p">
+                          @{{ contributor.username }}
+                        </div>
                       </v-col>
                     </v-row>
-                  </v-col>
-                </v-row>
               </v-list-item-content>
             </v-list-item>
           </v-card>
@@ -118,8 +84,16 @@
 </template>
 
 <script>
+import SinglePostCard from "~/components/cards/SinglePostCard"
+import CurrentTopic from "~/components/cards/CurrentTopic"
+
 export default {
   name: 'IndexPage',
+  components: {
+    CurrentTopic,
+    SinglePostCard
+  },
+  middleware: 'authenticated',
   props: {
     searchPost: {
       type: String,
@@ -128,38 +102,28 @@ export default {
   },
   data() {
     return {
-      contributors: [
-        {
-          id: 1,
-          username: 'chupachups',
-          image: 'https://randomuser.me/api/portraits/women/50.jpg',
-        },
-        {
-          id: 2,
-          username: 'marsonmark',
-          image: 'https://randomuser.me/api/portraits/women/81.jpg',
-        },
-      ],
     }
   },
   computed: {
     threads() {
       if (this.$route.params.id) {
-        return this.$store.state.threads.lists.filter((item) => {
+        return this.$store.state.lists.threads.filter((item) => {
           return item.id.toString().includes(this.$route.params.id)
         })
       }
-      return this.$store.state.threads.lists
+      return this.$store.state.lists.threads
     },
-    topics() {
-      // if (this.searchPost) {
-      //   return this.$store.state.topics.lists.filter((item) => {
-      //     return item.name.toLowerCase().includes(this.searchPost.toLowerCase())
-      //   })
-      // }
-      return this.$store.state.topics.lists
+    users() {
+      return this.$store.state.lists.users
     },
   },
+  created() {
+    this.$store.dispatch('lists/fetchThreads')
+    this.$store.dispatch('lists/fetchTopics')
+    this.$store.dispatch('lists/fetchUsers')
+  },
+  mounted() {
+  }
 }
 </script>
 
