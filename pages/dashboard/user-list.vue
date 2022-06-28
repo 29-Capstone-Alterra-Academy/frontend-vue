@@ -37,7 +37,13 @@
               </div>
             </template>
             <template #[`item.created_at`]="{ item }">
-              <span>{{ new Date(item.created_at).toLocaleString() }}</span>
+              <span>{{
+                months[new Date(String(item.created_at)).getMonth()] +
+                ' ' +
+                new Date(String(item.created_at)).getDate() +
+                ', ' +
+                new Date(String(item.created_at)).getFullYear()
+              }}</span>
             </template>
             <template #[`item.followers`]="{ item }">
               <span>{{ item.followers | abbr }}</span>
@@ -80,6 +86,20 @@ export default {
         { text: 'Post Created', align: 'center', value: 'created_at' },
         { text: 'Followers', align: 'center', value: 'followers' },
         { text: 'Likes Received', align: 'center', value: 'likes' },
+      ],
+      months: [
+        'Jan',
+        'Feb',
+        'Mar',
+        'Apr',
+        'May',
+        'Jun',
+        'Jul',
+        'Aug',
+        'Sep',
+        'Oct',
+        'Nov',
+        'Des',
       ],
     }
   },

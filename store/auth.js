@@ -22,3 +22,12 @@ export const mutations = {
     state.refreshToken = null
   }
 }
+
+export const getters = {
+  isLoggedIn(state) {
+    return !!state.accessToken;
+  },
+  isMale(state) {
+    return state.profile.gender === 'male';
+  }
+}

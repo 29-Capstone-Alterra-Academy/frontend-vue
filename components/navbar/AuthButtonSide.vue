@@ -14,6 +14,8 @@
 </template>
 
 <script>
+import { mapGetters } from "vuex";
+
 export default {
   name: 'AuthLayout',
   props: {
@@ -23,11 +25,9 @@ export default {
     },
   },
   computed: {
-    isLoggedIn() {
-      return this.$store.getters.isLoggedIn
-    },
+    ...mapGetters('auth', ["isLoggedIn"]),
     userState() {
-      if (this.$store.getters.isLoggedIn) {
+      if (this.$store.getters.auth.isLoggedIn) {
         return this.$store.state.auth.username
       } else {
         return null

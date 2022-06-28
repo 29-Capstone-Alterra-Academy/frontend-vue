@@ -25,7 +25,13 @@
               <span>{{ item.followers | abbr }}</span>
             </template>
             <template #[`item.created_at`]="{ item }">
-              <span>{{ new Date(item.created_at).toLocaleString() }}</span>
+              <span>{{
+                months[new Date(String(item.created_at)).getMonth()] +
+                ' ' +
+                new Date(String(item.created_at)).getDate() +
+                ', ' +
+                new Date(String(item.created_at)).getFullYear()
+              }}</span>
             </template>
             <template #[`item.details`]="{ item }">
               <v-btn class="mx-2" @click="detailsItem(item)"> Details </v-btn>
@@ -63,6 +69,20 @@ export default {
         { text: 'Total Post', value: 'total_post', align: 'center' },
         { text: 'Followers', value: 'followers', align: 'center' },
         { text: 'Actions', value: 'details', align: 'center', sortable: false },
+      ],
+      months: [
+        'Jan',
+        'Feb',
+        'Mar',
+        'Apr',
+        'May',
+        'Jun',
+        'Jul',
+        'Aug',
+        'Sep',
+        'Oct',
+        'Nov',
+        'Des',
       ],
     }
   },

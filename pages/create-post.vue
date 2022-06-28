@@ -19,9 +19,7 @@
               <v-chip
                 v-bind="data.attrs"
                 :input-value="data.selected"
-                close
                 @click="data.select"
-                @click:close="remove(data.item.name)"
               >
                 <v-avatar left>
                   <v-img :src="data.item.profile_image"></v-img>
@@ -30,7 +28,7 @@
               </v-chip>
             </template>
             <template #item="data">
-              <template v-if="typeof data.item !== 'object'">
+              <template v-if="data.item.length === 0">
                 <v-list-item-content v-text="data.item"></v-list-item-content>
               </template>
               <template v-else>
@@ -52,23 +50,28 @@
               <v-row>
                 <v-col cols="12">
                   <div class="">
-                    <v-text-field
-                      v-model="title"
+                    <v-textarea
+                      :value="title"
+                      rows="1"
                       class="rounded-lg"
                       label="Title"
                       placeholder="Input Your Title"
+                      counter
+                      auto-grow
                       outlined
                       dense
                       hide-details
-                    ></v-text-field>
+                    ></v-textarea>
                   </div>
                   <div class="py-2">
                     <v-textarea
-                      v-model="content"
+                      :value="content"
+                      rows="6"
                       class="rounded-lg"
-                      name="input-desc"
                       label="Text"
                       placeholder="Text (Optional)"
+                      counter
+                      auto-grow
                       outlined
                       dense
                       hide-details
@@ -76,25 +79,62 @@
                   </div>
                   <div class="py-2">
                     <p class="text-h6">Image or Video</p>
-                    <v-file-input
-                      v-model="images"
-                      counter
-                      multiple
-                      truncate-length="5"
-                      class="pt-0"
+                    <v-card
+                      outlined
+                      dense
+                      class="rounded-lg"
+                      :class="{ 'grey lighten-2': dragover }"
+                      @drop.prevent="onDrop($event)"
+                      @dragover.prevent="dragover = true"
+                      @dragenter.prevent="dragover = true"
+                      @dragleave.prevent="dragover = false"
                     >
-                      <template #selection="{ text, index, }">
-                        <v-chip
-                          small
-                          text-color="white"
-                          color="#295671"
-                          close
-                          @click:close="removeImage(index)"
+                      <v-card-text>
+                        <v-row
+                          class="d-flex flex-column"
+                          dense
+                          align="center"
+                          justify="center"
                         >
-                          {{ text }}
-                        </v-chip>
-                      </template>
-                    </v-file-input>
+                          <v-icon
+                            :class="[dragover ? 'mt-2, mb-6' : 'mt-5']"
+                            size="60"
+                          >
+                            mdi-cloud-upload
+                          </v-icon>
+                          <p>
+                            Drop your file(s) here, or click to select them.
+                          </p>
+                        </v-row>
+                        <v-virtual-scroll
+                          v-if="images.length > 0"
+                          :items="images"
+                          height="150"
+                          item-height="50"
+                        >
+                          <template #default="{ item }">
+                            <v-list-item :key="item.name">
+                              <v-list-item-content>
+                                <v-list-item-title outlined>
+                                  {{ item.name }}
+                                  <span class="ml-3 text--secondary">
+                                    {{ item.size }} bytes</span
+                                  >
+                                </v-list-item-title>
+                              </v-list-item-content>
+
+                              <v-list-item-action>
+                                <v-btn icon @click.stop="removeFile(item.name)">
+                                  <v-icon> mdi-close-circle </v-icon>
+                                </v-btn>
+                              </v-list-item-action>
+                            </v-list-item>
+
+                            <v-divider></v-divider>
+                          </template>
+                        </v-virtual-scroll>
+                      </v-card-text>
+                    </v-card>
                   </div>
                   <div class="py-2">
                     <v-btn elevation="2" color="teal" outlined @click="addPost"
@@ -114,22 +154,25 @@
           <v-card class="rounded-lg" outlined>
             <v-list-item three-line>
               <v-list-item-content>
-                <h4 class="text-capitalize pb-2">Basic Rules</h4>
-
-                <!-- <v-divider></v-divider> -->
-
-                <div class="subtitle text--disabled py-1">
-                  The Topic where the true asshole-ish nature of all cats is
-                  displayed for the world to see.
+                <h4 class="font-weight-medium mb-3">Basic Rules</h4>
+                <div class="pb-1">
+                  <v-divider />
                 </div>
-                <div class="subtitle text--disabled py-1">
-                  The Topic where the true asshole-ish nature of all cats is
-                  displayed for the world to see.
-                </div>
-                <div class="subtitle text--disabled py-1">
-                  The Topic where the true asshole-ish nature of all cats is
-                  displayed for the world to see.
-                </div>
+                <v-row>
+                  <v-col cols="12">
+                    <section
+                      v-for="(rule, index) in basicRules.split('\n')"
+                      :key="index"
+                    >
+                      <div
+                        class="subtitle-1 font-weight-light py-1"
+                        style="line-height: inherit"
+                      >
+                        {{ rule }}
+                      </div>
+                    </section>
+                  </v-col>
+                </v-row>
               </v-list-item-content>
             </v-list-item>
           </v-card>
@@ -148,12 +191,16 @@ export default {
       selectedTopic: [],
       title: '',
       content: '',
+      dragover: false,
       images: [],
+      multiple: true,
       author: {
         id: 7,
         profile_image: 'https://randomuser.me/api/portraits/women/84.jpg',
         username: 'UniqueUser7',
       },
+      basicRules:
+        '1. Selalu ingat postingan Anda akan dibaca banyak orang\n2. Berperilaku seperti yang Anda lakukan di kehidupan nyata\n3. Cari sumber konten asli\n4. Cari duplikat sebelum memposting\n5. Baca aturan Topik\n',
     }
   },
   computed: {
@@ -165,16 +212,30 @@ export default {
     this.$store.dispatch('lists/fetchTopics')
   },
   methods: {
-    remove(item) {
-      const index = this.selectedTopic.indexOf(item)
-      if (index >= 0) {
-        this.selectedTopic.splice(index, 1)
+    removeFile(fileName) {
+      // Find the index of the
+      const index = this.images.findIndex(
+        file => file.name === fileName
+      );
+      // If file is in uploaded files remove it
+      if (index > -1) this.images.splice(index, 1);
+    },
+    onDrop(e) {
+      this.dragover = false;
+      // If user has uploaded multiple files but the component is not multiple throw error
+      if (!this.multiple && e.dataTransfer.files.length > 1) {
+        this.$store.dispatch("addNotification", {
+          message: "Only one file can be uploaded at a time..",
+          colour: "error"
+        });
       }
+      // Add each file to the array of uploaded files
+      else
+        for (const image of e.dataTransfer.files) {
+          this.images.push(image)
+        }
     },
-    removeImage (index) {
-      this.images.splice(index, 1)
-    },
-    addPost() {},
+    addPost() {}
   },
 }
 </script>
