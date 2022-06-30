@@ -3,17 +3,19 @@
     <v-col cols="7">
       <v-row>
         <v-col cols="12" class="pt-3 py-1">
-          <v-btn
-            outlined
-            block
-            class="rounded-lg text-capitalize"
-            to="/create-post"
-          >
-            <div class="mr-auto">
-              <v-icon>mdi-plus</v-icon>
-              Create New Post
-            </div>
-          </v-btn>
+          <v-card class="rounded-lg mx-auto py-2 px-4" outlined>
+            <v-btn
+              outlined
+              block
+              class="rounded-lg text-capitalize"
+              to="/create-post"
+            >
+              <div class="mr-auto">
+                <v-icon>mdi-plus</v-icon>
+                Create New Post
+              </div>
+            </v-btn>
+          </v-card>
         </v-col>
         <v-col cols="12" class="py-1">
           <v-card class="rounded-lg mx-auto py-3 px-3" outlined>
@@ -26,9 +28,14 @@
                   style="min-width: 0px"
                 >
                   <v-col cols="auto">
-                    <v-spacer />
-                    <v-icon>{{ item.icon }}</v-icon
-                    >{{ item.tab }}
+                    <v-row align="center" justify="center">
+                      <v-col cols="auto">
+                        <v-icon>{{ item.icon }}</v-icon>
+                      </v-col>
+                      <v-col cols="auto">
+                        {{ item.tab }}
+                      </v-col>
+                    </v-row>
                   </v-col>
                 </v-tab>
               </v-tabs>
@@ -62,7 +69,10 @@
       </v-row>
     </v-col>
     <v-col cols="4" style="width: 373.75px">
-      <v-row style="position: fixed; width: inherit">
+      <v-row
+        class="hide-scrollbar"
+        style="position: fixed; width: inherit; height: 86%; overflow-y: scroll"
+      >
         <v-col cols="12" class="pt-3 py-1">
           <v-card class="rounded-lg" outlined>
             <v-list-item three-line>
@@ -70,7 +80,7 @@
                 <h4 class="text-capitalize mb-3">Hot Topic</h4>
                 <v-row>
                   <v-col
-                    v-for="(topic, index) in topics"
+                    v-for="(topic, index) in topicsToBeShown"
                     :key="topic.id"
                     cols="12"
                   >
@@ -99,10 +109,8 @@
                                 width="30"
                               ></v-img>
                             </v-col>
-                            <v-col class="pl-0">
-                              <div class="text-overline">
-                                {{ topic.name }}
-                              </div>
+                            <v-col class="pl-0" align-self="center">
+                              <TopicShortener :name="topic.name" />
                             </v-col>
                           </v-row>
                         </router-link>
@@ -111,6 +119,21 @@
                         <v-btn class="text-capitalize">Follow</v-btn>
                       </v-col>
                     </v-row>
+                  </v-col>
+                </v-row>
+                <v-row justify="center" align="center">
+                  <v-col v-show="currentTopicPage != 1" cols="auto">
+                    <span class="click-cursor" @click="prevTopicPage">
+                      View Less
+                    </span>
+                  </v-col>
+                  <v-col
+                    v-show="currentTopicPage != totalTopicPages"
+                    cols="auto"
+                  >
+                    <span class="click-cursor" @click="nextTopicPage">
+                      View More
+                    </span>
                   </v-col>
                 </v-row>
               </v-list-item-content>
@@ -124,7 +147,7 @@
                 <h4 class="text-capitalize mb-3">Hot Contributors</h4>
                 <v-row>
                   <v-col
-                    v-for="(contributor, index) in users"
+                    v-for="(contributor, index) in usersToBeShown"
                     :key="contributor.id"
                     cols="12"
                   >
@@ -140,9 +163,7 @@
                               class="pr-0"
                               style="max-width: 2rem"
                             >
-                              <div class="text-overline">
-                                {{ index + 1 }}.
-                              </div>
+                              <div class="text-overline">{{ index + 1 }}.</div>
                             </v-col>
                             <v-col
                               cols="1"
@@ -156,9 +177,7 @@
                               ></v-img>
                             </v-col>
                             <v-col class="pl-0" align-self="center">
-                              <div class="text-p">
-                                @{{ contributor.username }}
-                              </div>
+                              <NameShortener :username="contributor.username" />
                             </v-col>
                           </v-row>
                         </router-link>
@@ -167,6 +186,18 @@
                         <v-btn class="text-capitalize">Follow</v-btn>
                       </v-col>
                     </v-row>
+                  </v-col>
+                </v-row>
+                <v-row justify="center" align="center">
+                  <v-col v-show="currentUserPage != 1" cols="auto">
+                    <span class="click-cursor" @click="prevUserPage">
+                      View Less
+                    </span>
+                  </v-col>
+                  <v-col v-show="currentUserPage != totalUserPages" cols="auto">
+                    <span class="click-cursor" @click="nextUserPage">
+                      View More
+                    </span>
                   </v-col>
                 </v-row>
               </v-list-item-content>
@@ -202,12 +233,16 @@
 </template>
 
 <script>
-import PostCard from "~/components/cards/PostCard"
+import PostCard from '~/components/cards/PostCard'
+import TopicShortener from '~/components/utils/TopicShortener'
+import NameShortener from '~/components/utils/NameShortener'
 
 export default {
   name: 'IndexPage',
   components: {
     PostCard,
+    TopicShortener,
+    NameShortener,
   },
   middleware: 'authenticated',
   props: {
@@ -219,7 +254,12 @@ export default {
   data() {
     return {
       tab: null,
-      items: [{ tab: 'Rekomendasi', icon: 'mdi-fire' }, { tab: 'Mengikuti' }],
+      items: [
+        { tab: 'Rekomendasi', icon: 'mdi-fire' },
+        { tab: 'Mengikuti', icon: 'mdi-account' },
+      ],
+      currentTopicPage: 1,
+      currentUserPage: 1,
     }
   },
   computed: {
@@ -237,15 +277,22 @@ export default {
       return this.$store.state.lists.threads
     },
     topics() {
-      // if (this.searchPost) {
-      //   return this.$store.state.topics.lists.filter((item) => {
-      //     return item.name.toLowerCase().includes(this.searchPost.toLowerCase())
-      //   })
-      // }
       return this.$store.state.lists.topics
+    },
+    topicsToBeShown() {
+      return this.topics.slice(0, this.currentTopicPage * 5)
+    },
+    totalTopicPages() {
+      return Math.ceil(this.topics.length / 5)
     },
     users() {
       return this.$store.state.lists.users
+    },
+    usersToBeShown() {
+      return this.users.slice(0, this.currentUserPage * 5)
+    },
+    totalUserPages() {
+      return Math.ceil(this.users.length / 5)
     },
   },
   created() {
@@ -253,10 +300,34 @@ export default {
     this.$store.dispatch('lists/fetchTopics')
     this.$store.dispatch('lists/fetchUsers')
   },
+  methods: {
+    nextTopicPage() {
+      if (this.currentTopicPage < this.totalTopicPages) this.currentTopicPage++
+    },
+    prevTopicPage() {
+      this.currentTopicPage = this.currentTopicPage - 1 || 1
+    },
+    nextUserPage() {
+      if (this.currentUserPage < this.totalUserPages) this.currentUserPage++
+    },
+    prevUserPage() {
+      this.currentUserPage = this.currentUserPage - 1 || 1
+    },
+  },
 }
 </script>
 
 <style scoped>
+.hide-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+.hide-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.click-cursor {
+  cursor: pointer;
+}
 .image-rounded.theme--dark {
   border-radius: 50%;
 }

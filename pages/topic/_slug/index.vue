@@ -137,7 +137,7 @@
                         class="py-0"
                       >
                         <div class="pb-1 text-p">
-                          @{{ contributor.username }}
+                          <NameShortener :username="contributor.username"/>
                         </div>
                       </v-col>
                     </v-row>
@@ -204,13 +204,15 @@
 
 <script>
 import CurrentTopic from "~/components/cards/CurrentTopic"
-import PostCard from "~/components/cards/PostCard"
+import PostCard from "~/components/cards/PostCard";
+import NameShortener from "~/components/utils/NameShortener"
 
 export default {
   name: 'IndexPage',
   components: {
     CurrentTopic,
-    PostCard
+    PostCard,
+    NameShortener
   },
   middleware: 'authenticated',
   props: {

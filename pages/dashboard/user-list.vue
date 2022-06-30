@@ -33,20 +33,16 @@
                   max-width="25"
                   class="rounded-circle"
                 ></v-img>
-                <span class="px-2">{{ item.username }}</span>
+                <span class="px-2"
+                  ><NameShortener :username="item.username"
+                /></span>
               </div>
             </template>
             <template #[`item.created_at`]="{ item }">
-              <span>{{
-                months[new Date(String(item.created_at)).getMonth()] +
-                ' ' +
-                new Date(String(item.created_at)).getDate() +
-                ', ' +
-                new Date(String(item.created_at)).getFullYear()
-              }}</span>
+              <DateShortener :date="item.created_at" />
             </template>
             <template #[`item.followers`]="{ item }">
-              <span>{{ item.followers | abbr }}</span>
+              <FollowerShortener :follower="item.followers" />
             </template>
             <template #[`item.status`]="{ item }">
               <v-chip color="green" outlined>
@@ -61,16 +57,16 @@
 </template>
 
 <script>
+import NameShortener from '~/components/utils/NameShortener'
+import DateShortener from '~/components/utils/DateShortener'
+import FollowerShortener from '~/components/utils/FollowerShortener'
+
 export default {
   name: 'UserList',
-  filters: {
-    abbr(num) {
-      if (String(num).length < 7) {
-        return Math.floor(num / 1000) + 'k'
-      } else {
-        return Math.floor(num / 1000000) + 'm'
-      }
-    },
+  components: {
+    NameShortener,
+    DateShortener,
+    FollowerShortener,
   },
   data() {
     return {
@@ -87,29 +83,10 @@ export default {
         { text: 'Followers', align: 'center', value: 'followers' },
         { text: 'Likes Received', align: 'center', value: 'likes' },
       ],
-      months: [
-        'Jan',
-        'Feb',
-        'Mar',
-        'Apr',
-        'May',
-        'Jun',
-        'Jul',
-        'Aug',
-        'Sep',
-        'Oct',
-        'Nov',
-        'Des',
-      ],
     }
   },
   computed: {
     users() {
-      // return this.$store.state.lists.users.filter((item) => {
-      //   return item.username
-      //     .toLowerCase()
-      //     .includes(this.$route.params.slug.toLowerCase())
-      // })
       return this.$store.state.lists.users
     },
   },

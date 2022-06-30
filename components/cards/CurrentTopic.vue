@@ -9,64 +9,41 @@
     </div>
     <div class="py-1">
       <h3>
-        {{ topic.name }}
+        <TopicShortener :name="topic.name" />
       </h3>
     </div>
     <div class="subtitle-1 font-weight-light py-1" style="line-height: inherit">
       {{ topic.description }}
     </div>
     <div class="py-1">
-      <h4>{{ topic.followers | abbr }} Followers</h4>
+      <h4><FollowerShortener :follower="topic.followers" /> Followers</h4>
     </div>
     <div class="py-1">
-      <h4>{{ topic.followers | abbr }} Total Posts</h4>
+      <h4><FollowerShortener :follower="topic.followers" /> Total Posts</h4>
     </div>
     <div class="subtitle-1 font-weight-light py-1" style="line-height: inherit">
       Created
-      {{
-        months[new Date(String(topic.created_at)).getMonth()] + ' ' +
-        new Date(String(topic.created_at)).getDate() +
-        ', ' +
-        new Date(String(topic.created_at)).getFullYear()
-      }}
+      <DateShortener :date="topic.created_at"/>
     </div>
   </div>
 </template>
 
 <script>
+import TopicShortener from '~/components/utils/TopicShortener'
+import DateShortener from '~/components/utils/DateShortener'
+import FollowerShortener from '~/components/utils/FollowerShortener'
+
 export default {
-  filters: {
-    abbr(num) {
-      if (String(num).length < 7) {
-        return Math.floor(num / 1000) + 'k'
-      } else {
-        return Math.floor(num / 1000000) + 'm'
-      }
-    },
+  components: {
+    TopicShortener,
+    DateShortener,
+    FollowerShortener
   },
   props: {
     topic: {
       type: Object,
       required: true,
     },
-  },
-  data() {
-    return {
-      months: [
-        'Jan',
-        'Feb',
-        'Mar',
-        'Apr',
-        'May',
-        'Jun',
-        'Jul',
-        'Aug',
-        'Sep',
-        'Oct',
-        'Nov',
-        'Des',
-      ],
-    }
   },
 }
 </script>

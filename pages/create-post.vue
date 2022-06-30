@@ -4,45 +4,79 @@
       <h3 class="headline mb-3">Create Post</h3>
       <v-row>
         <v-col cols="auto" class="pb-1">
-          <v-autocomplete
+          <v-select
             v-model="selectedTopic"
             :items="topics"
             item-text="name"
             item-value="name"
-            placeholder="Create Topic"
+            label="Choose Topic"
             class="rounded-lg"
-            outlined
+            menu-props="{ top: true, offsetY: true }"
             dense
-            hide-details
+            outlined
+            style="width: 321px"
           >
-            <template #selection="data">
-              <v-chip
-                v-bind="data.attrs"
-                :input-value="data.selected"
-                @click="data.select"
-              >
-                <v-avatar left>
-                  <v-img :src="data.item.profile_image"></v-img>
-                </v-avatar>
-                {{ data.item.name }}
-              </v-chip>
+            <div slot="prepend-item" class="px-3 py-1">
+              <v-text-field
+                v-model="search"
+                clearable
+                outlined
+                dense
+                flat
+                hide-details
+                class="rounded-lg"
+                prepend-inner-icon="mdi-magnify"
+                label="Search"
+              ></v-text-field>
+              <v-list-item-title
+                class="text--disabled body-2"
+                v-text="`Following`"
+              />
+            </div>
+            <div slot="append-item" class="px-3 py-1">
+              <v-card class="rounded-lg" outlined dense @click="dialog = true">
+                <v-list-item>
+                  <v-list-item-content>
+                    <v-row align="center">
+                      <v-col cols="auto">
+                        <v-icon>mdi-plus</v-icon>
+                      </v-col>
+                      <v-col cols="auto"> Tambah Topic </v-col>
+                    </v-row>
+                  </v-list-item-content>
+                </v-list-item>
+              </v-card>
+            </div>
+            <template slot="selection" slot-scope="data">
+              <v-row v-row align="center" class="pa-1">
+                <v-col cols="auto" class="pa-1">
+                  <v-img
+                    :src="data.item.profile_image"
+                    class="rounded-circle"
+                    width="30"
+                  ></v-img>
+                </v-col>
+                <v-col cols="auto" class="pa-1">
+                  <TopicShortener :name="data.item.name" />
+                </v-col>
+              </v-row>
             </template>
-            <template #item="data">
-              <template v-if="data.item.length === 0">
-                <v-list-item-content v-text="data.item"></v-list-item-content>
-              </template>
-              <template v-else>
-                <v-list-item-avatar>
-                  <img :src="data.item.profile_image" />
-                </v-list-item-avatar>
-                <v-list-item-content>
-                  <v-list-item-title
-                    v-html="data.item.name"
-                  ></v-list-item-title>
-                </v-list-item-content>
-              </template>
+            <template slot="item" slot-scope="data">
+              <v-row align="center" class="pa-1">
+                <v-col cols="auto" class="pa-1">
+                  <v-img
+                    :src="data.item.profile_image"
+                    class="rounded-circle"
+                    width="30"
+                  ></v-img>
+                </v-col>
+                <v-col cols="auto" class="pa-1">
+                  <TopicShortener :name="data.item.name" />
+                </v-col>
+              </v-row>
             </template>
-          </v-autocomplete>
+          </v-select>
+          <AddTopic v-model="dialog"/>
         </v-col>
         <v-col cols="12" class="py-1 my-1">
           <v-card class="rounded-lg mx-auto py-3 px-3" outlined>
@@ -183,15 +217,24 @@
 </template>
 
 <script>
+import AddTopic from '~/components/cards/AddTopic'
+import TopicShortener from '~/components/utils/TopicShortener'
+
 export default {
   name: 'CreatePost',
+  components: {
+    AddTopic,
+    TopicShortener
+  },
   middleware: 'authenticated',
   data() {
     return {
       selectedTopic: [],
       title: '',
       content: '',
+      search: '',
       dragover: false,
+      dialog: false,
       images: [],
       multiple: true,
       author: {
@@ -205,6 +248,11 @@ export default {
   },
   computed: {
     topics() {
+      if (this.search) {
+        return this.$store.state.lists.topics.filter((item) => {
+          return item.name.toLowerCase().includes(this.search.toLowerCase())
+        })
+      }
       return this.$store.state.lists.topics
     },
   },
@@ -214,20 +262,18 @@ export default {
   methods: {
     removeFile(fileName) {
       // Find the index of the
-      const index = this.images.findIndex(
-        file => file.name === fileName
-      );
+      const index = this.images.findIndex((file) => file.name === fileName)
       // If file is in uploaded files remove it
-      if (index > -1) this.images.splice(index, 1);
+      if (index > -1) this.images.splice(index, 1)
     },
     onDrop(e) {
-      this.dragover = false;
+      this.dragover = false
       // If user has uploaded multiple files but the component is not multiple throw error
       if (!this.multiple && e.dataTransfer.files.length > 1) {
-        this.$store.dispatch("addNotification", {
-          message: "Only one file can be uploaded at a time..",
-          colour: "error"
-        });
+        this.$store.dispatch('addNotification', {
+          message: 'Only one file can be uploaded at a time..',
+          colour: 'error',
+        })
       }
       // Add each file to the array of uploaded files
       else
@@ -235,7 +281,7 @@ export default {
           this.images.push(image)
         }
     },
-    addPost() {}
+    addPost() {},
   },
 }
 </script>

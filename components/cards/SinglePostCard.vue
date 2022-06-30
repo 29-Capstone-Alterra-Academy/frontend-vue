@@ -15,7 +15,7 @@
               :to="`/topic/${thread.topic.name}`"
               style="text-decoration: none; color: black"
             >
-              {{ thread.topic.name }}
+              <TopicShortener :name="thread.topic.name" />
             </router-link>
           </v-col>
           <v-col>
@@ -23,8 +23,8 @@
               <small class="text--disabled"
                 >diposting oleh
                 <router-link :to="`/user/${thread.author.username}`"
-                  >@{{ thread.author.username }}</router-link
-                >
+                  ><NameShortener :username="thread.author.username"
+                /></router-link>
                 {{ timepost }} yang lalu</small
               >
             </div>
@@ -43,7 +43,7 @@
                       v-bind="attrs"
                       v-on="on"
                     >
-                      ...
+                      ···
                     </p>
                   </template>
                   <v-list class="pa-0">
@@ -93,15 +93,17 @@
     <v-card-actions class="pa-0">
       <v-list-item>
         <v-list-item-content>
-          <v-col cols="5" class="pa-0">
+          <v-col cols="4" class="pa-0">
             <v-row justify="center">
               <v-col>
                 <v-row align="center">
-                  <v-col class="pr-0">
+                  <v-col cols="auto" class="pr-2">
                     <v-icon>mdi-thumb-up-outline</v-icon>
                   </v-col>
-                  <v-col class="pl-0">
-                    <p class="ma-0" style="width: 50%; display: inline">50</p>
+                  <v-col cols="auto" class="pl-2">
+                    <p class="ma-0" style="width: 50%; display: inline">
+                      <FollowerShortener :follower="50" />
+                    </p>
                   </v-col>
                 </v-row>
               </v-col>
@@ -111,7 +113,7 @@
             </v-row>
             <v-row>
               <v-col>
-                <p>3 komentar</p>
+                <p><FollowerShortener :follower="3" /> komentar</p>
               </v-col>
             </v-row>
           </v-col>
@@ -183,6 +185,11 @@
               <v-btn class="text-capitalize">Comment</v-btn>
             </v-col>
           </v-row>
+          <div>
+            <v-col v-for="reply in replies" :key="reply.id">
+              <CommentCard :reply="reply" />
+            </v-col>
+          </div>
         </v-list-item-content>
       </v-list-item>
     </v-card-actions>
@@ -190,7 +197,18 @@
 </template>
 
 <script>
+import CommentCard from '~/components/cards/CommentCard'
+import TopicShortener from '~/components/utils/TopicShortener'
+import NameShortener from '~/components/utils/NameShortener'
+import FollowerShortener from '~/components/utils/FollowerShortener'
+
 export default {
+  components: {
+    CommentCard,
+    TopicShortener,
+    NameShortener,
+    FollowerShortener,
+  },
   props: {
     thread: {
       type: Object,
@@ -232,6 +250,12 @@ export default {
       }
       return Math.floor(seconds) + ' detik'
     },
+    replies() {
+      return this.$store.state.lists.replies
+    },
+  },
+  created() {
+    this.$store.dispatch('lists/fetchReplies')
   },
   methods: {
     removeImage(index) {

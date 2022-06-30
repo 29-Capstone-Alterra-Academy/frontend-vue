@@ -2,6 +2,7 @@ const state = () => ({
   threads: [],
   topics: [],
   users: [],
+  replies: [],
 })
 
 const mutations = {
@@ -13,6 +14,9 @@ const mutations = {
   },
   setUsers(state, users) {
     state.users = [...users]
+  },
+  setReplies(state, replies) {
+    state.replies = [...replies]
   },
 }
 
@@ -42,6 +46,16 @@ const actions = {
       .get('/users')
       .then((res) => {
         commit('setUsers', res.data)
+      })
+      .catch((err) => {
+        console.log(err)
+      })
+  },
+  fetchReplies({ commit }) {
+    this.$axios
+      .get('/replies')
+      .then((res) => {
+        commit('setReplies', res.data)
       })
       .catch((err) => {
         console.log(err)

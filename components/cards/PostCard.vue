@@ -15,7 +15,7 @@
               :to="`/topic/${thread.topic.name}`"
               style="text-decoration: none; color: black"
             >
-              {{ thread.topic.name }}
+              <TopicShortener :name="thread.topic.name"/>
             </router-link>
           </v-col>
           <v-col>
@@ -23,7 +23,7 @@
               <small class="text--disabled"
                 >diposting oleh
                 <router-link :to="`/user/${thread.author.username}`"
-                  >@{{ thread.author.username }}</router-link
+                  ><NameShortener :username="thread.author.username"/></router-link
                 >
                 {{ timepost }} yang lalu</small
               >
@@ -65,14 +65,12 @@
       <v-list-item>
         <v-list-item-content>
           <v-col cols="5" class="pa-0">
-            <v-row>
-              <v-col justify="center">
-                <v-icon>mdi-heart</v-icon>
-                <p class="ma-0" style="width: 50%; display: inline">50</p>
+            <v-row align="center">
+              <v-col cols="auto" justify="center">
+                <p class="ma-0" style="width: 50%; display: inline"><FollowerShortener :follower="50"/> Likes</p>
               </v-col>
-              <v-col justify="center">
-                <v-icon>mdi-message-processing</v-icon>
-                <p class="ma-0" style="width: 50%; display: inline">50</p>
+              <v-col cols="auto" justify="center">
+                <p class="ma-0" style="width: 50%; display: inline"><FollowerShortener :follower="50"/> Comments</p>
               </v-col>
               <v-col>
                 <v-menu offset-y>
@@ -83,7 +81,7 @@
                       v-bind="attrs"
                       v-on="on"
                     >
-                      ...
+                      ···
                     </p>
                   </template>
                   <v-list class="pa-0">
@@ -107,7 +105,16 @@
 </template>
 
 <script>
+import TopicShortener from '~/components/utils/TopicShortener'
+import NameShortener from '~/components/utils/NameShortener'
+import FollowerShortener from '~/components/utils/FollowerShortener'
+
 export default {
+  components: {
+    TopicShortener,
+    NameShortener,
+    FollowerShortener
+  },
   props: {
     thread: {
       type: Object,
@@ -152,7 +159,7 @@ export default {
   },
   methods: {
     toDetails(id) {
-      this.$router.push(`/dashboard/${id}`)
+      this.$router.push(`/post/${id}`)
     },
     removeImage(index) {
       this.images.splice(index, 1)

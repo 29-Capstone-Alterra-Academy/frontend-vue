@@ -21,17 +21,14 @@
             ></v-text-field>
           </v-card-title>
           <v-data-table :headers="headers" :search="search" :items="topics">
+            <template #[`item.name`]="{ item }">
+              <TopicShortener :name="item.name"/>
+            </template>
             <template #[`item.followers`]="{ item }">
-              <span>{{ item.followers | abbr }}</span>
+              <FollowerShortener :follower="item.followers"/>
             </template>
             <template #[`item.created_at`]="{ item }">
-              <span>{{
-                months[new Date(String(item.created_at)).getMonth()] +
-                ' ' +
-                new Date(String(item.created_at)).getDate() +
-                ', ' +
-                new Date(String(item.created_at)).getFullYear()
-              }}</span>
+              <DateShortener :date="item.created_at"/>
             </template>
             <template #[`item.details`]="{ item }">
               <v-btn class="mx-2" @click="detailsItem(item)"> Details </v-btn>
@@ -44,16 +41,16 @@
 </template>
 
 <script>
+import TopicShortener from '~/components/utils/TopicShortener'
+import DateShortener from '~/components/utils/DateShortener'
+import FollowerShortener from '~/components/utils/FollowerShortener'
+
 export default {
   name: 'TopicList',
-  filters: {
-    abbr(num) {
-      if (String(num).length < 7) {
-        return Math.floor(num / 1000) + 'k'
-      } else {
-        return Math.floor(num / 1000000) + 'm'
-      }
-    },
+  components: {
+    TopicShortener,
+    DateShortener,
+    FollowerShortener
   },
   data() {
     return {
@@ -69,20 +66,6 @@ export default {
         { text: 'Total Post', value: 'total_post', align: 'center' },
         { text: 'Followers', value: 'followers', align: 'center' },
         { text: 'Actions', value: 'details', align: 'center', sortable: false },
-      ],
-      months: [
-        'Jan',
-        'Feb',
-        'Mar',
-        'Apr',
-        'May',
-        'Jun',
-        'Jul',
-        'Aug',
-        'Sep',
-        'Oct',
-        'Nov',
-        'Des',
       ],
     }
   },

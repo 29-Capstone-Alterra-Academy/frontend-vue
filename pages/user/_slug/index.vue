@@ -49,7 +49,11 @@
             </section>
             <section v-if="item.tab == `Terbaru`">
               <v-col
-                v-for="(thread, index) in orderThreads.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())"
+                v-for="(thread, index) in orderThreads.sort(
+                  (a, b) =>
+                    new Date(b.created_at).getTime() -
+                    new Date(a.created_at).getTime()
+                )"
                 :key="index"
                 cols="12"
                 class="py-1"
@@ -62,7 +66,10 @@
       </v-row>
     </v-col>
     <v-col cols="4" style="width: 373.75px">
-      <v-row style="position: fixed; width: inherit">
+      <v-row
+        class="hide-scrollbar"
+        style="position: fixed; width: inherit; height: 86%; overflow-y: scroll"
+      >
         <v-col cols="12" class="pt-3 py-1">
           <v-card class="rounded-lg" outlined>
             <v-list-item three-line>
@@ -85,30 +92,30 @@
                     </v-col>
                     <v-col cols="auto" class="pl-0">
                       <div class="text-overline">
-                        {{ user.username }}
+                        <NameShortener :username="user.username" />
                       </div>
                     </v-col>
                     <v-col cols="2" style="max-width: 10rem">
                       <v-btn class="text-capitalize">Follow</v-btn>
                     </v-col>
                     <div class="py-1">
-                      <h4>{{ user.followers | abbr }} Followers</h4>
+                      <h4>
+                        <FollowerShortener :follower="user.followers" />
+                        Followers
+                      </h4>
                     </div>
                     <div class="py-1">
-                      <h4>{{ user.followers | abbr }} Total Posts</h4>
+                      <h4>
+                        <FollowerShortener :follower="user.followers" /> Total
+                        Posts
+                      </h4>
                     </div>
                     <div
                       class="subtitle-1 font-weight-light py-1"
                       style="line-height: inherit"
                     >
                       Joined
-                      {{
-                        months[new Date(String(user.created_at)).getMonth()] +
-                        ' ' +
-                        new Date(String(user.created_at)).getDate() +
-                        ', ' +
-                        new Date(String(user.created_at)).getFullYear()
-                      }}
+                      <DateShortener :date="user.created_at" />
                     </div>
                   </v-col>
                 </v-row>
@@ -136,7 +143,7 @@
                       </v-col>
                       <v-col class="pl-0">
                         <div class="text-overline">
-                          {{ topic.name }}
+                          <TopicShortener :name="topic.name" />
                         </div>
                       </v-col>
                       <v-col cols="2" style="max-width: 10rem">
@@ -178,21 +185,20 @@
 </template>
 
 <script>
-import PostCard from "~/components/cards/PostCard"
+import PostCard from '~/components/cards/PostCard'
+import TopicShortener from '~/components/utils/TopicShortener'
+import NameShortener from '~/components/utils/NameShortener'
+import DateShortener from '~/components/utils/DateShortener'
+import FollowerShortener from '~/components/utils/FollowerShortener'
 
 export default {
   name: 'IndexPage',
   components: {
-    PostCard
-  },
-  filters: {
-    abbr(num) {
-      if (String(num).length < 7) {
-        return Math.floor(num / 1000) + 'k'
-      } else {
-        return Math.floor(num / 1000000) + 'm'
-      }
-    },
+    PostCard,
+    TopicShortener,
+    NameShortener,
+    DateShortener,
+    FollowerShortener,
   },
   middleware: 'authenticated',
   props: {
@@ -205,20 +211,6 @@ export default {
     return {
       tab: null,
       items: [{ tab: 'Terpopuler', icon: 'mdi-fire' }, { tab: 'Terbaru' }],
-      months: [
-        'Jan',
-        'Feb',
-        'Mar',
-        'Apr',
-        'May',
-        'Jun',
-        'Jul',
-        'Aug',
-        'Sep',
-        'Oct',
-        'Nov',
-        'Des',
-      ],
     }
   },
   computed: {
@@ -267,11 +259,6 @@ export default {
       })
     },
     topics() {
-      // if (this.searchPost) {
-      //   return this.$store.state.topics.lists.filter((item) => {
-      //     return item.name.toLowerCase().includes(this.searchPost.toLowerCase())
-      //   })
-      // }
       return this.$store.state.lists.topics
     },
     users() {
@@ -291,6 +278,13 @@ export default {
 </script>
 
 <style scoped>
+.hide-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+.hide-scrollbar::-webkit-scrollbar {
+  display: none;
+}
 .image-rounded.theme--dark {
   border-radius: 50%;
 }
