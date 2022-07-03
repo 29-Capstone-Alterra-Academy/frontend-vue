@@ -15,7 +15,7 @@
         Users
       </p>
     </v-btn>
-    <v-btn v-if="isMale" link text to="/banned">
+    <v-btn v-if="isMale" link text to="/dashboard/banned-list">
       <p class="font-weight-medium ma-2 text-capitalize" style="color: black">
         Banned
       </p>

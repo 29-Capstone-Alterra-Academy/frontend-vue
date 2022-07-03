@@ -18,11 +18,7 @@
 
     <v-app-bar app clipped fixed class="">
       <v-toolbar-title>
-        <v-img
-          src="/Logo.svg"
-          class=""
-          width="110"
-        ></v-img>
+        <v-img src="/Logo.svg" class="" width="110"></v-img>
       </v-toolbar-title>
       <v-spacer />
       <v-app-bar-nav-icon
@@ -128,14 +124,14 @@
 
 <script>
 import { mapMutations } from 'vuex'
-import AuthButton from "~/components/navbar/AuthButton";
-import AuthButtonSide from "~/components/navbar/AuthButtonSide";
+import AuthButton from '~/components/navbar/AuthButton'
+import AuthButtonSide from '~/components/navbar/AuthButtonSide'
 
 export default {
   name: 'DefaultLayout',
   components: {
     AuthButton,
-    AuthButtonSide
+    AuthButtonSide,
   },
   middleware: 'authenticated',
   model: {
@@ -169,7 +165,7 @@ export default {
         {
           icon: 'mdi-palette',
           title: 'Ranking',
-          to: '/search',
+          to: '/ranking',
         },
       ],
       miniVariant: false,
