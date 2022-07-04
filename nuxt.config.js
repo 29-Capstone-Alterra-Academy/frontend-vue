@@ -48,7 +48,7 @@ export default {
   // Axios module configuration: https://go.nuxtjs.dev/config-axios
   axios: {
     // Workaround to avoid enforcing hard-coded localhost:3000: https://github.com/nuxt-community/axios-module/issues/308
-    baseURL: 'https://nomizo-json-server.herokuapp.com/',
+    baseURL: '/',
   },
 
   // PWA module configuration: https://go.nuxtjs.dev/pwa
@@ -62,9 +62,9 @@ export default {
   vuetify: {
     customVariables: ['~/assets/variables.scss'],
     theme: {
-      light: true,
+      dark: true,
       themes: {
-        light: {
+        dark: {
           primary: colors.blue.darken2,
           accent: colors.grey.darken3,
           secondary: colors.amber.darken3,
@@ -74,12 +74,6 @@ export default {
           success: colors.green.accent3,
         },
       },
-    },
-    treeShake: true,
-    defaultAssets: {
-      font: {
-        family: 'Inter'
-      }
     },
   },
 
