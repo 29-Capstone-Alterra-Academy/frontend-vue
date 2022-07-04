@@ -31,7 +31,7 @@
               <DateShortener :date="item.created_at"/>
             </template>
             <template #[`item.details`]="{ item }">
-              <v-btn class="mx-2" @click="detailsItem(item)"> Details </v-btn>
+              <v-btn class="mx-2" @click="$router.push(`/topic/${item.name}/details`)"> Details </v-btn>
             </template>
           </v-data-table>
         </v-card>

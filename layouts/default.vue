@@ -37,6 +37,13 @@
                   <v-row align="center" class="pa-0">
                     <v-col cols="1" class="pa-0" style="max-width: none">
                       <v-img
+                        v-if="profile.profile_image != null"
+                        :src="profile.profile_image"
+                        class="rounded-circle"
+                        width="30"
+                      ></v-img>
+                      <v-img
+                        v-else
                         src="https://randomuser.me/api/portraits/women/84.jpg"
                         class="rounded-circle"
                         width="30"
@@ -74,7 +81,7 @@
               />
             </v-list-item-content>
           </v-list-item>
-          <v-list-item to="/">
+          <v-list-item to="/my">
             <v-list-item-content>
               <v-list-item-title class="body-1" v-text="`Profile`" />
             </v-list-item-content>
@@ -123,7 +130,6 @@
 </template>
 
 <script>
-import { mapMutations } from 'vuex'
 import AuthButton from '~/components/navbar/AuthButton'
 import AuthButtonSide from '~/components/navbar/AuthButtonSide'
 
@@ -133,7 +139,6 @@ export default {
     AuthButton,
     AuthButtonSide,
   },
-  middleware: 'authenticated',
   model: {
     prop: 'value',
     event: 'input',
@@ -189,26 +194,14 @@ export default {
       return this.$store.state.lists.topics
     },
     profile() {
-      return this.$store.state.auth.profile
+      return this.$store.state.lists.profile
     },
   },
   created() {
     this.$store.dispatch('lists/fetchThreads')
     this.$store.dispatch('lists/fetchTopics')
     this.$store.dispatch('lists/fetchUsers')
-  },
-  methods: {
-    ...mapMutations('auth', ['logout']),
-    handleLogout() {
-      fetch('https://virtserver.swaggerhub.com/etrnal70/nomizo/1.0.0/logout', {
-        method: 'POST',
-        headers: {
-          accept: '*/*',
-        },
-      })
-      this.logout()
-      this.$forceUpdate()
-    },
+    this.$store.dispatch('lists/loggedUser')
   },
 }
 </script>

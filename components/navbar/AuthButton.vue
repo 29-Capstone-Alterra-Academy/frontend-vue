@@ -35,14 +35,7 @@ export default {
     },
   },
   computed: {
-    ...mapGetters('auth', ['isMale']),
-    userState() {
-      if (this.$store.getters.auth.isLoggedIn) {
-        return this.$store.state.auth.username
-      } else {
-        return null
-      }
-    },
+    ...mapGetters('lists', ['isMale']),
   },
 }
 </script>

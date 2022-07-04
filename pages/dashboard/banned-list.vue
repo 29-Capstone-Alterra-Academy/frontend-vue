@@ -137,7 +137,7 @@
                   <template #[`item.details`]="{ item }">
                     <v-btn
                       class="text-capitalize mx-2"
-                      @click="topicDetails(item)"
+                      @click="$router.push(`/topic/${item.name}/details`)"
                     >
                       Details
                     </v-btn>
@@ -272,12 +272,14 @@
 <script>
 import TopicShortener from '~/components/utils/TopicShortener'
 import NameShortener from '~/components/utils/NameShortener'
+import FollowerShortener from '~/components/utils/FollowerShortener'
 
 export default {
   name: 'BannedList',
   components: {
     TopicShortener,
     NameShortener,
+    FollowerShortener
   },
   filters: {
     timepost(date) {

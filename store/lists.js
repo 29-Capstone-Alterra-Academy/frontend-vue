@@ -1,8 +1,11 @@
+import axios from 'axios'
+
 const state = () => ({
   threads: [],
   topics: [],
   users: [],
   replies: [],
+  profile: [],
 })
 
 const mutations = {
@@ -17,6 +20,9 @@ const mutations = {
   },
   setReplies(state, replies) {
     state.replies = [...replies]
+  },
+  setProfile(state, profile) {
+    state.profile = profile
   },
 }
 
@@ -61,6 +67,27 @@ const actions = {
         console.log(err)
       })
   },
+  loggedUser({ commit, rootState }) {
+    axios
+      .get('https://staking-spade-production.up.railway.app/profile', {
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: 'Bearer ' + rootState.auth.accessToken,
+        },
+      })
+      .then((response) => {
+        commit('setProfile', response.data)
+      })
+      .catch((error) => {
+        console.log(error)
+      })
+  },
+}
+
+const getters = {
+  isMale(state) {
+    return state.profile.username !== null
+  },
 }
 
 export default {
@@ -68,4 +95,5 @@ export default {
   state,
   mutations,
   actions,
+  getters,
 }

@@ -26,13 +26,6 @@ export default {
   },
   computed: {
     ...mapGetters('auth', ["isLoggedIn"]),
-    userState() {
-      if (this.$store.getters.auth.isLoggedIn) {
-        return this.$store.state.auth.username
-      } else {
-        return null
-      }
-    },
   },
 }
 </script>
