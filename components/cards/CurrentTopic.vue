@@ -16,10 +16,10 @@
       {{ topic.description }}
     </div>
     <div class="py-1">
-      <h4><FollowerShortener :follower="topic.followers" /> Followers</h4>
+      <h4><FollowerShortener :follower="topic.contributor_count" /> Followers</h4>
     </div>
     <div class="py-1">
-      <h4><FollowerShortener :follower="topic.followers" /> Total Posts</h4>
+      <h4><FollowerShortener :follower="topic.activity_count" /> Total Posts</h4>
     </div>
     <div class="subtitle-1 font-weight-light py-1" style="line-height: inherit">
       Created

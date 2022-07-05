@@ -13,14 +13,18 @@
                 ></v-img>
               </v-col>
               <v-col cols="auto">
-                <TopicShortener :name="topic.name"/>
+                <TopicShortener :name="topic.name" />
               </v-col>
               <v-col cols="auto" style="max-width: 10rem">
                 <v-btn class="text-capitalize">Follow</v-btn>
               </v-col>
               <v-spacer />
               <v-col cols="auto" style="max-width: 10rem">
-                <v-btn class="text-capitalize" @click="$router.push(`/topic/${$route.params.slug}/details`)">Details</v-btn>
+                <v-btn
+                  class="text-capitalize"
+                  @click="$router.push(`/topic/${$route.params.slug}/details`)"
+                  >Details</v-btn
+                >
               </v-col>
             </v-row>
           </v-card>
@@ -72,30 +76,32 @@
                 </v-row>
               </v-card>
             </v-col>
-            <v-tabs-items v-model="tab">
-              <v-tab-item v-for="item in items" :key="item.tab">
-                <section v-if="item.tab == `Rekomendasi`">
-                  <v-col
-                    v-for="thread in threads"
-                    :key="thread.id"
-                    cols="12"
-                    class="py-1"
-                  >
-                    <PostCard :thread="thread" />
-                  </v-col>
-                </section>
-                <section v-if="item.tab == `Mengikuti`">
-                  <v-col
-                    v-for="thread in threads"
-                    :key="thread.id"
-                    cols="12"
-                    class="py-1"
-                  >
-                    <PostCard :thread="thread" />
-                  </v-col>
-                </section>
-              </v-tab-item>
-            </v-tabs-items>
+            <v-col cols="12" class="pa-0 py-1">
+              <v-tabs-items v-model="tab">
+                <v-tab-item v-for="item in items" :key="item.tab">
+                  <section v-if="item.tab == `Rekomendasi`">
+                    <v-col
+                      v-for="thread in threads"
+                      :key="thread.id"
+                      cols="12"
+                      class="py-1"
+                    >
+                      <PostCard :thread="thread" />
+                    </v-col>
+                  </section>
+                  <section v-if="item.tab == `Mengikuti`">
+                    <v-col
+                      v-for="thread in threads"
+                      :key="thread.id"
+                      cols="12"
+                      class="py-1"
+                    >
+                      <PostCard :thread="thread" />
+                    </v-col>
+                  </section>
+                </v-tab-item>
+              </v-tabs-items>
+            </v-col>
           </v-row>
         </v-col>
         <v-col cols="4" style="width: 395.75px">
@@ -141,7 +147,7 @@
                         class="py-0"
                       >
                         <div class="pb-1 text-p">
-                          <NameShortener :username="contributor.username"/>
+                          <NameShortener :username="contributor.username" />
                         </div>
                       </v-col>
                     </v-row>
@@ -159,16 +165,18 @@
                     </div>
                     <v-row>
                       <v-col v-for="topic in topics" :key="topic.id" cols="12">
-                        <section
-                          v-for="(rule, index) in topic.rules.split('\n')"
-                          :key="index"
-                        >
-                          <div
-                            class="subtitle-1 font-weight-light py-1"
-                            style="line-height: inherit"
+                        <section v-if="topic.rules != null">
+                          <section
+                            v-for="(rule, index) in topic.rules.split('\n')"
+                            :key="index"
                           >
-                            {{ rule }}
-                          </div>
+                            <div
+                              class="subtitle-1 font-weight-light py-1"
+                              style="line-height: inherit"
+                            >
+                              {{ rule }}
+                            </div>
+                          </section>
                         </section>
                       </v-col>
                     </v-row>
@@ -207,10 +215,10 @@
 </template>
 
 <script>
-import CurrentTopic from "~/components/cards/CurrentTopic"
-import PostCard from "~/components/cards/PostCard"
-import TopicShortener from "~/components/utils/TopicShortener"
-import NameShortener from "~/components/utils/NameShortener"
+import CurrentTopic from '~/components/cards/CurrentTopic'
+import PostCard from '~/components/cards/PostCard'
+import TopicShortener from '~/components/utils/TopicShortener'
+import NameShortener from '~/components/utils/NameShortener'
 
 export default {
   name: 'IndexPage',
@@ -218,13 +226,13 @@ export default {
     CurrentTopic,
     PostCard,
     TopicShortener,
-    NameShortener
+    NameShortener,
   },
   middleware: 'authenticated',
   props: {
     searchPost: {
       type: String,
-      default: '',
+      default: null,
     },
   },
   data() {
@@ -235,32 +243,13 @@ export default {
   },
   computed: {
     threads() {
-      if (this.searchPost) {
-        const threads = this.$store.state.lists.threads.filter((item) => {
-          return item.topic.name
-            .toLowerCase()
-            .includes(this.$route.params.slug.toLowerCase())
-        })
-        return threads.filter((item) => {
-          return (
-            item.title.toLowerCase().includes(this.searchPost.toLowerCase()) ||
-            item.author.username
-              .toLowerCase()
-              .includes(this.searchPost.toLowerCase())
-          )
-        })
-      }
-      return this.$store.state.lists.threads.filter((item) => {
-        return item.topic.name
-          .toLowerCase()
-          .includes(this.$route.params.slug.toLowerCase())
-      })
+      console.log(this.$store.state.lists.threads)
+      return this.$store.state.lists.threads
     },
     topics() {
+      console.log('topic', this.$store.state.lists.topics)
       return this.$store.state.lists.topics.filter((item) => {
-        return item.name
-          .toLowerCase()
-          .includes(this.$route.params.slug.toLowerCase())
+        return item.id.toString().includes(this.$route.params.slug)
       })
     },
     users() {
@@ -268,7 +257,7 @@ export default {
     },
   },
   created() {
-    this.$store.dispatch('lists/fetchThreads')
+    this.$store.dispatch('lists/fetchThreadsByTopic', this.$route.params.slug)
     this.$store.dispatch('lists/fetchTopics')
     this.$store.dispatch('lists/fetchUsers')
   },

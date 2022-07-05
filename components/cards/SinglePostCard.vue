@@ -12,7 +12,7 @@
           </v-col>
           <v-col cols="auto">
             <router-link
-              :to="`/topic/${thread.topic.name}`"
+              :to="`/topic/${thread.topic.id}`"
               style="text-decoration: none; color: black"
             >
               <TopicShortener :name="thread.topic.name" />
@@ -69,16 +69,13 @@
         </v-list-item-content>
         <v-flex class="text-center">
           <v-carousel
-            v-if="thread.images.length > 0"
+            v-if="thread.image_1 != null"
             :continuous="false"
             hide-delimiters
             height="auto"
             style="max-height: 460px"
           >
-            <v-carousel-item
-              v-for="(item, index) in thread.images"
-              :key="index"
-            >
+            <v-carousel-item v-for="(item, index) in postImages" :key="index">
               <v-img
                 :src="item"
                 class="mx-auto"
@@ -97,23 +94,33 @@
             <v-row justify="center">
               <v-col>
                 <v-row align="center">
-                  <v-col cols="auto" class="pr-2">
-                    <v-icon>mdi-thumb-up-outline</v-icon>
+                  <v-col
+                    cols="auto"
+                    class="pr-2 click-cursor"
+                    @click="like(thread.id)"
+                  >
+                    <v-icon v-if="liked">mdi-thumb-up</v-icon>
+                    <v-icon v-else>mdi-thumb-up-outline</v-icon>
                   </v-col>
                   <v-col cols="auto" class="pl-2">
                     <p class="ma-0" style="width: 50%; display: inline">
-                      <FollowerShortener :follower="50" />
+                      <FollowerShortener
+                        :follower="thread.liked_count - thread.unliked_count"
+                      />
                     </p>
                   </v-col>
                 </v-row>
               </v-col>
-              <v-col>
-                <v-icon>mdi-thumb-down-outline</v-icon>
+              <v-col class="click-cursor" @click="unlike(thread.id)">
+                <v-icon v-if="unliked">mdi-thumb-down</v-icon>
+                <v-icon v-else>mdi-thumb-down-outline</v-icon>
               </v-col>
             </v-row>
             <v-row>
               <v-col>
-                <p><FollowerShortener :follower="3" /> komentar</p>
+                <p>
+                  <FollowerShortener :follower="thread.reply_count" /> komentar
+                </p>
               </v-col>
             </v-row>
           </v-col>
@@ -197,6 +204,8 @@
 </template>
 
 <script>
+import axios from 'axios'
+
 import CommentCard from '~/components/cards/CommentCard'
 import TopicShortener from '~/components/utils/TopicShortener'
 import NameShortener from '~/components/utils/NameShortener'
@@ -220,12 +229,14 @@ export default {
       comment: null,
       addedImages: [],
       images: [],
+      liked: false,
+      unliked: false
     }
   },
   computed: {
     timepost() {
       const seconds = Math.floor(
-        (new Date() - new Date(String(this.thread.created_at))) / 1000
+        (new Date() - new Date(String(this.thread.updated_at))) / 1000
       )
       let interval = Math.floor(seconds / 31536000)
 
@@ -253,6 +264,36 @@ export default {
     replies() {
       return this.$store.state.lists.replies
     },
+    postImages() {
+      const images = []
+      if (this.thread.image_5 != null) {
+        images.push(this.thread.image_1)
+        images.push(this.thread.image_2)
+        images.push(this.thread.image_3)
+        images.push(this.thread.image_4)
+        images.push(this.thread.image_5)
+      }
+      if (this.thread.image_4 != null && this.thread.image_5 == null) {
+        images.push(this.thread.image_1)
+        images.push(this.thread.image_2)
+        images.push(this.thread.image_3)
+        images.push(this.thread.image_4)
+      }
+      if (this.thread.image_3 != null && this.thread.image_4 == null) {
+        images.push(this.thread.image_1)
+        images.push(this.thread.image_2)
+        images.push(this.thread.image_3)
+      }
+      if (this.thread.image_2 != null && this.thread.image_3 == null) {
+        images.push(this.thread.image_1)
+        images.push(this.thread.image_2)
+      }
+      if (this.thread.image_1 != null && this.thread.image_2 == null) {
+        images.push(this.thread.image_1)
+        images.push(this.thread.image_2)
+      }
+      return images
+    },
   },
   created() {
     this.$store.dispatch('lists/fetchReplies')
@@ -266,6 +307,60 @@ export default {
         this.images = [...this.images, ...this.addedImages]
       }
     },
+    like(param) {
+      console.log(this.$store.state.auth.accessToken)
+      axios
+        .post(
+          'https://staking-spade-production.up.railway.app/thread/' +
+            param +
+            '/like',
+          {},
+          {
+            headers: {
+              Authorization: 'Bearer ' + this.$store.state.auth.accessToken,
+            },
+          }
+        )
+        .then((response) => {
+          this.$forceUpdate()
+          this.liked = true
+          this.unliked = false
+        })
+        .catch((error) => {
+          console.log(error)
+        })
+      this.$forceUpdate()
+    },
+    unlike(param) {
+      axios
+        .post(
+          'https://staking-spade-production.up.railway.app/thread/' +
+            param +
+            '/unlike',
+          {},
+          {
+            headers: {
+              'Content-Type': 'application/json',
+              Authorization: 'Bearer ' + this.$store.state.auth.accessToken,
+            },
+          }
+        )
+        .then((response) => {
+          this.$forceUpdate()
+          this.unliked = true
+          this.liked = false
+        })
+        .catch((error) => {
+          console.log(error)
+        })
+      this.$forceUpdate()
+    },
   },
 }
 </script>
+
+<style scoped>
+.click-cursor {
+  cursor: pointer;
+}
+</style>

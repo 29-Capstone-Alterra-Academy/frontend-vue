@@ -42,30 +42,27 @@
             </v-row>
           </v-card>
         </v-col>
-        <v-tabs-items v-model="tab">
-          <v-tab-item v-for="item in items" :key="item.tab">
-            <section v-if="item.tab == `Rekomendasi`">
-              <v-col
-                v-for="thread in threads"
-                :key="thread.id"
-                cols="12"
-                class="py-1"
-              >
-                <PostCard :thread="thread" />
-              </v-col>
-            </section>
-            <section v-if="item.tab == `Mengikuti`">
-              <v-col
-                v-for="thread in threads"
-                :key="thread.id"
-                cols="12"
-                class="py-1"
-              >
-                <PostCard :thread="thread" />
-              </v-col>
-            </section>
-          </v-tab-item>
-        </v-tabs-items>
+        <v-col cols="12" class="pa-0 py-1">
+          <v-tabs-items v-model="tab">
+            <v-tab-item v-for="item in items" :key="item.tab">
+              <section v-if="item.tab == `Rekomendasi`">
+                <v-col v-for="thread in threads" :key="thread.id" class="py-1">
+                  <PostCard :thread="thread" />
+                </v-col>
+              </section>
+              <section v-if="item.tab == `Mengikuti`">
+                <v-col
+                  v-for="thread in threads"
+                  :key="thread.id"
+                  cols="12"
+                  class="py-1"
+                >
+                  <PostCard :thread="thread" />
+                </v-col>
+              </section>
+            </v-tab-item>
+          </v-tabs-items>
+        </v-col>
       </v-row>
     </v-col>
     <v-col cols="4" style="width: 373.75px">
@@ -87,7 +84,7 @@
                     <v-row>
                       <v-col>
                         <router-link
-                          :to="`/topic/${topic.name}`"
+                          :to="`/topic/${topic.id}`"
                           style="text-decoration: none; color: black"
                         >
                           <v-row>
@@ -248,7 +245,7 @@ export default {
   props: {
     searchPost: {
       type: String,
-      default: '',
+      default: null,
     },
   },
   data() {
@@ -264,6 +261,7 @@ export default {
   },
   computed: {
     threads() {
+      console.log(this.$store.state.lists.threads)
       if (this.searchPost) {
         return this.$store.state.lists.threads.filter((item) => {
           return (
@@ -295,7 +293,7 @@ export default {
       return Math.ceil(this.users.length / 5)
     },
   },
-  created() {
+  mounted() {
     this.$store.dispatch('lists/fetchThreads')
     this.$store.dispatch('lists/fetchTopics')
     this.$store.dispatch('lists/fetchUsers')

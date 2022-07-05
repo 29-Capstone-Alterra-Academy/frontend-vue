@@ -12,10 +12,14 @@
           </v-col>
           <v-col cols="auto">
             <router-link
-              :to="`/topic/${thread.topic.name}`"
+              :to="`/topic/${thread.topic.id}`"
               style="text-decoration: none; color: black"
             >
-              <TopicShortener :name="thread.topic.name"/>
+              <TopicShortener
+                v-if="thread.topic.name != null"
+                :name="thread.topic.name"
+              />
+              <section v-else>{{ thread.topic.name }}</section>
             </router-link>
           </v-col>
           <v-col>
@@ -23,7 +27,13 @@
               <small class="text--disabled"
                 >diposting oleh
                 <router-link :to="`/user/${thread.author.username}`"
-                  ><NameShortener :username="thread.author.username"/></router-link
+                  ><NameShortener
+                    v-if="thread.author.username != null"
+                    :username="thread.author.username"
+                  />
+                  <section v-else>
+                    {{ thread.author.username }}
+                  </section></router-link
                 >
                 {{ timepost }} yang lalu</small
               >
@@ -39,14 +49,14 @@
           </v-list-item-content>
           <v-flex class="text-center">
             <v-carousel
-              v-if="thread.images.length > 0"
+              v-if="thread.image_1 != null"
               :continuous="false"
               hide-delimiters
               height="auto"
               style="max-height: 460px"
             >
               <v-carousel-item
-                v-for="(item, index) in thread.images"
+                v-for="(item, index) in postImages"
                 :key="index"
               >
                 <v-img
@@ -67,10 +77,14 @@
           <v-col cols="5" class="pa-0">
             <v-row align="center">
               <v-col cols="auto" justify="center">
-                <p class="ma-0" style="width: 50%; display: inline"><FollowerShortener :follower="50"/> Likes</p>
+                <p class="ma-0" style="width: 50%; display: inline">
+                  <FollowerShortener :follower="thread.liked_count - thread.unliked_count" /> Likes
+                </p>
               </v-col>
               <v-col cols="auto" justify="center">
-                <p class="ma-0" style="width: 50%; display: inline"><FollowerShortener :follower="50"/> Comments</p>
+                <p class="ma-0" style="width: 50%; display: inline">
+                  <FollowerShortener :follower="thread.reply_count" /> Comments
+                </p>
               </v-col>
               <v-col>
                 <v-menu offset-y>
@@ -113,7 +127,7 @@ export default {
   components: {
     TopicShortener,
     NameShortener,
-    FollowerShortener
+    FollowerShortener,
   },
   props: {
     thread: {
@@ -131,7 +145,7 @@ export default {
   computed: {
     timepost() {
       const seconds = Math.floor(
-        (new Date() - new Date(String(this.thread.created_at))) / 1000
+        (new Date() - new Date(String(this.thread.updated_at))) / 1000
       )
       let interval = Math.floor(seconds / 31536000)
 
@@ -155,6 +169,36 @@ export default {
         return interval + ' menit'
       }
       return Math.floor(seconds) + ' detik'
+    },
+    postImages() {
+      const images = []
+      if (this.thread.image_5 != null) {
+        images.push(this.thread.image_1)
+        images.push(this.thread.image_2)
+        images.push(this.thread.image_3)
+        images.push(this.thread.image_4)
+        images.push(this.thread.image_5)
+      }
+      if (this.thread.image_4 != null && this.thread.image_5 == null) {
+        images.push(this.thread.image_1)
+        images.push(this.thread.image_2)
+        images.push(this.thread.image_3)
+        images.push(this.thread.image_4)
+      }
+      if (this.thread.image_3 != null && this.thread.image_4 == null) {
+        images.push(this.thread.image_1)
+        images.push(this.thread.image_2)
+        images.push(this.thread.image_3)
+      }
+      if (this.thread.image_2 != null && this.thread.image_3 == null) {
+        images.push(this.thread.image_1)
+        images.push(this.thread.image_2)
+      }
+      if (this.thread.image_1 != null && this.thread.image_2 == null) {
+        images.push(this.thread.image_1)
+        images.push(this.thread.image_2)
+      }
+      return images
     },
   },
   methods: {

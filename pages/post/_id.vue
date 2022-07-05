@@ -72,16 +72,18 @@
                 </div>
                 <v-row>
                   <v-col v-for="thread in threads" :key="thread.id" cols="12">
-                    <section
-                      v-for="(rule, index) in thread.topic.rules.split('\n')"
-                      :key="index"
-                    >
-                      <div
-                        class="subtitle-1 font-weight-light py-1"
-                        style="line-height: inherit"
+                    <section v-if="thread.topic.rules != null">
+                      <section
+                        v-for="(rule, index) in thread.topic.rules.split('\n')"
+                        :key="index"
                       >
-                        {{ rule }}
-                      </div>
+                        <div
+                          class="subtitle-1 font-weight-light py-1"
+                          style="line-height: inherit"
+                        >
+                          {{ rule }}
+                        </div>
+                      </section>
                     </section>
                   </v-col>
                 </v-row>
@@ -141,6 +143,7 @@ export default {
   },
   computed: {
     threads() {
+      console.log(this.$store.state.lists.threads)
       if (this.$route.params.id) {
         return this.$store.state.lists.threads.filter((item) => {
           return item.id.toString().includes(this.$route.params.id)

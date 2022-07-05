@@ -28,8 +28,8 @@ const mutations = {
 
 const actions = {
   fetchThreads({ commit }) {
-    this.$axios
-      .get('/threads')
+    axios
+      .get('https://staking-spade-production.up.railway.app/thread?topicId=1&limit=10&offset=0')
       .then((res) => {
         commit('setThreads', res.data)
       })
@@ -37,9 +37,19 @@ const actions = {
         console.log(err)
       })
   },
+  fetchThreadsByTopic({ commit }, param) {
+    axios
+      .get('https://staking-spade-production.up.railway.app/thread?topicId=' + param + '&limit=10&offset=0')
+      .then((response) => {
+        commit('setThreads', response.data)
+      })
+      .catch((error) => {
+        console.log(error)
+      })
+  },
   fetchTopics({ commit }) {
-    this.$axios
-      .get('/topics')
+    axios
+      .get('https://staking-spade-production.up.railway.app/topic?limit=10&offset=0')
       .then((res) => {
         commit('setTopics', res.data)
       })
