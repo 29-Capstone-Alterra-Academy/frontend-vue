@@ -136,7 +136,7 @@
                   <template #[`item.details`]="{ item }">
                     <v-btn
                       class="text-capitalize mx-2"
-                      @click="topicDetails(item)"
+                      @click="$router.push(`/topic/${item.name}/details`)"
                     >
                       Details
                     </v-btn>
@@ -157,7 +157,7 @@
                   <template #[`item.details`]="{ item }">
                     <v-btn
                       class="text-capitalize mx-2"
-                      @click="userDetails(item)"
+                      @click="$router.push(`/user/${item.username}`)"
                     >
                       Details
                     </v-btn>
@@ -175,12 +175,14 @@
 <script>
 import TopicShortener from '~/components/utils/TopicShortener'
 import NameShortener from '~/components/utils/NameShortener'
+import FollowerShortener from '~/components/utils/FollowerShortener'
 
 export default {
   name: 'SearchPage',
   components: {
     TopicShortener,
     NameShortener,
+    FollowerShortener
   },
   filters: {
     timepost(date) {
@@ -209,6 +211,7 @@ export default {
       return Math.floor(seconds) + ' detik'
     },
   },
+  middleware: 'authenticated',
   data() {
     return {
       tab: null,

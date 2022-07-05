@@ -115,6 +115,7 @@ export default {
     DateShortener,
     FollowerShortener,
   },
+  middleware: 'authenticated',
   props: {
     searchPost: {
       type: String,

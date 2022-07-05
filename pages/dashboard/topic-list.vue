@@ -52,6 +52,7 @@ export default {
     DateShortener,
     FollowerShortener
   },
+  middleware: 'authenticated',
   data() {
     return {
       search: '',

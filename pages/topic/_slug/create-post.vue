@@ -5,7 +5,7 @@
       <v-row>
         <v-col cols="auto" class="pb-1">
           <v-select
-            v-model="selectedTopic"
+            v-model="selectedTopic.name"
             :items="topics"
             item-text="name"
             item-value="name"
@@ -76,7 +76,7 @@
               </v-row>
             </template>
           </v-select>
-          <AddTopic v-model="dialog"/>
+          <AddTopic v-model="dialog" />
         </v-col>
         <v-col cols="12" class="py-1 my-1">
           <v-card class="rounded-lg mx-auto py-3 px-3" outlined>
@@ -224,12 +224,11 @@ export default {
   name: 'CreatePost',
   components: {
     AddTopic,
-    TopicShortener
+    TopicShortener,
   },
   middleware: 'authenticated',
   data() {
     return {
-      selectedTopic: [],
       title: '',
       content: '',
       search: '',
@@ -254,6 +253,18 @@ export default {
         })
       }
       return this.$store.state.lists.topics
+    },
+    selectedTopic: {
+      get() {
+        return this.$store.state.lists.topics.filter((item) => {
+          return item.name
+            .toLowerCase()
+            .includes(this.$route.params.slug.toLowerCase())
+        })
+      },
+      set(newValue) {
+        return newValue
+      },
     },
   },
   created() {
