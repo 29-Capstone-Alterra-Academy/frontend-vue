@@ -129,6 +129,7 @@ export default {
     SinglePostCard,
     NameShortener,
   },
+  middleware: 'authenticated',
   props: {
     searchPost: {
       type: String,

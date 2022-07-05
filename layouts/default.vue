@@ -130,6 +130,7 @@
 </template>
 
 <script>
+import { mapMutations } from 'vuex'
 import AuthButton from '~/components/navbar/AuthButton'
 import AuthButtonSide from '~/components/navbar/AuthButtonSide'
 
@@ -139,6 +140,7 @@ export default {
     AuthButton,
     AuthButtonSide,
   },
+  middleware: 'authenticated',
   model: {
     prop: 'value',
     event: 'input',
@@ -202,6 +204,19 @@ export default {
     this.$store.dispatch('lists/fetchTopics')
     this.$store.dispatch('lists/fetchUsers')
     this.$store.dispatch('lists/loggedUser')
+  },
+  methods: {
+    ...mapMutations('auth', ['logout']),
+    handleLogout() {
+      fetch('https://virtserver.swaggerhub.com/etrnal70/nomizo/1.0.0/logout', {
+        method: 'POST',
+        headers: {
+          accept: '*/*',
+        },
+      })
+      this.logout()
+      this.$forceUpdate()
+    },
   },
 }
 </script>

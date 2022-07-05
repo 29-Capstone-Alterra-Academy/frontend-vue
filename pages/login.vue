@@ -1,5 +1,13 @@
 <template>
   <v-app>
+    <v-snackbar v-model="snackbar" :timeout="5000">
+      Username atau password yang anda masukkan salah
+      <template #action="{ attrs }">
+        <v-btn color="warning" text v-bind="attrs" @click="snackbar = false"
+          >Close</v-btn
+        >
+      </template>
+    </v-snackbar>
     <v-row justify="center" align="center" class="pa-0 ma-0">
       <v-col cols="4">
         <v-row justify="center">
@@ -14,7 +22,6 @@
               <v-text-field
                 v-model="username"
                 :rules="nameRules"
-                label="Username"
                 placeholder="Username"
                 required
                 outlined
@@ -26,11 +33,10 @@
                 id="password"
                 v-model="password"
                 :append-icon="showPassword ? 'mdi-eye' : 'mdi-eye-off'"
-                :rules="[rules.required, rules.min]"
+                :rules="rules"
                 :type="showPassword ? 'text' : 'password'"
+                placeholder="Password"
                 name="input-10-2"
-                label="Password"
-                hint="At least 8 characters"
                 class="input-group--focused rounded-lg"
                 outlined
                 dense
@@ -65,26 +71,69 @@
   </v-app>
 </template>
 <script>
+import { mapMutations } from 'vuex'
+import axios from 'axios'
+
 export default {
   name: 'LoginPage',
   layout: 'registration',
+  middleware: 'guest',
   data() {
     return {
       valid: false,
       username: '',
       password: '',
+      message: '',
+      snackbar: false,
       showPassword: false,
-      nameRules: [(v) => !!v || 'This Field is required'],
-      rules: {
-        required: (value) => !!value || 'Required.',
-        min: (v) => v.length >= 8 || 'Min 8 characters',
-        emailMatch: () => `The email and password you entered don't match`,
-      },
+      nameRules: [(v) => !!v || 'Masukkan username anda'],
+      rules: [
+        (value) => !!value || 'Masukkan password anda',
+        (value) =>
+          (value && value.length >= 8) || 'Password minimal 8 karakter',
+      ],
     }
   },
   computed: {
     error() {
       return this.$store.state.error
+    },
+  },
+  methods: {
+    ...mapMutations('auth', [
+      'setAccessToken',
+      'setRefreshToken',
+      'setUserProfile',
+    ]),
+    handlelogin(e) {
+      e.preventDefault()
+      try {
+        this.message = ''
+        axios
+          .post(
+            'https://staking-spade-production.up.railway.app/login',
+            {
+              username: this.username,
+              password: this.password,
+            },
+            {
+              headers: {
+                'Content-Type': 'application/json',
+              },
+            }
+          )
+          .then((response) => {
+            this.setAccessToken(response.data.access_token)
+            this.setRefreshToken(response.data.refresh_token)
+            this.$router.push('/')
+          })
+          .catch((error) => {
+            this.message = error.message
+            this.snackbar = true
+          })
+      } catch (exception) {
+        console.log(exception)
+      }
     },
   },
 }

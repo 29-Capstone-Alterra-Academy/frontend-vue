@@ -47,7 +47,7 @@
                   <template #[`item.details`]="{ item }">
                     <v-btn
                       class="text-capitalize mx-2"
-                      @click="topicDetails(item)"
+                      @click="$router.push(`/topic/${item.name}/details`)"
                     >
                       Details
                     </v-btn>
@@ -68,7 +68,7 @@
                   <template #[`item.details`]="{ item }">
                     <v-btn
                       class="text-capitalize mx-2"
-                      @click="userDetails(item)"
+                      @click="$router.push(`/user/${item.username}`)"
                     >
                       Details
                     </v-btn>
@@ -120,6 +120,7 @@ export default {
       return Math.floor(seconds) + ' detik'
     },
   },
+  middleware: 'authenticated',
   data() {
     return {
       tab: null,

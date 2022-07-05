@@ -44,7 +44,7 @@
                 outlined
                 block
                 class="rounded-lg text-capitalize"
-                to="/create-post"
+                :to="`${$route.params.slug}/create-post`"
               >
                 <div class="mr-auto">
                   <v-icon>mdi-plus</v-icon>
@@ -220,6 +220,7 @@ export default {
     TopicShortener,
     NameShortener
   },
+  middleware: 'authenticated',
   props: {
     searchPost: {
       type: String,
