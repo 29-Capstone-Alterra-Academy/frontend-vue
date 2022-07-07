@@ -1,5 +1,25 @@
 <template>
   <v-row justify="center" style="position: relative">
+    <v-snackbar v-model="snackbar" :timeout="5000">
+      Thread anda berhasil diposting
+      <template #action="{ attrs }">
+        <v-btn color="primary" text v-bind="attrs" @click="snackbar = false"
+          >Close</v-btn
+        >
+      </template>
+    </v-snackbar>
+    <v-snackbar v-model="snackbarFalse" :timeout="5000">
+      Terjadi kesalahan saat memposting thread
+      <template #action="{ attrs }">
+        <v-btn
+          color="warning"
+          text
+          v-bind="attrs"
+          @click="snackbarFalse = false"
+          >Close</v-btn
+        >
+      </template>
+    </v-snackbar>
     <v-col cols="7">
       <h3 class="headline mb-3">Create Post</h3>
       <v-row>
@@ -8,7 +28,7 @@
             v-model="selectedTopic"
             :items="topics"
             item-text="name"
-            item-value="name"
+            item-value="id"
             label="Choose Topic"
             class="rounded-lg"
             menu-props="{ top: true, offsetY: true }"
@@ -46,6 +66,7 @@
                   </v-list-item-content>
                 </v-list-item>
               </v-card>
+              <Observer @intersect="intersected" />
             </div>
             <template slot="selection" slot-scope="data">
               <v-row v-row align="center" class="pa-1">
@@ -54,6 +75,7 @@
                     :src="data.item.profile_image"
                     class="rounded-circle"
                     width="30"
+                    height="30"
                   ></v-img>
                 </v-col>
                 <v-col cols="auto" class="pa-1">
@@ -68,6 +90,7 @@
                     :src="data.item.profile_image"
                     class="rounded-circle"
                     width="30"
+                    height="30"
                   ></v-img>
                 </v-col>
                 <v-col cols="auto" class="pa-1">
@@ -76,7 +99,7 @@
               </v-row>
             </template>
           </v-select>
-          <AddTopic v-model="dialog"/>
+          <AddTopic v-model="dialog" />
         </v-col>
         <v-col cols="12" class="py-1 my-1">
           <v-card class="rounded-lg mx-auto py-3 px-3" outlined>
@@ -85,7 +108,7 @@
                 <v-col cols="12">
                   <div class="">
                     <v-textarea
-                      :value="title"
+                      v-model="title"
                       rows="1"
                       class="rounded-lg"
                       label="Title"
@@ -99,7 +122,7 @@
                   </div>
                   <div class="py-2">
                     <v-textarea
-                      :value="content"
+                      v-model="content"
                       rows="6"
                       class="rounded-lg"
                       label="Text"
@@ -217,14 +240,18 @@
 </template>
 
 <script>
+import INSERT_THREADS from '~/apollo/mutations/insert-threads'
+
+import Observer from '~/components/ObserverScroll'
 import AddTopic from '~/components/cards/AddTopic'
 import TopicShortener from '~/components/utils/TopicShortener'
 
 export default {
   name: 'CreatePost',
   components: {
+    Observer,
     AddTopic,
-    TopicShortener
+    TopicShortener,
   },
   middleware: 'authenticated',
   data() {
@@ -233,28 +260,17 @@ export default {
       title: '',
       content: '',
       search: '',
+      snackbar: false,
+      snackbarFalse: false,
       dragover: false,
       dialog: false,
       images: [],
       multiple: true,
-      author: {
-        id: 7,
-        profile_image: 'https://randomuser.me/api/portraits/women/84.jpg',
-        username: 'UniqueUser7',
-      },
+      topics: [],
+      page: 1,
       basicRules:
         '1. Selalu ingat postingan Anda akan dibaca banyak orang\n2. Berperilaku seperti yang Anda lakukan di kehidupan nyata\n3. Cari sumber konten asli\n4. Cari duplikat sebelum memposting\n5. Baca aturan Topik\n',
     }
-  },
-  computed: {
-    topics() {
-      if (this.search) {
-        return this.$store.state.lists.topics.filter((item) => {
-          return item.name.toLowerCase().includes(this.search.toLowerCase())
-        })
-      }
-      return this.$store.state.lists.topics
-    },
   },
   created() {
     this.$store.dispatch('lists/fetchTopics')
@@ -278,10 +294,74 @@ export default {
       // Add each file to the array of uploaded files
       else
         for (const image of e.dataTransfer.files) {
-          this.images.push(image)
+          if (this.images.length < 5) this.images.push(image)
         }
     },
-    addPost() {},
+    addPost() {
+      const formData = new FormData()
+      console.log(this.selectedTopic)
+      formData.append('title', this.title)
+      console.log(this.title)
+      formData.append('content', this.content)
+      console.log(this.content)
+      for (let i = 0; i < this.images.length; i++) {
+        formData.append('image_' + [i + 1], this.images[i])
+      }
+      for (const pair of formData.entries()) {
+        console.log(pair[0] + ', ' + pair[1])
+      }
+      this.$axios
+        .post('/topic/' + this.selectedTopic + '/thread', formData, {
+          headers: {
+            'Content-Type': 'multipart/form-data',
+            Authorization: 'Bearer ' + this.$store.state.auth.accessToken,
+          },
+        })
+        .then((response) => {
+          if (response.status === 201) {
+            console.log(response)
+            this.snackbar = true
+            this.selectedTopic = []
+            this.title = ''
+            this.content = ''
+            this.search = ''
+            this.images = []
+            try {
+              this.$apollo.mutate({
+                mutation: INSERT_THREADS,
+                variables: {
+                  user_name: this.$store.state.lists.profile.username,
+                  id: response.data.id,
+                },
+              })
+            } catch (error) {
+              console.log(error)
+            }
+          }
+        })
+        .catch((error) => {
+          if (error.status) {
+            this.snackbarFalse = true
+            this.selectedTopic = []
+            this.title = ''
+            this.content = ''
+            this.search = ''
+            this.images = []
+          }
+        })
+    },
+    intersected() {
+      this.$axios
+        .get(`/topic?limit=5&offset=${this.page}`)
+        .then((res) => {
+          this.page++
+          const newTopics = res.data
+          this.topics = [...this.topics, ...newTopics]
+        })
+        .catch((err) => {
+          console.log(err)
+        })
+    },
   },
 }
 </script>

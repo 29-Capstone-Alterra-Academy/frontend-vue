@@ -5,9 +5,10 @@
         <v-row align="center">
           <v-col cols="1" style="max-width: none">
             <v-img
-              :src="thread.author.profile_image"
+              :src="thread.topic.profile_image"
               class="rounded-circle"
               width="35"
+              height="35"
             ></v-img>
           </v-col>
           <v-col cols="auto">
@@ -40,7 +41,7 @@
             </div>
           </v-col>
         </v-row>
-        <section class="click-cursor" @click="toDetails(thread.id)">
+        <section class="click-cursor" @click="toDetails(thread.id, thread.topic.id)">
           <v-list-item-title class="text-h6 my-2">
             {{ thread.title }}
           </v-list-item-title>
@@ -172,38 +173,38 @@ export default {
     },
     postImages() {
       const images = []
-      if (this.thread.image_5 != null) {
+      if (this.thread.image_5 !== '') {
         images.push(this.thread.image_1)
         images.push(this.thread.image_2)
         images.push(this.thread.image_3)
         images.push(this.thread.image_4)
         images.push(this.thread.image_5)
       }
-      if (this.thread.image_4 != null && this.thread.image_5 == null) {
+      if (this.thread.image_4 !== '' && this.thread.image_5 === '') {
         images.push(this.thread.image_1)
         images.push(this.thread.image_2)
         images.push(this.thread.image_3)
         images.push(this.thread.image_4)
       }
-      if (this.thread.image_3 != null && this.thread.image_4 == null) {
+      if (this.thread.image_3 !== '' && this.thread.image_4 === '') {
         images.push(this.thread.image_1)
         images.push(this.thread.image_2)
         images.push(this.thread.image_3)
       }
-      if (this.thread.image_2 != null && this.thread.image_3 == null) {
+      if (this.thread.image_2 !== '' && this.thread.image_3 === '') {
         images.push(this.thread.image_1)
         images.push(this.thread.image_2)
       }
-      if (this.thread.image_1 != null && this.thread.image_2 == null) {
+      if (this.thread.image_1 !== '' && this.thread.image_2 === '') {
         images.push(this.thread.image_1)
-        images.push(this.thread.image_2)
       }
+      console.log(images.length)
       return images
     },
   },
   methods: {
-    toDetails(id) {
-      this.$router.push(`/post/${id}`)
+    toDetails(post, topic) {
+      this.$router.push(`/${post}/${topic}`)
     },
     removeImage(index) {
       this.images.splice(index, 1)

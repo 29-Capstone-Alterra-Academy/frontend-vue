@@ -1,5 +1,25 @@
 <template>
   <v-dialog :value="value" max-width="500" @input="$emit('input', $event)">
+    <v-snackbar v-model="snackbar" :timeout="5000">
+      Topik baru berhasil dibuat
+      <template #action="{ attrs }">
+        <v-btn color="primary" text v-bind="attrs" @click="snackbar = false"
+          >Close</v-btn
+        >
+      </template>
+    </v-snackbar>
+    <v-snackbar v-model="snackbarFalse" :timeout="5000">
+      Terjadi kesalahan saat membuat topik baru
+      <template #action="{ attrs }">
+        <v-btn
+          color="warning"
+          text
+          v-bind="attrs"
+          @click="snackbarFalse = false"
+          >Close</v-btn
+        >
+      </template>
+    </v-snackbar>
     <v-card>
       <v-card-title class="text-h5">
         <v-col cols="11" class="pa-0"> Buat Topik Baru </v-col>
@@ -16,7 +36,7 @@
       <v-card-text>
         <div class="">
           <v-textarea
-            :value="title"
+            v-model="title"
             rows="1"
             class="rounded-lg"
             label="Nama Topik"
@@ -30,7 +50,7 @@
         </div>
         <div class="py-2">
           <v-textarea
-            :value="content"
+            v-model="description"
             rows="6"
             class="rounded-lg"
             label="Deskripsi (Optional)"
@@ -44,7 +64,7 @@
         </div>
         <div class="">
           <v-textarea
-            :value="rules"
+            v-model="rules"
             rows="1"
             class="rounded-lg"
             label="Tambah Rules (Opsional)"
@@ -57,58 +77,38 @@
           ></v-textarea>
         </div>
         <div class="py-2">
-          <p class="text-h6">Image or Video</p>
-          <v-card
-            outlined
-            dense
-            class="rounded-lg"
-            :class="{ 'grey lighten-2': dragover }"
-            @drop.prevent="onDrop($event)"
-            @dragover.prevent="dragover = true"
-            @dragenter.prevent="dragover = true"
-            @dragleave.prevent="dragover = false"
-          >
-            <v-card-text>
-              <v-row
-                class="d-flex flex-column"
-                dense
-                align="center"
-                justify="center"
-              >
-                <v-icon :class="[dragover ? 'mt-2, mb-6' : 'mt-5']" size="60">
-                  mdi-cloud-upload
-                </v-icon>
-                <p>Drop your file(s) here, or click to select them.</p>
-              </v-row>
-              <v-virtual-scroll
-                v-if="images.length > 0"
-                :items="images"
-                height="150"
-                item-height="50"
-              >
-                <template #default="{ item }">
-                  <v-list-item :key="item.name">
-                    <v-list-item-content>
-                      <v-list-item-title outlined>
-                        {{ item.name }}
-                        <span class="ml-3 text--secondary">
-                          {{ item.size }} bytes</span
-                        >
-                      </v-list-item-title>
-                    </v-list-item-content>
-
-                    <v-list-item-action>
-                      <v-btn icon @click.stop="removeFile(item.name)">
-                        <v-icon> mdi-close-circle </v-icon>
-                      </v-btn>
-                    </v-list-item-action>
-                  </v-list-item>
-
-                  <v-divider></v-divider>
-                </template>
-              </v-virtual-scroll>
-            </v-card-text>
-          </v-card>
+          <p class="text-h6">Image</p>
+          <v-row align="center">
+            <v-col cols="auto">
+              <v-img
+                :src="imageUrl"
+                class="rounded-circle"
+                style="background: grey"
+                width="100"
+                height="100"
+              ></v-img>
+            </v-col>
+            <v-col cols="auto">
+              <div>
+                <v-btn
+                  color="primary"
+                  class="text-none rounded-lg"
+                  depressed
+                  :loading="isSelecting"
+                  @click="onButtonClick"
+                >
+                  {{ buttonText }}
+                </v-btn>
+                <input
+                  ref="uploader"
+                  class="d-none"
+                  type="file"
+                  accept="image/*"
+                  @change="onFileChanged"
+                />
+              </div>
+            </v-col>
+          </v-row>
         </div>
       </v-card-text>
 
@@ -130,36 +130,87 @@ export default {
   data() {
     return {
       title: '',
-      content: '',
+      description: '',
       rules: '',
-      dragover: false,
-      images: [],
-      multiple: true,
+      defaultButtonText: 'Unggah Foto',
+      defaultImage: '',
+      snackbar: false,
+      snackbarFalse: false,
+      selectedFile: null,
+      isSelecting: false,
     }
   },
+  computed: {
+    buttonText() {
+      return this.selectedFile ? this.selectedFile.name : this.defaultButtonText
+    },
+    imageUrl() {
+      return this.selectedFile
+        ? URL.createObjectURL(this.selectedFile)
+        : this.defaultButtonText
+    },
+  },
   methods: {
-    removeFile(fileName) {
-      // Find the index of the
-      const index = this.images.findIndex((file) => file.name === fileName)
-      // If file is in uploaded files remove it
-      if (index > -1) this.images.splice(index, 1)
+    onButtonClick() {
+      this.isSelecting = true
+      window.addEventListener(
+        'focus',
+        () => {
+          this.isSelecting = false
+        },
+        { once: true }
+      )
+
+      this.$refs.uploader.click()
     },
-    onDrop(e) {
-      this.dragover = false
-      // If user has uploaded multiple files but the component is not multiple throw error
-      if (!this.multiple && e.dataTransfer.files.length > 1) {
-        this.$store.dispatch('addNotification', {
-          message: 'Only one file can be uploaded at a time..',
-          colour: 'error',
-        })
+    onFileChanged(e) {
+      this.selectedFile = e.target.files[0]
+
+      // do something
+    },
+    addTopic() {
+      const formData = new FormData()
+      formData.append('name', this.title)
+      console.log(this.title)
+      formData.append('description', this.description)
+      console.log(this.description)
+      formData.append('rules', this.rules)
+      console.log(this.rules)
+      formData.append('profile_image', this.selectedFile)
+      console.log(this.selectedFile)
+      for (const pair of formData.entries()) {
+        console.log(pair[0] + ', ' + pair[1])
       }
-      // Add each file to the array of uploaded files
-      else
-        for (const image of e.dataTransfer.files) {
-          this.images.push(image)
-        }
+      this.$axios
+        .post(
+          '/topic',
+          formData,
+          {
+            headers: {
+              'Content-Type': 'multipart/form-data',
+              Authorization: 'Bearer ' + this.$store.state.auth.accessToken,
+            },
+          }
+        )
+        .then((response) => {
+          if (response.status === 201) {
+            this.snackbar = true
+            this.title = ''
+            this.description = ''
+            this.rules = ''
+            this.selectedFile = null
+          }
+        })
+        .catch((error) => {
+          if (error.status) {
+            this.snackbarFalse = true
+            this.title = ''
+            this.description = ''
+            this.rules = ''
+            this.selectedFile = null
+          }
+        })
     },
-    addTopic() {},
   },
 }
 </script>

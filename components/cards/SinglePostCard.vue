@@ -5,9 +5,10 @@
         <v-row align="center">
           <v-col cols="1" style="max-width: none">
             <v-img
-              :src="thread.author.profile_image"
+              :src="thread.topic.profile_image"
               class="rounded-circle"
               width="35"
+              height="35"
             ></v-img>
           </v-col>
           <v-col cols="auto">
@@ -15,7 +16,10 @@
               :to="`/topic/${thread.topic.id}`"
               style="text-decoration: none; color: black"
             >
-              <TopicShortener :name="thread.topic.name" />
+              <TopicShortener
+                v-if="thread.topic.name != null"
+                :name="thread.topic.name"
+              />
             </router-link>
           </v-col>
           <v-col>
@@ -23,7 +27,9 @@
               <small class="text--disabled"
                 >diposting oleh
                 <router-link :to="`/user/${thread.author.username}`"
-                  ><NameShortener :username="thread.author.username"
+                  ><NameShortener
+                    v-if="thread.author.username != null"
+                    :username="thread.author.username"
                 /></router-link>
                 {{ timepost }} yang lalu</small
               >
@@ -69,7 +75,7 @@
         </v-list-item-content>
         <v-flex class="text-center">
           <v-carousel
-            v-if="thread.image_1 != null"
+            v-if="thread.image_1 != ''"
             :continuous="false"
             hide-delimiters
             height="auto"
@@ -95,11 +101,13 @@
               <v-col>
                 <v-row align="center">
                   <v-col
+                    v-for="(threaddata, index) in threadsdata"
+                    :key="index"
                     cols="auto"
                     class="pr-2 click-cursor"
                     @click="like(thread.id)"
                   >
-                    <v-icon v-if="liked">mdi-thumb-up</v-icon>
+                    <v-icon v-if="threaddata.liked">mdi-thumb-up</v-icon>
                     <v-icon v-else>mdi-thumb-up-outline</v-icon>
                   </v-col>
                   <v-col cols="auto" class="pl-2">
@@ -111,8 +119,13 @@
                   </v-col>
                 </v-row>
               </v-col>
-              <v-col class="click-cursor" @click="unlike(thread.id)">
-                <v-icon v-if="unliked">mdi-thumb-down</v-icon>
+              <v-col
+                v-for="(threaddata, index) in threadsdata"
+                :key="index"
+                class="click-cursor"
+                @click="unlike(thread.id)"
+              >
+                <v-icon v-if="threaddata.unliked">mdi-thumb-down</v-icon>
                 <v-icon v-else>mdi-thumb-down-outline</v-icon>
               </v-col>
             </v-row>
@@ -204,7 +217,7 @@
 </template>
 
 <script>
-import axios from 'axios'
+import FETCH_LIKED_DISLIKED from '~/apollo/queries/fetch-liked-disliked'
 
 import CommentCard from '~/components/cards/CommentCard'
 import TopicShortener from '~/components/utils/TopicShortener'
@@ -230,8 +243,17 @@ export default {
       addedImages: [],
       images: [],
       liked: false,
-      unliked: false
+      unliked: false,
     }
+  },
+  apollo: {
+    threadsdata: {
+      prefetch: true,
+      query: FETCH_LIKED_DISLIKED,
+      variables() {
+        return { user_name: this.thread.author.username, id: this.thread.id }
+      },
+    },
   },
   computed: {
     timepost() {
@@ -308,12 +330,9 @@ export default {
       }
     },
     like(param) {
-      console.log(this.$store.state.auth.accessToken)
-      axios
+      this.$axios
         .post(
-          'https://staking-spade-production.up.railway.app/thread/' +
-            param +
-            '/like',
+          '/thread/' + param + '/like',
           {},
           {
             headers: {
@@ -322,21 +341,24 @@ export default {
           }
         )
         .then((response) => {
-          this.$forceUpdate()
-          this.liked = true
-          this.unliked = false
+          console.log(response)
+          if (response.status === 200) {
+            this.$store.dispatch(
+              'lists/fetchThreadById',
+              this.$route.params.post
+            )
+            this.liked = true
+            this.unliked = false
+          }
         })
         .catch((error) => {
           console.log(error)
         })
-      this.$forceUpdate()
     },
     unlike(param) {
-      axios
+      this.$axios
         .post(
-          'https://staking-spade-production.up.railway.app/thread/' +
-            param +
-            '/unlike',
+          '/thread/' + param + '/unlike',
           {},
           {
             headers: {
@@ -346,14 +368,19 @@ export default {
           }
         )
         .then((response) => {
-          this.$forceUpdate()
-          this.unliked = true
-          this.liked = false
+          console.log(response)
+          if (response.status === 200) {
+            this.$store.dispatch(
+              'lists/fetchThreadById',
+              this.$route.params.post
+            )
+            this.unliked = true
+            this.liked = false
+          }
         })
         .catch((error) => {
           console.log(error)
         })
-      this.$forceUpdate()
     },
   },
 }

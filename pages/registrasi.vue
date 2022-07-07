@@ -84,7 +84,6 @@
 </template>
 <script>
 import { mapMutations } from 'vuex'
-import axios from 'axios'
 
 export default {
   name: 'LoginPage',
@@ -138,9 +137,9 @@ export default {
     ...mapMutations('auth', ['setAccessToken', 'setRefreshToken']),
     register() {
       this.message = ''
-      axios
+      this.$axios
         .post(
-          'https://staking-spade-production.up.railway.app/register',
+          '/register',
           {
             email: this.email,
             username: this.username,

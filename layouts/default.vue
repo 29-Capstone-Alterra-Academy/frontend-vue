@@ -200,7 +200,6 @@ export default {
     },
   },
   created() {
-    this.$store.dispatch('lists/fetchThreads')
     this.$store.dispatch('lists/fetchTopics')
     this.$store.dispatch('lists/fetchUsers')
     this.$store.dispatch('lists/loggedUser')
@@ -208,14 +207,26 @@ export default {
   methods: {
     ...mapMutations('auth', ['logout']),
     handleLogout() {
-      fetch('https://virtserver.swaggerhub.com/etrnal70/nomizo/1.0.0/logout', {
-        method: 'POST',
-        headers: {
-          accept: '*/*',
-        },
-      })
-      this.logout()
-      this.$forceUpdate()
+      this.$axios
+        .post(
+          '/logout',
+          {},
+          {
+            headers: {
+              'Content-Type': 'application/json',
+              Authorization: 'Bearer ' + this.$store.state.auth.accessToken,
+            },
+          }
+        )
+        .then((response) => {
+          this.logout()
+          this.$forceUpdate()
+          this.$router.push('/')
+        })
+        .catch((error) => {
+          this.message = error.message
+          this.snackbar = true
+        })
     },
   },
 }

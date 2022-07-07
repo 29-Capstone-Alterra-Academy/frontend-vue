@@ -1,0 +1,7 @@
+mutation liked($user_name: String, $liked: Boolean) {
+  update_threadsdata(where: {user_name: {_eq: $user_name}}, _set: {liked: $liked}) {
+    returning {
+      id
+    }
+  }
+}

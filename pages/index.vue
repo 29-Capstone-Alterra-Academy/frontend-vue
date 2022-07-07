@@ -47,7 +47,7 @@
             <v-tab-item v-for="item in items" :key="item.tab">
               <section v-if="item.tab == `Rekomendasi`">
                 <v-col v-for="thread in threads" :key="thread.id" class="py-1">
-                  <PostCard :thread="thread" />
+                    <PostCard :thread="thread"/>
                 </v-col>
               </section>
               <section v-if="item.tab == `Mengikuti`">
@@ -104,6 +104,7 @@
                                 :src="topic.profile_image"
                                 class="rounded-circle"
                                 width="30"
+                                height="30"
                               ></v-img>
                             </v-col>
                             <v-col class="pl-0" align-self="center">
@@ -171,6 +172,7 @@
                                 :src="contributor.profile_image"
                                 class="rounded-circle"
                                 width="30"
+                                height="30"
                               ></v-img>
                             </v-col>
                             <v-col class="pl-0" align-self="center">

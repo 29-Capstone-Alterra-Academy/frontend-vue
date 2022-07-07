@@ -5,10 +5,10 @@
       <v-row>
         <v-col cols="auto" class="pb-1">
           <v-select
-            v-model="selectedTopic.name"
+            v-model="selectedTopic.id"
             :items="topics"
             item-text="name"
-            item-value="name"
+            item-value="id"
             label="Choose Topic"
             class="rounded-lg"
             menu-props="{ top: true, offsetY: true }"
@@ -85,7 +85,7 @@
                 <v-col cols="12">
                   <div class="">
                     <v-textarea
-                      :value="title"
+                      v-model="title"
                       rows="1"
                       class="rounded-lg"
                       label="Title"
@@ -99,7 +99,7 @@
                   </div>
                   <div class="py-2">
                     <v-textarea
-                      :value="content"
+                      v-model="content"
                       rows="6"
                       class="rounded-lg"
                       label="Text"
@@ -257,10 +257,8 @@ export default {
     selectedTopic: {
       get() {
         return this.$store.state.lists.topics.filter((item) => {
-          return item.name
-            .toLowerCase()
-            .includes(this.$route.params.slug.toLowerCase())
-        })
+                      return item.id === +this.$route.params.slug
+                    })
       },
       set(newValue) {
         return newValue

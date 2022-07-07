@@ -2,7 +2,7 @@
   <v-container class="py-0" style="width: 93.67%">
     <v-card class="rounded-lg pa-4" outlined>
       <v-breadcrumbs :items="breadcrumbs" class="pa-0 pb-4"></v-breadcrumbs>
-      <v-row v-for="topic in topics" :key="topic.id" align="center">
+      <v-row align="center">
         <v-col cols="auto">
           <v-img
             :src="topic.profile_image"
@@ -52,7 +52,7 @@
         <v-col cols="auto"> Deskripsi </v-col>
         <v-col cols="auto"><v-btn class="text-capitalize">Ubah</v-btn></v-col>
       </v-row>
-      <section v-for="(topic, id) in topics" :key="id">
+      <section>
         <div>
           {{ topic.description }}
         </div>
@@ -168,12 +168,8 @@ export default {
           .includes(this.$route.params.slug.toLowerCase())
       })
     },
-    topics() {
-      return this.$store.state.lists.topics.filter((item) => {
-        return item.name
-          .toLowerCase()
-          .includes(this.$route.params.slug.toLowerCase())
-      })
+    topic() {
+      return this.$store.state.lists.detailTopic
     },
     users() {
       return this.$store.state.lists.users
@@ -181,7 +177,7 @@ export default {
   },
   created() {
     this.$store.dispatch('lists/fetchThreads')
-    this.$store.dispatch('lists/fetchTopics')
+    this.$store.dispatch('lists/fetchTopicById', this.$route.params.slug)
     this.$store.dispatch('lists/fetchUsers')
   },
 }

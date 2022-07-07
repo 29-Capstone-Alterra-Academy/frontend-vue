@@ -1,0 +1,7 @@
+mutation insert($user_name: String, $id: Int){
+  insert_threadsdata(objects: {user_name: $user_name, id: $id}) {
+    returning {
+      id
+    }
+  }
+}

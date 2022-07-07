@@ -72,7 +72,6 @@
 </template>
 <script>
 import { mapMutations } from 'vuex'
-import axios from 'axios'
 
 export default {
   name: 'LoginPage',
@@ -109,9 +108,9 @@ export default {
       e.preventDefault()
       try {
         this.message = ''
-        axios
+        this.$axios
           .post(
-            'https://staking-spade-production.up.railway.app/login',
+            '/login',
             {
               username: this.username,
               password: this.password,

@@ -1,0 +1,7 @@
+mutation unliked($user_name: String, $unliked: Boolean) {
+  update_threadsdata(where: {user_name: {_eq: $user_name}}, _set: {unliked: $unliked}) {
+    returning {
+      id
+    }
+  }
+}

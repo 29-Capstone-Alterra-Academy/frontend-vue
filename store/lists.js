@@ -3,6 +3,8 @@ import axios from 'axios'
 const state = () => ({
   threads: [],
   topics: [],
+  detailTopic: {},
+  detailThread: {},
   users: [],
   replies: [],
   profile: [],
@@ -14,6 +16,12 @@ const mutations = {
   },
   setTopics(state, topics) {
     state.topics = [...topics]
+  },
+  setDetailTopics(state, detailTopic) {
+    state.detailTopic = detailTopic
+  },
+  setDetailThread(state, detailThread) {
+    state.detailThread = detailThread
   },
   setUsers(state, users) {
     state.users = [...users]
@@ -28,8 +36,8 @@ const mutations = {
 
 const actions = {
   fetchThreads({ commit }) {
-    axios
-      .get('https://staking-spade-production.up.railway.app/thread?topicId=1&limit=10&offset=0')
+    this.$axios
+      .get('/thread?topicId=1&limit=10&offset=0')
       .then((res) => {
         commit('setThreads', res.data)
       })
@@ -38,8 +46,8 @@ const actions = {
       })
   },
   fetchThreadsByTopic({ commit }, param) {
-    axios
-      .get('https://staking-spade-production.up.railway.app/thread?topicId=' + param + '&limit=10&offset=0')
+    this.$axios
+      .get('/thread?topicId=' + param + '&limit=10&offset=0')
       .then((response) => {
         commit('setThreads', response.data)
       })
@@ -47,9 +55,24 @@ const actions = {
         console.log(error)
       })
   },
+  fetchThreadById({ commit, rootState }, param) {
+    this.$axios
+      .get('/thread/' + param, {
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: 'Bearer ' + rootState.auth.accessToken,
+        },
+      })
+      .then((response) => {
+        commit('setDetailThread', response.data)
+      })
+      .catch((error) => {
+        console.log(error)
+      })
+  },
   fetchTopics({ commit }) {
-    axios
-      .get('https://staking-spade-production.up.railway.app/topic?limit=10&offset=0')
+    this.$axios
+      .get('/topic?limit=10&offset=0')
       .then((res) => {
         commit('setTopics', res.data)
       })
@@ -57,9 +80,24 @@ const actions = {
         console.log(err)
       })
   },
-  fetchUsers({ commit }) {
+  fetchTopicById({ commit, rootState }, param) {
     this.$axios
-      .get('/users')
+      .get('/topic/' + param, {
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: 'Bearer ' + rootState.auth.accessToken,
+        },
+      })
+      .then((res) => {
+        commit('setDetailTopics', res.data)
+      })
+      .catch((err) => {
+        console.log(err)
+      })
+  },
+  fetchUsers({ commit }) {
+    axios
+      .get('https://nomizo-json-server.herokuapp.com/users')
       .then((res) => {
         commit('setUsers', res.data)
       })
@@ -68,8 +106,8 @@ const actions = {
       })
   },
   fetchReplies({ commit }) {
-    this.$axios
-      .get('/replies')
+    axios
+      .get('https://nomizo-json-server.herokuapp.com/replies')
       .then((res) => {
         commit('setReplies', res.data)
       })
@@ -78,8 +116,8 @@ const actions = {
       })
   },
   loggedUser({ commit, rootState }) {
-    axios
-      .get('https://staking-spade-production.up.railway.app/profile', {
+    this.$axios
+      .get('/profile', {
         headers: {
           'Content-Type': 'application/json',
           Authorization: 'Bearer ' + rootState.auth.accessToken,

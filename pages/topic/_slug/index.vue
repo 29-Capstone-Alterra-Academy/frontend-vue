@@ -2,7 +2,7 @@
   <v-row>
     <v-col cols="12">
       <v-row justify="center">
-        <v-col v-for="topic in topics" :key="topic.id" cols="11">
+        <v-col cols="11">
           <v-card class="rounded-lg pa-4" outlined>
             <v-row align="center">
               <v-col cols="auto">
@@ -10,6 +10,7 @@
                   :src="topic.profile_image"
                   class="rounded-circle"
                   width="100"
+                  height="100"
                 ></v-img>
               </v-col>
               <v-col cols="auto">
@@ -123,8 +124,8 @@
                       <v-divider />
                     </div>
                     <v-row>
-                      <v-col v-for="topic in topics" :key="topic.id" cols="12">
-                        <CurrentTopic :topic="topics[0]" />
+                      <v-col cols="12">
+                        <CurrentTopic :topic="topic" />
                       </v-col>
                     </v-row>
                   </v-list-item-content>
@@ -164,10 +165,10 @@
                       <v-divider />
                     </div>
                     <v-row>
-                      <v-col v-for="topic in topics" :key="topic.id" cols="12">
+                      <v-col cols="12">
                         <section v-if="topic.rules != null">
                           <section
-                            v-for="(rule, index) in topic.rules.split('\n')"
+                            v-for="(rule, index) in topic.rules.split('/n')"
                             :key="index"
                           >
                             <div
@@ -246,19 +247,17 @@ export default {
       console.log(this.$store.state.lists.threads)
       return this.$store.state.lists.threads
     },
-    topics() {
-      console.log('topic', this.$store.state.lists.topics)
-      return this.$store.state.lists.topics.filter((item) => {
-        return item.id.toString().includes(this.$route.params.slug)
-      })
+    topic() {
+      console.log('topic', this.$store.state.lists.detailTopic)
+      return this.$store.state.lists.detailTopic
     },
     users() {
       return this.$store.state.lists.users
     },
   },
   created() {
-    this.$store.dispatch('lists/fetchThreadsByTopic', this.$route.params.slug)
-    this.$store.dispatch('lists/fetchTopics')
+    this.$store.dispatch('lists/fetchThreadsByTopic', +this.$route.params.slug)
+    this.$store.dispatch('lists/fetchTopicById', this.$route.params.slug)
     this.$store.dispatch('lists/fetchUsers')
   },
 }

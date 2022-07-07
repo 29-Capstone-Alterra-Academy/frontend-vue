@@ -3,8 +3,6 @@
     <v-col cols="7">
       <v-row>
         <v-col
-          v-for="thread in threads"
-          :key="thread.id"
           cols="12"
           class="pt-3 py-1"
         >
@@ -27,11 +25,9 @@
                 </div>
                 <v-row>
                   <v-col
-                    v-for="(thread, index) in threads"
-                    :key="index"
                     cols="12"
                   >
-                    <CurrentTopic :topic="thread.topic" />
+                    <CurrentTopic :topic="topic" />
                   </v-col>
                 </v-row>
               </v-list-item-content>
@@ -71,10 +67,10 @@
                   <v-divider />
                 </div>
                 <v-row>
-                  <v-col v-for="thread in threads" :key="thread.id" cols="12">
-                    <section v-if="thread.topic.rules != null">
+                  <v-col cols="12">
+                    <section v-if="topic.rules != null">
                       <section
-                        v-for="(rule, index) in thread.topic.rules.split('\n')"
+                        v-for="(rule, index) in topic.rules.split('\n')"
                         :key="index"
                       >
                         <div
@@ -123,7 +119,6 @@
 import SinglePostCard from '~/components/cards/SinglePostCard'
 import CurrentTopic from '~/components/cards/CurrentTopic'
 import NameShortener from '~/components/utils/NameShortener'
-
 export default {
   name: 'IndexPage',
   components: {
@@ -142,25 +137,21 @@ export default {
     return {}
   },
   computed: {
-    threads() {
-      console.log(this.$store.state.lists.threads)
-      if (this.$route.params.id) {
-        return this.$store.state.lists.threads.filter((item) => {
-          return item.id.toString().includes(this.$route.params.id)
-        })
-      }
-      return this.$store.state.lists.threads
+    thread() {
+      return this.$store.state.lists.detailThread
     },
     users() {
       return this.$store.state.lists.users
     },
+    topic() {
+      return this.$store.state.lists.detailTopic
+    },
   },
-  created() {
-    this.$store.dispatch('lists/fetchThreads')
-    this.$store.dispatch('lists/fetchTopics')
+  mounted() {
+    this.$store.dispatch('lists/fetchTopicById', this.$route.params.topic)
+    this.$store.dispatch('lists/fetchThreadById', this.$route.params.post)
     this.$store.dispatch('lists/fetchUsers')
   },
-  mounted() {},
 }
 </script>
 
