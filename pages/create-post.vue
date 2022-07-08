@@ -240,8 +240,6 @@
 </template>
 
 <script>
-import INSERT_THREADS from '~/apollo/mutations/insert-threads'
-
 import Observer from '~/components/ObserverScroll'
 import AddTopic from '~/components/cards/AddTopic'
 import TopicShortener from '~/components/utils/TopicShortener'
@@ -326,17 +324,6 @@ export default {
             this.content = ''
             this.search = ''
             this.images = []
-            try {
-              this.$apollo.mutate({
-                mutation: INSERT_THREADS,
-                variables: {
-                  user_name: this.$store.state.lists.profile.username,
-                  id: response.data.id,
-                },
-              })
-            } catch (error) {
-              console.log(error)
-            }
           }
         })
         .catch((error) => {

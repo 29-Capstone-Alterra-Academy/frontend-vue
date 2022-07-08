@@ -99,9 +99,9 @@
           <v-col cols="4" class="pa-0">
             <v-row justify="center">
               <v-col>
-                <v-row align="center">
+                <v-row v-if="threadsui.length > 0" align="center">
                   <v-col
-                    v-for="(threaddata, index) in threadsdata"
+                    v-for="(threaddata, index) in threadsui"
                     :key="index"
                     cols="auto"
                     class="pr-2 click-cursor"
@@ -118,14 +118,36 @@
                     </p>
                   </v-col>
                 </v-row>
+                <v-row v-else align="center">
+                  <v-col
+                    cols="auto"
+                    class="pr-2 click-cursor"
+                    @click="like(thread.id)"
+                  >
+                    <v-icon v-if="liked">mdi-thumb-up</v-icon>
+                    <v-icon v-else>mdi-thumb-up-outline</v-icon>
+                  </v-col>
+                  <v-col cols="auto" class="pl-2">
+                    <p class="ma-0" style="width: 50%; display: inline">
+                      <FollowerShortener
+                        :follower="thread.liked_count - thread.unliked_count"
+                      />
+                    </p>
+                  </v-col>
+                </v-row>
               </v-col>
               <v-col
-                v-for="(threaddata, index) in threadsdata"
-                :key="index"
+                v-if="threadsui.length > 0"
                 class="click-cursor"
                 @click="unlike(thread.id)"
               >
-                <v-icon v-if="threaddata.unliked">mdi-thumb-down</v-icon>
+                <section v-for="(threaddata, index) in threadsui" :key="index">
+                  <v-icon v-if="threaddata.unliked">mdi-thumb-down</v-icon>
+                  <v-icon v-else>mdi-thumb-down-outline</v-icon>
+                </section>
+              </v-col>
+              <v-col v-else class="click-cursor" @click="unlike(thread.id)">
+                <v-icon v-if="unliked">mdi-thumb-down</v-icon>
                 <v-icon v-else>mdi-thumb-down-outline</v-icon>
               </v-col>
             </v-row>
@@ -218,6 +240,12 @@
 
 <script>
 import FETCH_LIKED_DISLIKED from '~/apollo/queries/fetch-liked-disliked'
+import LIKED from '~/apollo/mutations/liked'
+import INSERT_LIKED from '~/apollo/mutations/insert-liked'
+import INSERT_UNLIKED from '~/apollo/mutations/insert-unliked'
+import UNLIKED from '~/apollo/mutations/unliked'
+// import REVERT_THREADS from '~/apollo/mutations/revert-threads'
+import SUBS_THREADS from '~/apollo/subscriptions/subs-threads'
 
 import CommentCard from '~/components/cards/CommentCard'
 import TopicShortener from '~/components/utils/TopicShortener'
@@ -247,11 +275,22 @@ export default {
     }
   },
   apollo: {
-    threadsdata: {
+    threadsui: {
       prefetch: true,
       query: FETCH_LIKED_DISLIKED,
       variables() {
-        return { user_name: this.thread.author.username, id: this.thread.id }
+        return {
+          user_name: this.$store.state.lists.profile.username,
+          id: this.$route.params.post,
+        }
+      },
+      subscribeToMore: {
+        document: SUBS_THREADS,
+        updateQuery: ({ subscriptionData }) => {
+          return {
+            threadsui: subscriptionData.data,
+          }
+        },
       },
     },
   },
@@ -330,57 +369,162 @@ export default {
       }
     },
     like(param) {
-      this.$axios
-        .post(
-          '/thread/' + param + '/like',
-          {},
-          {
-            headers: {
-              Authorization: 'Bearer ' + this.$store.state.auth.accessToken,
-            },
-          }
-        )
-        .then((response) => {
-          console.log(response)
-          if (response.status === 200) {
-            this.$store.dispatch(
-              'lists/fetchThreadById',
-              this.$route.params.post
-            )
-            this.liked = true
-            this.unliked = false
-          }
-        })
-        .catch((error) => {
-          console.log(error)
-        })
+      console.log(this.threadsui)
+      if (this.threadsui.length > 0) {
+        console.log(this.threadsui)
+        this.$axios
+          .post(
+            '/thread/' + param + '/like',
+            {},
+            {
+              headers: {
+                Authorization: 'Bearer ' + this.$store.state.auth.accessToken,
+              },
+            }
+          )
+          .then((response) => {
+            console.log(response)
+            if (response.status === 200) {
+              this.$store.dispatch(
+                'lists/fetchThreadById',
+                this.$route.params.post
+              )
+              this.liked = true
+              this.unliked = false
+              try {
+                this.$apollo.mutate({
+                  mutation: LIKED,
+                  variables: {
+                    user_name: this.$store.state.lists.profile.username,
+                    id: this.$route.params.post,
+                  },
+                })
+              } catch (error) {
+                console.log(error)
+              }
+            }
+          })
+          .catch((error) => {
+            console.log(error)
+          })
+      } else {
+        this.$axios
+          .post(
+            '/thread/' + param + '/like',
+            {},
+            {
+              headers: {
+                Authorization: 'Bearer ' + this.$store.state.auth.accessToken,
+              },
+            }
+          )
+          .then((response) => {
+            console.log(response)
+            if (response.status === 200) {
+              this.$store.dispatch(
+                'lists/fetchThreadById',
+                this.$route.params.post
+              )
+              this.liked = true
+              this.unliked = false
+              try {
+                this.$apollo.mutate({
+                  mutation: INSERT_LIKED,
+                  variables: {
+                    user_name: this.$store.state.lists.profile.username,
+                    id: this.$route.params.post,
+                  },
+                })
+              } catch (error) {
+                console.log(error)
+              }
+              setTimeout(this.$apollo.queries.threadsui.refetch(), 6000)
+            }
+          })
+          .catch((error) => {
+            console.log(error)
+          })
+      }
     },
     unlike(param) {
-      this.$axios
-        .post(
-          '/thread/' + param + '/unlike',
-          {},
-          {
-            headers: {
-              'Content-Type': 'application/json',
-              Authorization: 'Bearer ' + this.$store.state.auth.accessToken,
-            },
-          }
-        )
-        .then((response) => {
-          console.log(response)
-          if (response.status === 200) {
-            this.$store.dispatch(
-              'lists/fetchThreadById',
-              this.$route.params.post
-            )
-            this.unliked = true
-            this.liked = false
-          }
-        })
-        .catch((error) => {
-          console.log(error)
-        })
+      console.log(this.threadsui)
+      if (this.threadsui.length > 0) {
+        console.log(this.threadsui)
+        this.$axios
+          .post(
+            '/thread/' + param + '/unlike',
+            {},
+            {
+              headers: {
+                'Content-Type': 'application/json',
+                Authorization: 'Bearer ' + this.$store.state.auth.accessToken,
+              },
+            }
+          )
+          .then((response) => {
+            console.log(response)
+            if (response.status === 200) {
+              this.$store.dispatch(
+                'lists/fetchThreadById',
+                this.$route.params.post
+              )
+              this.unliked = true
+              this.liked = false
+              try {
+                this.$apollo.mutate({
+                  mutation: UNLIKED,
+                  variables: {
+                    user_name: this.$store.state.lists.profile.username,
+                    id: this.$route.params.post,
+                  },
+                })
+              } catch (error) {
+                console.log(error)
+              }
+            }
+          })
+          .catch((error) => {
+            console.log(error)
+          })
+      } else {
+        this.$axios
+          .post(
+            '/thread/' + param + '/unlike',
+            {},
+            {
+              headers: {
+                'Content-Type': 'application/json',
+                Authorization: 'Bearer ' + this.$store.state.auth.accessToken,
+              },
+            }
+          )
+          .then((response) => {
+            console.log(response)
+            if (response.status === 200) {
+              this.$store.dispatch(
+                'lists/fetchThreadById',
+                this.$route.params.post
+              )
+              this.unliked = true
+              this.liked = false
+              try {
+                this.$apollo.mutate({
+                  mutation: INSERT_UNLIKED,
+                  variables: {
+                    user_name: this.$store.state.lists.profile.username,
+                    id: this.$route.params.post,
+                  },
+                })
+              } catch (error) {
+                console.log(error)
+              }
+              setTimeout(this.$apollo.queries.threadsui.refetch(), 6000)
+            }
+          })
+          .catch((error) => {
+            console.log(error)
+          })
+      }
     },
   },
 }

@@ -207,26 +207,29 @@ export default {
   methods: {
     ...mapMutations('auth', ['logout']),
     handleLogout() {
-      this.$axios
-        .post(
-          '/logout',
-          {},
-          {
-            headers: {
-              'Content-Type': 'application/json',
-              Authorization: 'Bearer ' + this.$store.state.auth.accessToken,
-            },
-          }
-        )
-        .then((response) => {
-          this.logout()
-          this.$forceUpdate()
-          this.$router.push('/')
-        })
-        .catch((error) => {
-          this.message = error.message
-          this.snackbar = true
-        })
+      this.logout()
+      this.$forceUpdate()
+      this.$router.push('/')
+      // this.$axios
+      //   .post(
+      //     '/logout',
+      //     {},
+      //     {
+      //       headers: {
+      //         'Content-Type': 'application/json',
+      //         Authorization: 'Bearer ' + this.$store.state.auth.accessToken,
+      //       },
+      //     }
+      //   )
+      //   .then((response) => {
+      //     this.logout()
+      //     this.$forceUpdate()
+      //     this.$router.push('/')
+      //   })
+      //   .catch((error) => {
+      //     this.message = error.message
+      //     this.snackbar = true
+      //   })
     },
   },
 }
