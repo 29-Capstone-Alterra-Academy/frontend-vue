@@ -368,9 +368,10 @@ export default {
         this.images = [...this.images, ...this.addedImages]
       }
     },
-    like(param) {
-      console.log(this.threadsui)
-      if (this.threadsui.length > 0) {
+    async like(param) {
+      const response = await this.$apollo.queries.threadsui.refetch()
+      console.log(response)
+      if (response.data.threadsui.length > 0) {
         console.log(this.threadsui)
         this.$axios
           .post(
@@ -438,7 +439,6 @@ export default {
               } catch (error) {
                 console.log(error)
               }
-              setTimeout(this.$apollo.queries.threadsui.refetch(), 6000)
             }
           })
           .catch((error) => {
@@ -446,9 +446,10 @@ export default {
           })
       }
     },
-    unlike(param) {
-      console.log(this.threadsui)
-      if (this.threadsui.length > 0) {
+    async unlike(param) {
+      const response = await this.$apollo.queries.threadsui.refetch()
+      console.log(response)
+      if (response.data.threadsui.length > 0) {
         console.log(this.threadsui)
         this.$axios
           .post(
@@ -518,7 +519,6 @@ export default {
               } catch (error) {
                 console.log(error)
               }
-              setTimeout(this.$apollo.queries.threadsui.refetch(), 6000)
             }
           })
           .catch((error) => {
