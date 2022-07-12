@@ -1,10 +1,10 @@
 <template>
   <v-app dark>
-    <v-navigation-drawer v-model="drawer" temporary app color="primary">
+    <v-navigation-drawer v-model="drawer" temporary app flat color="primary">
       <v-list>
         <v-list-item>
           <v-list-item-content>
-            <v-list-item-title class="title">City Bike</v-list-item-title>
+            <v-list-item-title class="title">Nomizo</v-list-item-title>
           </v-list-item-content>
         </v-list-item>
       </v-list>
@@ -16,7 +16,7 @@
       </v-list>
     </v-navigation-drawer>
 
-    <v-app-bar app clipped fixed class="">
+    <v-app-bar app flat clipped fixed class="">
       <v-toolbar-title>
         <v-img src="/Logo.svg" class="" width="110"></v-img>
       </v-toolbar-title>
@@ -28,6 +28,7 @@
       />
       <AuthButton v-else :items="items" />
       <v-spacer />
+      <v-icon class="pa-2"> mdi-bell-outline </v-icon>
       <v-menu offset-y>
         <template #activator="{ on, attrs }">
           <v-card class="rounded-lg px-2" outlined v-bind="attrs" v-on="on">
@@ -108,24 +109,9 @@
         </v-list>
       </v-menu>
     </v-app-bar>
-    <v-main>
-      <v-container>
-        <NuxtChild :search-post="search" />
-      </v-container>
+    <v-main class="global">
+      <NuxtChild :search-post="search" />
     </v-main>
-    <v-navigation-drawer v-model="rightDrawer" :right="right" temporary fixed>
-      <v-list>
-        <v-list-item @click.native="right = !right">
-          <v-list-item-action>
-            <v-icon light> mdi-repeat </v-icon>
-          </v-list-item-action>
-          <v-list-item-title>Switch drawer (click me)</v-list-item-title>
-        </v-list-item>
-      </v-list>
-    </v-navigation-drawer>
-    <v-footer app>
-      <span>&copy; {{ new Date().getFullYear() }}</span>
-    </v-footer>
   </v-app>
 </template>
 
@@ -203,6 +189,7 @@ export default {
     this.$store.dispatch('lists/fetchTopics')
     this.$store.dispatch('lists/fetchUsers')
     this.$store.dispatch('lists/loggedUser')
+    this.$store.dispatch('lists/isAdmin')
   },
   methods: {
     ...mapMutations('auth', ['logout']),
@@ -235,7 +222,10 @@ export default {
 }
 </script>
 
-<style scoped>
+<style>
+.global {
+  background-color: #cfcfcf;
+}
 .user-card.v-card.v-sheet.v-sheet--shaped {
   border-radius: 24px;
 }

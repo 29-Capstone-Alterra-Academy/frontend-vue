@@ -41,11 +41,10 @@
             class="rounded-lg"
             label="Nama Topik"
             placeholder="Nama Topik"
-            counter
+            counter="25"
             auto-grow
             outlined
             dense
-            hide-details
           ></v-textarea>
         </div>
         <div class="py-2">

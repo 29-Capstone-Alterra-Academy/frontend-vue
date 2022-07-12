@@ -5,9 +5,12 @@ const state = () => ({
   topics: [],
   detailTopic: {},
   detailThread: {},
+  detailUser: {},
   users: [],
   replies: [],
   profile: [],
+  reasons: [],
+  isAdmin: null,
 })
 
 const mutations = {
@@ -23,14 +26,23 @@ const mutations = {
   setDetailThread(state, detailThread) {
     state.detailThread = detailThread
   },
+  setDetailUser(state, detailUser) {
+    state.detailUser = detailUser
+  },
   setUsers(state, users) {
     state.users = [...users]
   },
   setReplies(state, replies) {
     state.replies = [...replies]
   },
+  setReasons(state, reasons) {
+    state.reasons = [...reasons]
+  },
   setProfile(state, profile) {
     state.profile = profile
+  },
+  setUserRole(state, isAdmin) {
+    state.isAdmin = isAdmin
   },
 }
 
@@ -48,6 +60,16 @@ const actions = {
   fetchThreadsByTopic({ commit }, param) {
     this.$axios
       .get('/thread?topicId=' + param + '&limit=10&offset=0')
+      .then((response) => {
+        commit('setThreads', response.data)
+      })
+      .catch((error) => {
+        console.log(error)
+      })
+  },
+  fetchThreadsByUser({ commit }, param) {
+    this.$axios
+      .get('/thread?userId=' + param + '&limit=10&offset=0')
       .then((response) => {
         commit('setThreads', response.data)
       })
@@ -105,11 +127,56 @@ const actions = {
         console.log(err)
       })
   },
+  fetchUserById({ commit, rootState }, param) {
+    this.$axios
+      .get('/user/' + param, {
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: 'Bearer ' + rootState.auth.accessToken,
+        },
+      })
+      .then((res) => {
+        commit('setDetailUser', res.data)
+      })
+      .catch((err) => {
+        console.log(err)
+      })
+  },
   fetchReplies({ commit }) {
     axios
       .get('https://nomizo-json-server.herokuapp.com/replies')
       .then((res) => {
         commit('setReplies', res.data)
+      })
+      .catch((err) => {
+        console.log(err)
+      })
+  },
+  fetchRepliesByThreadId({ commit, rootState }, param) {
+    this.$axios
+      .get('reply?scope=thread&limit=5&offset=0&threadId=' + param, {
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: 'Bearer ' + rootState.auth.accessToken,
+        },
+      })
+      .then((res) => {
+        commit('setReplies', res.data)
+      })
+      .catch((err) => {
+        console.log(err)
+      })
+  },
+  fetchReportReasons({ commit, rootState }) {
+    this.$axios
+      .get('/report/reason', {
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: 'Bearer ' + rootState.auth.accessToken,
+        },
+      })
+      .then((res) => {
+        commit('setReasons', res.data)
       })
       .catch((err) => {
         console.log(err)
@@ -130,11 +197,17 @@ const actions = {
         console.log(error)
       })
   },
+  isAdmin({ commit, rootState }) {
+    const base64Payload = rootState.auth.accessToken.split('.')[1]
+    const payload = Buffer.from(base64Payload, 'base64')
+    const tkData = JSON.parse(payload.toString())
+    commit('setUserRole', tkData.is_admin)
+  },
 }
 
 const getters = {
-  isMale(state) {
-    return state.profile.username !== null
+  isAdmin(state) {
+    return state.isAdmin
   },
 }
 

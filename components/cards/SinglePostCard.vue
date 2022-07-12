@@ -5,7 +5,10 @@
         <v-row align="center">
           <v-col cols="1" style="max-width: none">
             <v-img
-              :src="thread.topic.profile_image"
+              :src="
+                'https://staking-spade-production.up.railway.app' +
+                thread.topic.profile_image
+              "
               class="rounded-circle"
               width="35"
               height="35"
@@ -26,7 +29,7 @@
             <div>
               <small class="text--disabled"
                 >diposting oleh
-                <router-link :to="`/user/${thread.author.username}`"
+                <router-link :to="`/user/${thread.author.id}`"
                   ><NameShortener
                     v-if="thread.author.username != null"
                     :username="thread.author.username"
@@ -37,10 +40,10 @@
           </v-col>
           <v-col cols="auto">
             <v-row>
-              <v-col cols="6">
+              <v-col v-if="!isAdmin" cols="auto">
                 <v-icon> mdi-bell-outline </v-icon>
               </v-col>
-              <v-col cols="6">
+              <v-col cols="auto">
                 <v-menu offset-y>
                   <template #activator="{ on, attrs }">
                     <p
@@ -53,7 +56,15 @@
                     </p>
                   </template>
                   <v-list class="pa-0">
-                    <v-list-item to="/">
+                    <v-list-item v-if="isAdmin" to="/">
+                      <v-list-item-action>
+                        <v-icon>mdi-bullhorn-outline</v-icon>
+                      </v-list-item-action>
+                      <v-list-item-content>
+                        <v-list-item-title v-text="`Hapus`" />
+                      </v-list-item-content>
+                    </v-list-item>
+                    <v-list-item v-else to="/">
                       <v-list-item-action>
                         <v-icon>mdi-bullhorn-outline</v-icon>
                       </v-list-item-action>
@@ -67,30 +78,43 @@
             </v-row>
           </v-col>
         </v-row>
-        <v-list-item-title class="text-h6 my-2">
-          {{ thread.title }}
-        </v-list-item-title>
-        <v-list-item-content>
-          {{ thread.content }}
-        </v-list-item-content>
-        <v-flex class="text-center">
-          <v-carousel
-            v-if="thread.image_1 != ''"
-            :continuous="false"
-            hide-delimiters
-            height="auto"
-            style="max-height: 460px"
-          >
-            <v-carousel-item v-for="(item, index) in postImages" :key="index">
-              <v-img
-                :src="item"
-                class="mx-auto"
-                max-width="75%"
-                max-height="100%"
-              ></v-img>
-            </v-carousel-item>
-          </v-carousel>
-        </v-flex>
+        <section>
+          <v-list-item-title class="text-h6 my-2">
+            {{ thread.title }}
+          </v-list-item-title>
+          <v-list-item-content>
+            <section v-if="thread.content != null">
+              <section
+                v-for="(content, index) in thread.content.split('\r\n')"
+                :key="index"
+              >
+                <div class="subtitle-1 font-weight-light py-1">
+                  {{ content }}
+                </div>
+              </section>
+            </section>
+          </v-list-item-content>
+          <v-flex class="text-center">
+            <v-carousel
+              v-if="thread.image_1 !== ''"
+              :continuous="false"
+              hide-delimiters
+              height="auto"
+              style="max-height: 460px"
+            >
+              <v-carousel-item v-for="(item, index) in postImages" :key="index">
+                <v-img
+                  :src="
+                    'https://staking-spade-production.up.railway.app' + item
+                  "
+                  class="mx-auto"
+                  max-width="75%"
+                  height="460"
+                ></v-img>
+              </v-carousel-item>
+            </v-carousel>
+          </v-flex>
+        </section>
       </v-list-item-content>
     </v-list-item>
     <v-card-actions class="pa-0">
@@ -227,7 +251,7 @@
               <v-btn class="text-capitalize">Comment</v-btn>
             </v-col>
           </v-row>
-          <div>
+          <div v-if="replies.length > 0">
             <v-col v-for="reply in replies" :key="reply.id">
               <CommentCard :reply="reply" />
             </v-col>
@@ -239,12 +263,14 @@
 </template>
 
 <script>
+import { mapGetters } from 'vuex'
+
 import FETCH_LIKED_DISLIKED from '~/apollo/queries/fetch-liked-disliked'
 import LIKED from '~/apollo/mutations/liked'
 import INSERT_LIKED from '~/apollo/mutations/insert-liked'
 import INSERT_UNLIKED from '~/apollo/mutations/insert-unliked'
 import UNLIKED from '~/apollo/mutations/unliked'
-// import REVERT_THREADS from '~/apollo/mutations/revert-threads'
+import REVERT_THREADS from '~/apollo/mutations/revert-threads'
 import SUBS_THREADS from '~/apollo/subscriptions/subs-threads'
 
 import CommentCard from '~/components/cards/CommentCard'
@@ -295,9 +321,10 @@ export default {
     },
   },
   computed: {
+    ...mapGetters('lists', ['isAdmin']),
     timepost() {
       const seconds = Math.floor(
-        (new Date() - new Date(String(this.thread.updated_at))) / 1000
+        (new Date() - new Date(String(this.thread.created_at))) / 1000
       )
       let interval = Math.floor(seconds / 31536000)
 
@@ -327,37 +354,37 @@ export default {
     },
     postImages() {
       const images = []
-      if (this.thread.image_5 != null) {
+      if (this.thread.image_5 !== '') {
         images.push(this.thread.image_1)
         images.push(this.thread.image_2)
         images.push(this.thread.image_3)
         images.push(this.thread.image_4)
         images.push(this.thread.image_5)
       }
-      if (this.thread.image_4 != null && this.thread.image_5 == null) {
+      if (this.thread.image_4 !== '' && this.thread.image_5 === '') {
         images.push(this.thread.image_1)
         images.push(this.thread.image_2)
         images.push(this.thread.image_3)
         images.push(this.thread.image_4)
       }
-      if (this.thread.image_3 != null && this.thread.image_4 == null) {
+      if (this.thread.image_3 !== '' && this.thread.image_4 === '') {
         images.push(this.thread.image_1)
         images.push(this.thread.image_2)
         images.push(this.thread.image_3)
       }
-      if (this.thread.image_2 != null && this.thread.image_3 == null) {
+      if (this.thread.image_2 !== '' && this.thread.image_3 === '') {
         images.push(this.thread.image_1)
         images.push(this.thread.image_2)
       }
-      if (this.thread.image_1 != null && this.thread.image_2 == null) {
+      if (this.thread.image_1 !== '' && this.thread.image_2 === '') {
         images.push(this.thread.image_1)
-        images.push(this.thread.image_2)
       }
+      console.log(images.length)
       return images
     },
   },
   created() {
-    this.$store.dispatch('lists/fetchReplies')
+    this.$store.dispatch('lists/fetchRepliesByThreadId', this.$route.params.post)
   },
   methods: {
     removeImage(index) {
@@ -370,9 +397,43 @@ export default {
     },
     async like(param) {
       const response = await this.$apollo.queries.threadsui.refetch()
-      console.log(response)
       if (response.data.threadsui.length > 0) {
-        console.log(this.threadsui)
+        if (this.threadsui[0].liked === true) {
+          this.$axios
+          .delete(
+            '/thread/' + param + '/like',
+            {
+              headers: {
+                Authorization: 'Bearer ' + this.$store.state.auth.accessToken,
+              },
+            }
+          )
+          .then((response) => {
+            if (response.status === 200) {
+              this.$store.dispatch(
+                'lists/fetchThreadById',
+                this.$route.params.post
+              )
+              this.liked = true
+              this.unliked = false
+              try {
+                this.$apollo.mutate({
+                  mutation: REVERT_THREADS,
+                  variables: {
+                    user_name: this.$store.state.lists.profile.username,
+                    id: this.$route.params.post,
+                  },
+                })
+              } catch (error) {
+                console.log(error)
+              }
+            }
+          })
+          .catch((error) => {
+            console.log(error)
+          })
+          return
+        }
         this.$axios
           .post(
             '/thread/' + param + '/like',
@@ -384,7 +445,6 @@ export default {
             }
           )
           .then((response) => {
-            console.log(response)
             if (response.status === 200) {
               this.$store.dispatch(
                 'lists/fetchThreadById',
@@ -420,7 +480,6 @@ export default {
             }
           )
           .then((response) => {
-            console.log(response)
             if (response.status === 200) {
               this.$store.dispatch(
                 'lists/fetchThreadById',
@@ -448,9 +507,44 @@ export default {
     },
     async unlike(param) {
       const response = await this.$apollo.queries.threadsui.refetch()
-      console.log(response)
       if (response.data.threadsui.length > 0) {
-        console.log(this.threadsui)
+        if (this.threadsui[0].unliked === true) {
+          this.$axios
+          .delete(
+            '/thread/' + param + '/unlike',
+            {
+              headers: {
+                Authorization: 'Bearer ' + this.$store.state.auth.accessToken,
+              },
+            }
+          )
+          .then((response) => {
+            console.log(response)
+            if (response.status === 200) {
+              this.$store.dispatch(
+                'lists/fetchThreadById',
+                this.$route.params.post
+              )
+              this.liked = true
+              this.unliked = false
+              try {
+                this.$apollo.mutate({
+                  mutation: REVERT_THREADS,
+                  variables: {
+                    user_name: this.$store.state.lists.profile.username,
+                    id: this.$route.params.post,
+                  },
+                })
+              } catch (error) {
+                console.log(error)
+              }
+            }
+          })
+          .catch((error) => {
+            console.log(error)
+          })
+          return
+        }
         this.$axios
           .post(
             '/thread/' + param + '/unlike',

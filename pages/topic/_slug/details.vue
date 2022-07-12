@@ -5,7 +5,10 @@
       <v-row align="center">
         <v-col cols="auto">
           <v-img
-            :src="topic.profile_image"
+            :src="
+              'https://staking-spade-production.up.railway.app' +
+              topic.profile_image
+            "
             class="rounded-circle"
             width="100"
           ></v-img>
@@ -27,7 +30,7 @@
             <v-col cols="12" class="pa-0">
               <div class="py-1">
                 <h4>
-                  <FollowerShortener :follower="topic.followers" />
+                  <FollowerShortener :follower="topic.contributor_count" />
                   Followers
                 </h4>
               </div>
@@ -35,7 +38,8 @@
             <v-col cols="12" class="pa-0">
               <div class="py-1">
                 <h4>
-                  <FollowerShortener :follower="topic.followers" /> Total Posts
+                  <FollowerShortener :follower="topic.activity_count" /> Total
+                  Posts
                 </h4>
               </div>
             </v-col>
@@ -60,14 +64,16 @@
           <v-col cols="auto"> Rules </v-col>
           <v-col cols="auto"><v-btn class="text-capitalize">Ubah</v-btn></v-col>
         </v-row>
-        <div v-for="(rule, index) in topic.rules.split('\n')" :key="index">
-          <div
-            class="subtitle-1 font-weight-light py-1"
-            style="line-height: inherit"
-          >
-            {{ rule }}
+        <template v-if="topic.rules != ''">
+          <div v-for="(rule, index) in topic.rules.split('\n')" :key="index">
+            <div
+              class="subtitle-1 font-weight-light py-1"
+              style="line-height: inherit"
+            >
+              {{ rule }}
+            </div>
           </div>
-        </div>
+        </template>
       </section>
       <v-row>
         <v-col>
@@ -126,23 +132,6 @@ export default {
     return {
       tab: null,
       items: [{ tab: 'Rekomendasi', icon: 'mdi-fire' }, { tab: 'Mengikuti' }],
-      breadcrumbs: [
-        {
-          text: 'Home',
-          disabled: false,
-          href: '/',
-        },
-        {
-          text: this.$route.params.slug,
-          disabled: false,
-          href: '/topic/' + this.$route.params.slug,
-        },
-        {
-          text: 'Details',
-          disabled: true,
-          href: 'breadcrumbs_link_2',
-        },
-      ],
     }
   },
   computed: {
@@ -173,6 +162,25 @@ export default {
     },
     users() {
       return this.$store.state.lists.users
+    },
+    breadcrumbs() {
+      return [
+        {
+          text: 'Home',
+          disabled: false,
+          href: '/',
+        },
+        {
+          text: this.$store.state.lists.detailTopic.name,
+          disabled: false,
+          href: '/topic/' + this.$route.params.slug,
+        },
+        {
+          text: 'Details',
+          disabled: true,
+          href: 'breadcrumbs_link_2',
+        },
+      ]
     },
   },
   created() {

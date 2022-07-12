@@ -102,7 +102,7 @@ export default {
     ...mapMutations('auth', [
       'setAccessToken',
       'setRefreshToken',
-      'setUserProfile',
+      'setUserRole'
     ]),
     handlelogin(e) {
       e.preventDefault()
@@ -125,6 +125,11 @@ export default {
             this.setAccessToken(response.data.access_token)
             this.setRefreshToken(response.data.refresh_token)
             this.$router.push('/')
+            const base64Payload = response.data.access_token.split('.')[1];
+            const payload = Buffer.from(base64Payload, 'base64');
+            const tkData = JSON.parse(payload.toString());
+            this.setUserRole(tkData.is_admin)
+
           })
           .catch((error) => {
             this.message = error.message

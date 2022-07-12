@@ -2,7 +2,7 @@
   <div>
     <div class="py-1">
       <v-img
-        :src="topic.profile_image"
+        :src="'https://staking-spade-production.up.railway.app' + topic.profile_image"
         class="rounded-circle"
         width="75"
         height="75"

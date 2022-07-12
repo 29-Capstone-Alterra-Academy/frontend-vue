@@ -5,17 +5,17 @@
         {{ item.title }}
       </p>
     </v-btn>
-    <v-btn v-if="isMale" link text to="/dashboard/topic-list">
+    <v-btn v-if="isAdmin" link text to="/dashboard/topic-list">
       <p class="font-weight-medium ma-2 text-capitalize" style="color: black">
         Topics
       </p>
     </v-btn>
-    <v-btn v-if="isMale" link text to="/dashboard/user-list">
+    <v-btn v-if="isAdmin" link text to="/dashboard/user-list">
       <p class="font-weight-medium ma-2 text-capitalize" style="color: black">
         Users
       </p>
     </v-btn>
-    <v-btn v-if="isMale" link text to="/dashboard/banned-list">
+    <v-btn v-if="isAdmin" link text to="/dashboard/banned-list">
       <p class="font-weight-medium ma-2 text-capitalize" style="color: black">
         Banned
       </p>
@@ -35,7 +35,7 @@ export default {
     },
   },
   computed: {
-    ...mapGetters('lists', ['isMale']),
+    ...mapGetters('lists', ['isAdmin']),
   },
 }
 </script>

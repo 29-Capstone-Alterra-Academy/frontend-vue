@@ -3,15 +3,18 @@
     <v-list-item three-line>
       <v-list-item-content>
         <v-row align="center">
-          <v-col cols="1" style="max-width: none">
+          <v-col v-if="!istopic" cols="1" style="max-width: none">
             <v-img
-              :src="thread.topic.profile_image"
+              :src="
+                'https://staking-spade-production.up.railway.app' +
+                thread.topic.profile_image
+              "
               class="rounded-circle"
               width="35"
               height="35"
             ></v-img>
           </v-col>
-          <v-col cols="auto">
+          <v-col v-if="!istopic" cols="auto">
             <router-link
               :to="`/topic/${thread.topic.id}`"
               style="text-decoration: none; color: black"
@@ -27,7 +30,7 @@
             <div>
               <small class="text--disabled"
                 >diposting oleh
-                <router-link :to="`/user/${thread.author.username}`"
+                <router-link :to="`/user/${thread.author.id}`"
                   ><NameShortener
                     v-if="thread.author.username != null"
                     :username="thread.author.username"
@@ -41,30 +44,44 @@
             </div>
           </v-col>
         </v-row>
-        <section class="click-cursor" @click="toDetails(thread.id, thread.topic.id)">
+        <section
+          class="click-cursor"
+          @click="toDetails(thread.id, thread.topic.id)"
+        >
           <v-list-item-title class="text-h6 my-2">
             {{ thread.title }}
           </v-list-item-title>
           <v-list-item-content>
-            {{ thread.content }}
+            <section v-if="thread.content != null">
+              <section
+                v-for="(content, index) in thread.content.split('\r\n')"
+                :key="index"
+              >
+                <div
+                  class="subtitle-1 font-weight-light py-1"
+                  style="line-height: inherit"
+                >
+                  {{ content }}
+                </div>
+              </section>
+            </section>
           </v-list-item-content>
           <v-flex class="text-center">
             <v-carousel
-              v-if="thread.image_1 != null"
+              v-if="thread.image_1 != ''"
               :continuous="false"
               hide-delimiters
               height="auto"
               style="max-height: 460px"
             >
-              <v-carousel-item
-                v-for="(item, index) in postImages"
-                :key="index"
-              >
+              <v-carousel-item v-for="(item, index) in postImages" :key="index">
                 <v-img
-                  :src="item"
+                  :src="
+                    'https://staking-spade-production.up.railway.app' + item
+                  "
                   class="mx-auto"
                   max-width="75%"
-                  max-height="100%"
+                  max-height="460"
                 ></v-img>
               </v-carousel-item>
             </v-carousel>
@@ -79,7 +96,10 @@
             <v-row align="center">
               <v-col cols="auto" justify="center">
                 <p class="ma-0" style="width: 50%; display: inline">
-                  <FollowerShortener :follower="thread.liked_count - thread.unliked_count" /> Likes
+                  <FollowerShortener
+                    :follower="thread.liked_count - thread.unliked_count"
+                  />
+                  Likes
                 </p>
               </v-col>
               <v-col cols="auto" justify="center">
@@ -100,7 +120,15 @@
                     </p>
                   </template>
                   <v-list class="pa-0">
-                    <v-list-item to="/">
+                    <v-list-item v-if="isAdmin" to="/">
+                      <v-list-item-action>
+                        <v-icon>mdi-bullhorn-outline</v-icon>
+                      </v-list-item-action>
+                      <v-list-item-content>
+                        <v-list-item-title v-text="`Hapus`" />
+                      </v-list-item-content>
+                    </v-list-item>
+                    <v-list-item v-else @click="dialog = true">
                       <v-list-item-action>
                         <v-icon>mdi-bullhorn-outline</v-icon>
                       </v-list-item-action>
@@ -110,6 +138,7 @@
                     </v-list-item>
                   </v-list>
                 </v-menu>
+                <ReportCard v-model="dialog" />
               </v-col>
             </v-row>
           </v-col>
@@ -120,12 +149,16 @@
 </template>
 
 <script>
+import { mapGetters } from 'vuex'
+
+import ReportCard from '~/components/cards/ReportCard'
 import TopicShortener from '~/components/utils/TopicShortener'
 import NameShortener from '~/components/utils/NameShortener'
 import FollowerShortener from '~/components/utils/FollowerShortener'
 
 export default {
   components: {
+    ReportCard,
     TopicShortener,
     NameShortener,
     FollowerShortener,
@@ -135,18 +168,25 @@ export default {
       type: Object,
       required: true,
     },
+    istopic: {
+      type: Boolean,
+      default: false,
+    },
   },
   data() {
     return {
       comment: null,
       addedImages: [],
       images: [],
+      dialogm1: '',
+      dialog: false,
     }
   },
   computed: {
+    ...mapGetters('lists', ['isAdmin']),
     timepost() {
       const seconds = Math.floor(
-        (new Date() - new Date(String(this.thread.updated_at))) / 1000
+        (new Date() - new Date(String(this.thread.created_at))) / 1000
       )
       let interval = Math.floor(seconds / 31536000)
 
