@@ -132,7 +132,46 @@
                 <v-card class="rounded-lg" outlined>
                   <v-list-item three-line>
                     <v-list-item-content>
-                      <h4 class="font-weight-medium mb-3">Tentang Topik Ini</h4>
+                      <v-row align="center">
+                        <v-col>
+                          <h4 class="font-weight-medium">
+                            Tentang Topik Ini
+                          </h4>
+                        </v-col>
+                        <v-col cols="auto">
+                          <v-menu offset-y>
+                            <template #activator="{ on, attrs }">
+                              <p
+                                class="ma-0"
+                                style="width: 50%; display: inline"
+                                v-bind="attrs"
+                                v-on="on"
+                              >
+                                ···
+                              </p>
+                            </template>
+                            <v-list class="pa-0">
+                              <v-list-item v-if="isAdmin" to="/">
+                                <v-list-item-action>
+                                  <v-icon>mdi-bullhorn-outline</v-icon>
+                                </v-list-item-action>
+                                <v-list-item-content>
+                                  <v-list-item-title v-text="`Hapus`" />
+                                </v-list-item-content>
+                              </v-list-item>
+                              <v-list-item v-else @click="reportTopic = true">
+                                <v-list-item-action>
+                                  <v-icon>mdi-bullhorn-outline</v-icon>
+                                </v-list-item-action>
+                                <v-list-item-content>
+                                  <v-list-item-title v-text="`Laporkan`" />
+                                </v-list-item-content>
+                              </v-list-item>
+                            </v-list>
+                          </v-menu>
+                          <ReportTopicCard v-model="reportTopic" />
+                        </v-col>
+                      </v-row>
                       <div class="pb-1">
                         <v-divider />
                       </div>
@@ -232,6 +271,7 @@
 <script>
 import { mapGetters } from 'vuex'
 
+import ReportTopicCard from '~/components/cards/ReportTopicCard'
 import Observer from '~/components/ObserverScroll'
 import CurrentTopic from '~/components/cards/CurrentTopic'
 import PostCard from '~/components/cards/PostCard'
@@ -241,6 +281,7 @@ import NameShortener from '~/components/utils/NameShortener'
 export default {
   name: 'IndexPage',
   components: {
+    ReportTopicCard,
     Observer,
     CurrentTopic,
     PostCard,
@@ -257,6 +298,7 @@ export default {
   data() {
     return {
       tab: null,
+      reportTopic: false,
       items: [{ tab: 'Rekomendasi', icon: 'mdi-fire' }, { tab: 'Mengikuti' }],
       offset: 0,
       threads: [],

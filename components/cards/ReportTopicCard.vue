@@ -27,7 +27,7 @@
     </v-snackbar>
     <v-card>
       <v-card-title class="text-h5">
-        <v-col cols="auto" class="pa-0"> Ada apa dengan postingan ini? </v-col>
+        <v-col cols="auto" class="pa-0"> Ada apa dengan topik ini? </v-col>
         <v-spacer />
         <v-col cols="auto" class="pa-0">
           <v-btn icon @click.native="$emit('input', false)">

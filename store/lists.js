@@ -191,6 +191,7 @@ const actions = {
         },
       })
       .then((response) => {
+        console.log(response.data)
         commit('setProfile', response.data)
       })
       .catch((error) => {
@@ -201,7 +202,8 @@ const actions = {
     const base64Payload = rootState.auth.accessToken.split('.')[1]
     const payload = Buffer.from(base64Payload, 'base64')
     const tkData = JSON.parse(payload.toString())
-    commit('setUserRole', tkData.is_admin)
+    console.log(tkData)
+    commit('setUserRole', tkData.IsAdmin)
   },
 }
 

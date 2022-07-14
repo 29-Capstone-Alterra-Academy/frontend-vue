@@ -214,7 +214,7 @@
                     <div class="py-2">
                       <v-btn
                         color="teal"
-                        flat
+                        text
                         outlined
                         @click="addPost"
                         >Post</v-btn
@@ -294,6 +294,11 @@ export default {
       offset: 0,
       basicRules:
         '1. Selalu ingat postingan Anda akan dibaca banyak orang\n2. Berperilaku seperti yang Anda lakukan di kehidupan nyata\n3. Cari sumber konten asli\n4. Cari duplikat sebelum memposting\n5. Baca aturan Topik\n',
+    }
+  },
+  watch: {
+    dialog() {
+      this.intersected()
     }
   },
   created() {

@@ -43,7 +43,7 @@
               </v-row>
             </v-card>
           </v-col>
-          <v-col cols="12" class="pa-0 pb-1">
+          <v-col v-if="threads.length > 0" cols="12" class="pa-0 pb-1">
             <section v-if="isAdmin" class="py-1 pt-2">
               <v-col v-for="thread in threads" :key="thread.id" class="py-1">
                 <PostCard :thread="thread" />
@@ -78,6 +78,22 @@
                   </section>
                 </v-tab-item>
               </v-tabs-items>
+            </section>
+          </v-col>
+          <v-col v-else cols="12" class="pa-0 pb-1">
+            <section class="py-1 pt-2">
+              <v-col class="py-0">
+                <v-card class="rounded-lg mx-auto" outlined>
+                  <v-list-item three-line>
+                    <v-list-item-content>
+                      <v-list-item-title class="text-h6 my-2">
+                        Ups ada yang salah nih
+                      </v-list-item-title>
+                    </v-list-item-content>
+                  </v-list-item>
+                </v-card>
+              </v-col>
+              <Observer @intersect="intersected" />
             </section>
           </v-col>
         </v-row>

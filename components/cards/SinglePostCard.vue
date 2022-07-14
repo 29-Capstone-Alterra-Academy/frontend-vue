@@ -64,7 +64,7 @@
                         <v-list-item-title v-text="`Hapus`" />
                       </v-list-item-content>
                     </v-list-item>
-                    <v-list-item v-else to="/">
+                    <v-list-item v-else @click="dialog = true">
                       <v-list-item-action>
                         <v-icon>mdi-bullhorn-outline</v-icon>
                       </v-list-item-action>
@@ -74,6 +74,7 @@
                     </v-list-item>
                   </v-list>
                 </v-menu>
+                <ReportCard v-model="dialog" />
               </v-col>
             </v-row>
           </v-col>
@@ -273,6 +274,7 @@ import UNLIKED from '~/apollo/mutations/unliked'
 import REVERT_THREADS from '~/apollo/mutations/revert-threads'
 import SUBS_THREADS from '~/apollo/subscriptions/subs-threads'
 
+import ReportCard from '~/components/cards/ReportCard'
 import CommentCard from '~/components/cards/CommentCard'
 import TopicShortener from '~/components/utils/TopicShortener'
 import NameShortener from '~/components/utils/NameShortener'
@@ -280,6 +282,7 @@ import FollowerShortener from '~/components/utils/FollowerShortener'
 
 export default {
   components: {
+    ReportCard,
     CommentCard,
     TopicShortener,
     NameShortener,
@@ -298,6 +301,7 @@ export default {
       images: [],
       liked: false,
       unliked: false,
+      dialog: false,
     }
   },
   apollo: {
@@ -384,7 +388,10 @@ export default {
     },
   },
   created() {
-    this.$store.dispatch('lists/fetchRepliesByThreadId', this.$route.params.post)
+    this.$store.dispatch(
+      'lists/fetchRepliesByThreadId',
+      this.$route.params.post
+    )
   },
   methods: {
     removeImage(index) {
@@ -400,38 +407,35 @@ export default {
       if (response.data.threadsui.length > 0) {
         if (this.threadsui[0].liked === true) {
           this.$axios
-          .delete(
-            '/thread/' + param + '/like',
-            {
+            .delete('/thread/' + param + '/like', {
               headers: {
                 Authorization: 'Bearer ' + this.$store.state.auth.accessToken,
               },
-            }
-          )
-          .then((response) => {
-            if (response.status === 200) {
-              this.$store.dispatch(
-                'lists/fetchThreadById',
-                this.$route.params.post
-              )
-              this.liked = true
-              this.unliked = false
-              try {
-                this.$apollo.mutate({
-                  mutation: REVERT_THREADS,
-                  variables: {
-                    user_name: this.$store.state.lists.profile.username,
-                    id: this.$route.params.post,
-                  },
-                })
-              } catch (error) {
-                console.log(error)
+            })
+            .then((response) => {
+              if (response.status === 200) {
+                this.$store.dispatch(
+                  'lists/fetchThreadById',
+                  this.$route.params.post
+                )
+                this.liked = true
+                this.unliked = false
+                try {
+                  this.$apollo.mutate({
+                    mutation: REVERT_THREADS,
+                    variables: {
+                      user_name: this.$store.state.lists.profile.username,
+                      id: this.$route.params.post,
+                    },
+                  })
+                } catch (error) {
+                  console.log(error)
+                }
               }
-            }
-          })
-          .catch((error) => {
-            console.log(error)
-          })
+            })
+            .catch((error) => {
+              console.log(error)
+            })
           return
         }
         this.$axios
@@ -510,39 +514,36 @@ export default {
       if (response.data.threadsui.length > 0) {
         if (this.threadsui[0].unliked === true) {
           this.$axios
-          .delete(
-            '/thread/' + param + '/unlike',
-            {
+            .delete('/thread/' + param + '/unlike', {
               headers: {
                 Authorization: 'Bearer ' + this.$store.state.auth.accessToken,
               },
-            }
-          )
-          .then((response) => {
-            console.log(response)
-            if (response.status === 200) {
-              this.$store.dispatch(
-                'lists/fetchThreadById',
-                this.$route.params.post
-              )
-              this.liked = true
-              this.unliked = false
-              try {
-                this.$apollo.mutate({
-                  mutation: REVERT_THREADS,
-                  variables: {
-                    user_name: this.$store.state.lists.profile.username,
-                    id: this.$route.params.post,
-                  },
-                })
-              } catch (error) {
-                console.log(error)
+            })
+            .then((response) => {
+              console.log(response)
+              if (response.status === 200) {
+                this.$store.dispatch(
+                  'lists/fetchThreadById',
+                  this.$route.params.post
+                )
+                this.liked = true
+                this.unliked = false
+                try {
+                  this.$apollo.mutate({
+                    mutation: REVERT_THREADS,
+                    variables: {
+                      user_name: this.$store.state.lists.profile.username,
+                      id: this.$route.params.post,
+                    },
+                  })
+                } catch (error) {
+                  console.log(error)
+                }
               }
-            }
-          })
-          .catch((error) => {
-            console.log(error)
-          })
+            })
+            .catch((error) => {
+              console.log(error)
+            })
           return
         }
         this.$axios

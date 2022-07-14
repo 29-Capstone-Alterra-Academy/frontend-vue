@@ -71,7 +71,44 @@
             <v-card class="rounded-lg" outlined>
               <v-list-item three-line>
                 <v-list-item-content>
-                  <h4 class="text-capitalize mb-3"></h4>
+                  <div>
+                    <v-row align="center">
+                      <v-spacer />
+                      <v-col cols="auto">
+                        <v-menu offset-y>
+                          <template #activator="{ on, attrs }">
+                            <p
+                              class="ma-0"
+                              style="width: 50%; display: inline"
+                              v-bind="attrs"
+                              v-on="on"
+                            >
+                              ···
+                            </p>
+                          </template>
+                          <v-list class="pa-0">
+                            <v-list-item v-if="isAdmin" to="/">
+                              <v-list-item-action>
+                                <v-icon>mdi-bullhorn-outline</v-icon>
+                              </v-list-item-action>
+                              <v-list-item-content>
+                                <v-list-item-title v-text="`Hapus`" />
+                              </v-list-item-content>
+                            </v-list-item>
+                            <v-list-item v-else @click="reportUser = true">
+                              <v-list-item-action>
+                                <v-icon>mdi-bullhorn-outline</v-icon>
+                              </v-list-item-action>
+                              <v-list-item-content>
+                                <v-list-item-title v-text="`Laporkan`" />
+                              </v-list-item-content>
+                            </v-list-item>
+                          </v-list>
+                        </v-menu>
+                        <ReportUserCard v-model="reportUser" />
+                      </v-col>
+                    </v-row>
+                  </div>
                   <v-row>
                     <v-col cols="12" justify="center" align="center">
                       <v-col cols="auto" class="px-2" style="max-width: none">
@@ -170,6 +207,7 @@
 <script>
 import { mapGetters } from 'vuex'
 
+import ReportUserCard from '~/components/cards/ReportUserCard'
 import Observer from '~/components/ObserverScroll'
 import PostCard from '~/components/cards/PostCard'
 import TopicShortener from '~/components/utils/TopicShortener'
@@ -180,6 +218,7 @@ import FollowerShortener from '~/components/utils/FollowerShortener'
 export default {
   name: 'IndexPage',
   components: {
+    ReportUserCard,
     Observer,
     PostCard,
     TopicShortener,
@@ -197,6 +236,7 @@ export default {
   data() {
     return {
       tab: null,
+      reportUser: false,
       items: [{ tab: 'Terpopuler', icon: 'mdi-fire' }, { tab: 'Terbaru' }],
       offset: 0,
       threads: [],

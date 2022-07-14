@@ -27,7 +27,7 @@
     </v-snackbar>
     <v-card>
       <v-card-title class="text-h5">
-        <v-col cols="auto" class="pa-0"> Ada apa dengan postingan ini? </v-col>
+        <v-col cols="auto" class="pa-0"> Ada apa dengan user ini? </v-col>
         <v-spacer />
         <v-col cols="auto" class="pa-0">
           <v-btn icon @click.native="$emit('input', false)">
@@ -38,8 +38,12 @@
       <v-divider></v-divider>
       <v-card-text class="pa-0">
         <v-list dense outlined class="rounded-lg">
-          <v-list-item-group v-model="selectedItem" color="primary" style="column-count: 3;">
-            <v-list-item v-for="item in reasons" :key="item.id" >
+          <v-list-item-group
+            v-model="selectedItem"
+            color="primary"
+            style="column-count: 3"
+          >
+            <v-list-item v-for="item in reasons" :key="item.id">
               <v-list-item-content>
                 <v-list-item-title v-text="item.detail"></v-list-item-title>
               </v-list-item-content>

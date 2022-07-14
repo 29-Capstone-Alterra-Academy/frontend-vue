@@ -3,18 +3,20 @@
     <v-row justify="center" style="position: relative">
       <v-col cols="7">
         <v-row>
-          <v-col cols="12" class="pt-3 py-1">
-            <v-btn
-              outlined
-              block
-              class="rounded-lg text-capitalize"
-              to="/create-post"
-            >
-              <div class="mr-auto">
-                <v-icon>mdi-plus</v-icon>
-                Create New Post
-              </div>
-            </v-btn>
+          <v-col v-if="!isAdmin" cols="12" class="py-1">
+            <v-card class="rounded-lg mx-auto py-2 px-4" outlined>
+              <v-btn
+                outlined
+                block
+                class="rounded-lg text-capitalize"
+                :to="`/create-post`"
+              >
+                <div class="mr-auto">
+                  <v-icon>mdi-plus</v-icon>
+                  Create New Post
+                </div>
+              </v-btn>
+            </v-card>
           </v-col>
           <v-col cols="12" class="py-1">
             <v-card class="rounded-lg mx-auto py-3 px-3" outlined>
@@ -36,35 +38,59 @@
               </v-row>
             </v-card>
           </v-col>
-          <v-tabs-items v-model="tab">
-            <v-tab-item v-for="item in items" :key="item.tab">
-              <section v-if="item.tab == `Terpopuler`">
-                <v-col
-                  v-for="thread in threads"
-                  :key="thread.id"
-                  cols="12"
-                  class="py-1"
-                >
-                  <PostCard :thread="thread" />
-                </v-col>
-                <Observer @intersect="intersected" />
-              </section>
-              <section v-if="item.tab == `Terbaru`">
-                <v-col
-                  v-for="(thread, index) in orderThreads.sort(
-                    (a, b) =>
-                      new Date(b.created_at).getTime() -
-                      new Date(a.created_at).getTime()
-                  )"
-                  :key="index"
-                  cols="12"
-                  class="py-1"
-                >
-                  <PostCard :thread="thread" />
-                </v-col>
-              </section>
-            </v-tab-item>
-          </v-tabs-items>
+          <v-col v-if="threads.length > 0" cols="12" class="pa-0 pb-1">
+            <section v-if="isAdmin" class="py-1 pt-2">
+              <v-col v-for="thread in threads" :key="thread.id" class="py-1">
+                <PostCard :thread="thread" />
+              </v-col>
+              <Observer @intersect="intersected" />
+            </section>
+            <section v-else>
+              <v-tabs-items
+                v-model="tab"
+                style="background-color: transparent !important"
+              >
+                <v-tab-item v-for="item in items" :key="item.tab">
+                  <section v-if="item.tab == `Terpopuler`">
+                    <v-col
+                      v-for="thread in threads"
+                      :key="thread.id"
+                      class="py-1"
+                    >
+                      <PostCard :thread="thread" />
+                    </v-col>
+                    <Observer @intersect="intersected" />
+                  </section>
+                  <section v-if="item.tab == `Terbaru`">
+                    <v-col
+                      v-for="thread in threads"
+                      :key="thread.id"
+                      class="py-1"
+                    >
+                      <PostCard :thread="thread" />
+                    </v-col>
+                    <Observer @intersect="intersected" />
+                  </section>
+                </v-tab-item>
+              </v-tabs-items>
+            </section>
+          </v-col>
+          <v-col v-else cols="12" class="pa-0 pb-1">
+            <section class="py-1 pt-2">
+              <v-col class="py-0">
+                <v-card class="rounded-lg mx-auto" outlined>
+                  <v-list-item three-line>
+                    <v-list-item-content>
+                      <v-list-item-title class="text-h6 my-2">
+                        Ups ada yang salah nih
+                      </v-list-item-title>
+                    </v-list-item-content>
+                  </v-list-item>
+                </v-card>
+              </v-col>
+              <Observer @intersect="intersected" />
+            </section>
+          </v-col>
         </v-row>
       </v-col>
       <v-col cols="4" style="width: 373.75px">
@@ -103,13 +129,17 @@
                       </v-col>
                       <div class="py-1">
                         <h4>
-                          <FollowerShortener :follower="profile.followers" />
+                          <FollowerShortener
+                            :follower="currentUser.FollowersCount"
+                          />
                           Followers
                         </h4>
                       </div>
                       <div class="py-1">
                         <h4>
-                          <FollowerShortener :follower="profile.followers" />
+                          <FollowerShortener
+                            :follower="currentUser.ThreadCount"
+                          />
                           Total Posts
                         </h4>
                       </div>
@@ -210,17 +240,19 @@ export default {
           .includes(this.$store.state.lists.profile.username.toLowerCase())
       })
     },
-    topics() {
-      return this.$store.state.lists.topics
-    },
     profile() {
       console.log(this.$store.state.lists.profile)
       return this.$store.state.lists.profile
+    },
+    currentUser() {
+      console.log(this.$store.state.lists.detailUser)
+      return this.$store.state.lists.detailUser
     },
   },
   watch: {
     profile() {
       this.intersected()
+      this.user()
     },
   },
   created() {
@@ -242,6 +274,12 @@ export default {
             console.log(err)
           })
       }
+    },
+    user() {
+      this.$store.dispatch(
+        'lists/fetchUserById',
+        this.$store.state.lists.profile.id
+      )
     },
   },
 }

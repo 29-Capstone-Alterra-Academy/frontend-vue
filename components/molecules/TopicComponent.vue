@@ -1,15 +1,15 @@
 <template>
-  <v-row>
+  <v-row align="center">
     <v-col>
       <router-link
         :to="`/topic/${topic.id}`"
         style="text-decoration: none; color: black"
       >
         <v-row>
-          <v-col cols="2" class="pr-0" style="max-width: 3rem">
+          <v-col cols="2" class="pr-0" style="max-width: 2rem">
             <div class="text-overline">{{ index + 1 }}.</div>
           </v-col>
-          <v-col cols="1" class="px-2" style="max-width: 30px">
+          <v-col cols="2" class="px-2" style="max-width: 45px">
             <v-img
               :src="
                 'https://staking-spade-production.up.railway.app' +
@@ -20,13 +20,13 @@
               height="30"
             ></v-img>
           </v-col>
-          <v-col class="pl-0" align-self="center">
+          <v-col cols="auto" class="pl-0" align-self="center">
             <TopicShortener :name="topic.name" />
           </v-col>
         </v-row>
       </router-link>
     </v-col>
-    <v-col cols="2" style="max-width: 10rem">
+    <v-col cols="3" class="pa-0">
       <v-btn
         v-if="isAdmin"
         class="text-capitalize"
