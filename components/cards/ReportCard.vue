@@ -2,7 +2,7 @@
   <v-dialog
     :value="value"
     scrollable
-    max-width="800px"
+    max-width="650px"
     @input="$emit('input', $event)"
   >
     <v-snackbar v-model="snackbar" :timeout="5000">
@@ -37,9 +37,20 @@
       </v-card-title>
       <v-divider></v-divider>
       <v-card-text class="pa-0">
-        <v-list dense outlined class="rounded-lg">
-          <v-list-item-group v-model="selectedItem" color="primary" style="column-count: 3;">
-            <v-list-item v-for="item in reasons" :key="item.id" >
+        <v-list dense>
+          <v-list-item-group
+            v-model="selectedItem"
+            color="primary"
+            style="
+              max-height: 200px;
+              display: flex;
+              flex-flow: column wrap;
+              align-items: center;
+              gap: 15px;
+              row-gap: 15px;
+            "
+          >
+            <v-list-item v-for="item in reasons" :key="item.id">
               <v-list-item-content>
                 <v-list-item-title v-text="item.detail"></v-list-item-title>
               </v-list-item-content>
@@ -47,14 +58,21 @@
           </v-list-item-group>
         </v-list>
       </v-card-text>
-      <v-divider></v-divider>
       <v-card-actions>
-        <v-btn color="blue darken-1" text @click.native="$emit('input', false)">
-          Close
-        </v-btn>
-        <v-btn color="blue darken-1" text @click.native="$emit('input', false)">
-          Save
-        </v-btn>
+        <v-list-item>
+          <v-list-item-content>
+            <v-row justify="center">
+              <v-col cols="auto">
+                <v-btn
+                  color="error"
+                  class="text-capitalize rounded-lg"
+                  @click="reportThread"
+                  >Laporkan</v-btn
+                >
+              </v-col>
+            </v-row>
+          </v-list-item-content>
+        </v-list-item>
       </v-card-actions>
     </v-card>
   </v-dialog>
@@ -84,6 +102,20 @@ export default {
   mounted() {
     this.$store.dispatch('lists/fetchReportReasons')
   },
-  methods: {},
+  methods: {
+    reportThread() {
+    },
+  },
 }
 </script>
+
+<style scoped>
+.v-list-item-group .v-list-item {
+  border: 1px solid rgba(0, 0, 0, 0.1) !important;
+  border-radius: 8px !important;
+}
+.v-list-item-group .v-list-item--active {
+  border: 1px solid blue !important;
+  border-radius: 8px !important;
+}
+</style>

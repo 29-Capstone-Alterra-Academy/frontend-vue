@@ -105,7 +105,7 @@
                             </v-list-item>
                           </v-list>
                         </v-menu>
-                        <ReportUserCard v-model="reportUser" />
+                        <ReportUserCard v-model="reportUser" :user="user"/>
                       </v-col>
                     </v-row>
                   </div>
@@ -174,6 +174,7 @@
                             :src="topic.profile_image"
                             class="rounded-circle"
                             width="30"
+                            height="30"
                           ></v-img>
                         </v-col>
                         <v-col class="pl-0">

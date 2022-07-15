@@ -1,0 +1,8 @@
+query user($user_name: String, $id: Int) {
+  commentsui(where: {username: {_eq: $user_name}, comment_id: {_eq: $id}}) {
+    id
+    comment_id
+    liked
+    unliked
+  }
+}

@@ -117,9 +117,14 @@ const actions = {
         console.log(err)
       })
   },
-  fetchUsers({ commit }) {
-    axios
-      .get('https://nomizo-json-server.herokuapp.com/users')
+  fetchModeratorsByTopic({ commit, rootState }, param) {
+    this.$axios
+      .get('/topic/' + param + '/moderator', {
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: 'Bearer ' + rootState.auth.accessToken,
+        },
+      })
       .then((res) => {
         commit('setUsers', res.data)
       })

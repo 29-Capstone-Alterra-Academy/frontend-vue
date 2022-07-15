@@ -21,7 +21,43 @@
                   <TopicShortener :name="topic.name" />
                 </v-col>
                 <v-col v-if="!isAdmin" cols="auto" style="max-width: 10rem">
-                  <v-btn class="text-capitalize">Follow</v-btn>
+                  <section v-if="topicsui.length > 0">
+                    <section
+                      v-for="(topicdata, index) in topicsui"
+                      :key="index"
+                    >
+                      <v-btn
+                        v-if="topicdata.subscribe"
+                        class="text-capitalize"
+                        @click="unfollow(topic.id)"
+                      >
+                        Unfollow
+                      </v-btn>
+                      <v-btn
+                        v-else
+                        class="text-capitalize"
+                        @click="follow(topic.id)"
+                      >
+                        Follow
+                      </v-btn>
+                    </section>
+                  </section>
+                  <section v-else>
+                    <v-btn
+                      v-if="subscribe"
+                      class="text-capitalize"
+                      @click="unfollow(topic.id)"
+                    >
+                      Unfollow
+                    </v-btn>
+                    <v-btn
+                      v-else
+                      class="text-capitalize"
+                      @click="follow(topic.id)"
+                    >
+                      Follow
+                    </v-btn>
+                  </section>
                 </v-col>
                 <v-spacer v-if="isAdmin" />
                 <v-col v-if="isAdmin" cols="auto" style="max-width: 10rem">
@@ -134,9 +170,7 @@
                     <v-list-item-content>
                       <v-row align="center">
                         <v-col>
-                          <h4 class="font-weight-medium">
-                            Tentang Topik Ini
-                          </h4>
+                          <h4 class="font-weight-medium">Tentang Topik Ini</h4>
                         </v-col>
                         <v-col cols="auto">
                           <v-menu offset-y>
@@ -169,7 +203,7 @@
                               </v-list-item>
                             </v-list>
                           </v-menu>
-                          <ReportTopicCard v-model="reportTopic" />
+                          <ReportTopicCard v-model="reportTopic" :topic="topic"/>
                         </v-col>
                       </v-row>
                       <div class="pb-1">
@@ -271,6 +305,13 @@
 <script>
 import { mapGetters } from 'vuex'
 
+import FETCH_TOPICS from '~/apollo/queries/fetch-topics'
+import SUBSCRIBE_TOPICS from '~/apollo/mutations/subscribed-topics'
+import INSERT_SUBSCRIBE_TOPICS from '~/apollo/mutations/insert-subscribed-topics'
+import INSERT_UNSUBSCRIBE_TOPICS from '~/apollo/mutations/insert-unsubscribed-topics'
+import UNSUBSCRIBE_TOPICS from '~/apollo/mutations/unsubscribed-topic'
+import SUBS_TOPICS from '~/apollo/subscriptions/subs-topics'
+
 import ReportTopicCard from '~/components/cards/ReportTopicCard'
 import Observer from '~/components/ObserverScroll'
 import CurrentTopic from '~/components/cards/CurrentTopic'
@@ -300,10 +341,31 @@ export default {
       tab: null,
       reportTopic: false,
       items: [{ tab: 'Rekomendasi', icon: 'mdi-fire' }, { tab: 'Mengikuti' }],
+      subscribe: false,
       offset: 0,
       threads: [],
       newThreads: [],
     }
+  },
+  apollo: {
+    topicsui: {
+      prefetch: true,
+      query: FETCH_TOPICS,
+      variables() {
+        return {
+          user_name: this.$store.state.lists.profile.username,
+          id: this.$route.params.slug,
+        }
+      },
+      subscribeToMore: {
+        document: SUBS_TOPICS,
+        updateQuery: ({ subscriptionData }) => {
+          return {
+            topicsui: subscriptionData.data,
+          }
+        },
+      },
+    },
   },
   computed: {
     ...mapGetters('lists', ['isAdmin']),
@@ -316,7 +378,7 @@ export default {
   },
   created() {
     this.$store.dispatch('lists/fetchTopicById', this.$route.params.slug)
-    this.$store.dispatch('lists/fetchUsers')
+    this.$store.dispatch('lists/fetchModeratorsByTopic', this.$route.params.slug)
   },
   methods: {
     intersected() {
@@ -332,6 +394,150 @@ export default {
           })
           .catch((err) => {
             console.log(err)
+          })
+      }
+    },
+    async follow(param) {
+      const response = await this.$apollo.queries.topicsui.refetch()
+      if (response.data.topicsui.length > 0) {
+        this.$axios
+          .get(
+            '/topic/' + param + '/subscribe',
+            {},
+            {
+              headers: {
+                Authorization: 'Bearer ' + this.$store.state.auth.accessToken,
+              },
+            }
+          )
+          .then((response) => {
+            if (response.status === 200) {
+              this.$store.dispatch(
+                'lists/fetchTopicById',
+                this.$route.params.slug
+              )
+              this.subscribe = true
+              try {
+                this.$apollo.mutate({
+                  mutation: SUBSCRIBE_TOPICS,
+                  variables: {
+                    user_name: this.$store.state.lists.profile.username,
+                    id: this.$route.params.slug,
+                  },
+                })
+              } catch (error) {
+                console.log(error)
+              }
+            }
+          })
+          .catch((error) => {
+            console.log(error)
+          })
+      } else {
+        this.$axios
+          .get(
+            '/topic/' + param + '/subscribe',
+            {},
+            {
+              headers: {
+                Authorization: 'Bearer ' + this.$store.state.auth.accessToken,
+              },
+            }
+          )
+          .then((response) => {
+            if (response.status === 200) {
+              this.$store.dispatch(
+                'lists/fetchTopicById',
+                this.$route.params.slug
+              )
+              this.subscribe = true
+              try {
+                this.$apollo.mutate({
+                  mutation: INSERT_SUBSCRIBE_TOPICS,
+                  variables: {
+                    user_name: this.$store.state.lists.profile.username,
+                    id: this.$route.params.slug,
+                  },
+                })
+              } catch (error) {
+                console.log(error)
+              }
+            }
+          })
+          .catch((error) => {
+            console.log(error)
+          })
+      }
+    },
+    async unfollow(param) {
+      const response = await this.$apollo.queries.topicsui.refetch()
+      if (response.data.topicsui.length > 0) {
+        this.$axios
+          .get(
+            '/topic/' + param + '/unsubscribe',
+            {},
+            {
+              headers: {
+                Authorization: 'Bearer ' + this.$store.state.auth.accessToken,
+              },
+            }
+          )
+          .then((response) => {
+            if (response.status === 200) {
+              this.$store.dispatch(
+                'lists/fetchTopicById',
+                this.$route.params.slug
+              )
+              this.subscribe = false
+              try {
+                this.$apollo.mutate({
+                  mutation: UNSUBSCRIBE_TOPICS,
+                  variables: {
+                    user_name: this.$store.state.lists.profile.username,
+                    id: this.$route.params.slug,
+                  },
+                })
+              } catch (error) {
+                console.log(error)
+              }
+            }
+          })
+          .catch((error) => {
+            console.log(error)
+          })
+      } else {
+        this.$axios
+          .get(
+            '/topic/' + param + '/unsubscribe',
+            {},
+            {
+              headers: {
+                Authorization: 'Bearer ' + this.$store.state.auth.accessToken,
+              },
+            }
+          )
+          .then((response) => {
+            if (response.status === 200) {
+              this.$store.dispatch(
+                'lists/fetchTopicById',
+                this.$route.params.slug
+              )
+              this.subscribe = false
+              try {
+                this.$apollo.mutate({
+                  mutation: INSERT_UNSUBSCRIBE_TOPICS,
+                  variables: {
+                    user_name: this.$store.state.lists.profile.username,
+                    id: this.$route.params.slug,
+                  },
+                })
+              } catch (error) {
+                console.log(error)
+              }
+            }
+          })
+          .catch((error) => {
+            console.log(error)
           })
       }
     },

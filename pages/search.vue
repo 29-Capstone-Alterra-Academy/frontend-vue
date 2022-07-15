@@ -43,94 +43,7 @@
                     :items-per-page="5"
                   >
                     <template #[`item.title`]="{ item }">
-                      <v-card class="rounded-lg px-2 py-2 mb-1 mt-1">
-                        <v-row>
-                          <v-col cols="auto">
-                            <v-img
-                              :src="item.author.profile_image"
-                              class="rounded-circle"
-                              width="35"
-                            ></v-img>
-                          </v-col>
-                          <v-col cols="auto">
-                            <router-link
-                              :to="`/topic/${item.topic.name}`"
-                              style="text-decoration: none; color: black"
-                            >
-                              <TopicShortener :name="item.topic.name" />
-                            </router-link>
-                          </v-col>
-                          <v-col>
-                            <div>
-                              <small class="text--disabled"
-                                >diposting oleh
-                                <router-link
-                                  :to="`/user/${item.author.username}`"
-                                  ><NameShortener
-                                    :username="item.author.username"
-                                /></router-link>
-                                {{ item.created_at | timepost }} yang
-                                lalu</small
-                              >
-                            </div>
-                          </v-col>
-                        </v-row>
-                        <v-row>
-                          <v-col class="py-0">
-                            <p class="text-h6 my-0">
-                              {{ item.title }}
-                            </p>
-                          </v-col>
-                        </v-row>
-                        <v-row>
-                          <v-col cols="5">
-                            <v-row align="center">
-                              <v-col cols="auto" justify="center">
-                                <p
-                                  class="ma-0"
-                                  style="width: 50%; display: inline"
-                                >
-                                  <FollowerShortener :follower="50" /> Likes
-                                </p>
-                              </v-col>
-                              <v-col cols="auto" justify="center">
-                                <p
-                                  class="ma-0"
-                                  style="width: 50%; display: inline"
-                                >
-                                  <FollowerShortener :follower="50" /> Comments
-                                </p>
-                              </v-col>
-                              <v-col>
-                                <v-menu offset-y>
-                                  <template #activator="{ on, attrs }">
-                                    <p
-                                      class="ma-0"
-                                      style="width: 50%; display: inline"
-                                      v-bind="attrs"
-                                      v-on="on"
-                                    >
-                                      ···
-                                    </p>
-                                  </template>
-                                  <v-list class="pa-0">
-                                    <v-list-item to="/">
-                                      <v-list-item-action>
-                                        <v-icon>mdi-bullhorn-outline</v-icon>
-                                      </v-list-item-action>
-                                      <v-list-item-content>
-                                        <v-list-item-title
-                                          v-text="`Laporkan`"
-                                        />
-                                      </v-list-item-content>
-                                    </v-list-item>
-                                  </v-list>
-                                </v-menu>
-                              </v-col>
-                            </v-row>
-                          </v-col>
-                        </v-row>
-                      </v-card>
+                      <PostCard :thread="item" />
                     </template>
                   </v-data-table>
                 </section>
@@ -186,16 +99,16 @@
 </template>
 
 <script>
+import PostCard from '~/components/cards/PostCardTable'
 import TopicShortener from '~/components/utils/TopicShortener'
 import NameShortener from '~/components/utils/NameShortener'
-import FollowerShortener from '~/components/utils/FollowerShortener'
 
 export default {
   name: 'SearchPage',
   components: {
+    PostCard,
     TopicShortener,
     NameShortener,
-    FollowerShortener,
   },
   filters: {
     timepost(date) {

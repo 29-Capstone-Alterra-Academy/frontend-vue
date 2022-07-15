@@ -57,7 +57,7 @@
                           </v-list-item>
                         </v-list>
                       </v-menu>
-                      <ReportTopicCard v-model="reportTopic" />
+                      <ReportTopicCard v-model="reportTopic" :topic="topic"/>
                     </v-col>
                   </v-row>
                   <div class="pb-1">

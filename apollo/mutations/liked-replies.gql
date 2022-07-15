@@ -1,0 +1,7 @@
+mutation liked($user_name: String, $id: Int) {
+  update_commentsui(where: {username: {_eq: $user_name}, comment_id: {_eq: $id}}, _set: {liked: true, unliked: false}) {
+    returning {
+      id
+    }
+  }
+}

@@ -128,7 +128,7 @@ export default {
             const base64Payload = response.data.access_token.split('.')[1];
             const payload = Buffer.from(base64Payload, 'base64');
             const tkData = JSON.parse(payload.toString());
-            this.setUserRole(tkData.is_admin)
+            this.setUserRole(tkData.IsAdmin)
 
           })
           .catch((error) => {

@@ -3,12 +3,33 @@
     <v-list-item three-line>
       <v-list-item-content>
         <v-row align="center">
+          <v-snackbar v-model="snackbar" :timeout="5000">
+            Thread anda berhasil diposting
+            <template #action="{ attrs }">
+              <v-btn
+                color="primary"
+                text
+                v-bind="attrs"
+                @click="snackbar = false"
+                >Close</v-btn
+              >
+            </template>
+          </v-snackbar>
+          <v-snackbar v-model="snackbarFalse" :timeout="5000">
+            Terjadi kesalahan saat memposting thread
+            <template #action="{ attrs }">
+              <v-btn
+                color="warning"
+                text
+                v-bind="attrs"
+                @click="snackbarFalse = false"
+                >Close</v-btn
+              >
+            </template>
+          </v-snackbar>
           <v-col cols="1" style="max-width: none">
             <v-img
-              :src="
-                'https://staking-spade-production.up.railway.app' +
-                thread.topic.profile_image
-              "
+              :src="thread.topic.profile_image"
               class="rounded-circle"
               width="35"
               height="35"
@@ -80,21 +101,19 @@
           </v-col>
         </v-row>
         <section>
-          <v-list-item-title class="text-h6 my-2">
+          <p class="text-h6 my-2 text-justify">
             {{ thread.title }}
-          </v-list-item-title>
-          <v-list-item-content>
-            <section v-if="thread.content != null">
-              <section
-                v-for="(content, index) in thread.content.split('\r\n')"
-                :key="index"
-              >
-                <div class="subtitle-1 font-weight-light py-1">
-                  {{ content }}
-                </div>
-              </section>
+          </p>
+          <section v-if="thread.content != null">
+            <section
+              v-for="(content, index) in thread.content.split('\r\n')"
+              :key="index"
+            >
+              <div class="subtitle-1 font-weight-light py-1 text-justify">
+                {{ content }}
+              </div>
             </section>
-          </v-list-item-content>
+          </section>
           <v-flex class="text-center">
             <v-carousel
               v-if="thread.image_1 !== ''"
@@ -105,11 +124,9 @@
             >
               <v-carousel-item v-for="(item, index) in postImages" :key="index">
                 <v-img
-                  :src="
-                    'https://staking-spade-production.up.railway.app' + item
-                  "
+                  :src="item"
                   class="mx-auto"
-                  max-width="75%"
+                  max-width="460"
                   height="460"
                 ></v-img>
               </v-carousel-item>
@@ -188,7 +205,7 @@
             <v-row>
               <v-col>
                 <v-textarea
-                  :value="comment"
+                  v-model="comment"
                   rows="1"
                   class="rounded-lg"
                   label="Tinggalkan Komentar.."
@@ -229,12 +246,12 @@
               </v-file-input>
             </v-col>
             <v-col v-if="images.length">
-              <v-row>
+              <v-row align="center">
                 <v-col
                   v-for="image in images"
                   :key="image.id"
                   cols="auto"
-                  class="px-0"
+                  align="center"
                 >
                   <v-chip
                     small
@@ -249,14 +266,15 @@
               </v-row>
             </v-col>
             <v-col cols="auto" style="max-width: 10rem">
-              <v-btn class="text-capitalize">Comment</v-btn>
+              <v-btn class="text-capitalize" @click="addComment">Comment</v-btn>
             </v-col>
           </v-row>
           <div v-if="replies.length > 0">
             <v-col v-for="reply in replies" :key="reply.id">
-              <CommentCard :reply="reply" />
+              <CommentCard :reply="reply" @change="refetchReplies"/>
             </v-col>
           </div>
+          <Observer @intersect="intersected" />
         </v-list-item-content>
       </v-list-item>
     </v-card-actions>
@@ -266,14 +284,16 @@
 <script>
 import { mapGetters } from 'vuex'
 
-import FETCH_LIKED_DISLIKED from '~/apollo/queries/fetch-liked-disliked'
-import LIKED from '~/apollo/mutations/liked'
-import INSERT_LIKED from '~/apollo/mutations/insert-liked'
-import INSERT_UNLIKED from '~/apollo/mutations/insert-unliked'
-import UNLIKED from '~/apollo/mutations/unliked'
+import FETCH_THREADS from '~/apollo/queries/fetch-threads'
+import LIKED_THREADS from '~/apollo/mutations/liked-threads'
+import INSERT_REPLY from '~/apollo/mutations/insert-reply'
+import INSERT_LIKED_THREADS from '~/apollo/mutations/insert-liked-threads'
+import INSERT_UNLIKED_THREADS from '~/apollo/mutations/insert-unliked-threads'
+import UNLIKED_THREADS from '~/apollo/mutations/unliked-threads'
 import REVERT_THREADS from '~/apollo/mutations/revert-threads'
 import SUBS_THREADS from '~/apollo/subscriptions/subs-threads'
 
+import Observer from '~/components/ObserverScroll'
 import ReportCard from '~/components/cards/ReportCard'
 import CommentCard from '~/components/cards/CommentCard'
 import TopicShortener from '~/components/utils/TopicShortener'
@@ -282,6 +302,7 @@ import FollowerShortener from '~/components/utils/FollowerShortener'
 
 export default {
   components: {
+    Observer,
     ReportCard,
     CommentCard,
     TopicShortener,
@@ -302,12 +323,16 @@ export default {
       liked: false,
       unliked: false,
       dialog: false,
+      snackbar: false,
+      replies: [],
+      newReplies: [],
+      offset: 0,
     }
   },
   apollo: {
     threadsui: {
       prefetch: true,
-      query: FETCH_LIKED_DISLIKED,
+      query: FETCH_THREADS,
       variables() {
         return {
           user_name: this.$store.state.lists.profile.username,
@@ -353,9 +378,6 @@ export default {
       }
       return Math.floor(seconds) + ' detik'
     },
-    replies() {
-      return this.$store.state.lists.replies
-    },
     postImages() {
       const images = []
       if (this.thread.image_5 !== '') {
@@ -387,12 +409,6 @@ export default {
       return images
     },
   },
-  created() {
-    this.$store.dispatch(
-      'lists/fetchRepliesByThreadId',
-      this.$route.params.post
-    )
-  },
   methods: {
     removeImage(index) {
       this.images.splice(index, 1)
@@ -401,6 +417,70 @@ export default {
       if (this.images.length < 5) {
         this.images = [...this.images, ...this.addedImages]
       }
+    },
+    intersected() {
+      if (this.newReplies.length === 5 || this.newReplies.length === 0) {
+        this.$axios
+          .get(
+            `reply?scope=thread&limit=5&offset=${this.offset}&threadId=${this.$route.params.post}`,
+            {
+              headers: {
+                'Content-Type': 'application/json',
+                Authorization: 'Bearer ' + this.$store.state.auth.accessToken,
+              },
+            }
+          )
+          .then((res) => {
+            if (res.data.length !== 0) {
+              this.offset += 5
+              this.newReplies = res.data
+              this.replies = [...this.replies, ...this.newReplies]
+            }
+          })
+          .catch((err) => {
+            console.log(err)
+          })
+      }
+    },
+    addComment() {
+      const formData = new FormData()
+      formData.append('content', this.comment)
+      for (let i = 0; i < this.images.length; i++) {
+        formData.append('image_' + [i + 1], this.images[i])
+      }
+      for (const pair of formData.entries()) {
+        console.log(pair[0] + ', ' + pair[1])
+      }
+      this.$axios
+        .post('/thread/' + this.$route.params.post + '/reply', formData, {
+          headers: {
+            'Content-Type': 'multipart/form-data',
+            Authorization: 'Bearer ' + this.$store.state.auth.accessToken,
+          },
+        })
+        .then((response) => {
+          if (response.status === 201) {
+            console.log(response)
+            this.snackbar = true
+            this.images = []
+            try {
+              this.$apollo.mutate({
+                mutation: INSERT_REPLY,
+                variables: {
+                  user_name: this.$store.state.lists.profile.username,
+                  id: response.data.id,
+                },
+              })
+            } catch (error) {
+              console.log(error)
+            }
+          }
+        })
+        .catch((error) => {
+          if (error.status) {
+            this.images = []
+          }
+        })
     },
     async like(param) {
       const response = await this.$apollo.queries.threadsui.refetch()
@@ -458,7 +538,7 @@ export default {
               this.unliked = false
               try {
                 this.$apollo.mutate({
-                  mutation: LIKED,
+                  mutation: LIKED_THREADS,
                   variables: {
                     user_name: this.$store.state.lists.profile.username,
                     id: this.$route.params.post,
@@ -493,7 +573,7 @@ export default {
               this.unliked = false
               try {
                 this.$apollo.mutate({
-                  mutation: INSERT_LIKED,
+                  mutation: INSERT_LIKED_THREADS,
                   variables: {
                     user_name: this.$store.state.lists.profile.username,
                     id: this.$route.params.post,
@@ -568,7 +648,7 @@ export default {
               this.liked = false
               try {
                 this.$apollo.mutate({
-                  mutation: UNLIKED,
+                  mutation: UNLIKED_THREADS,
                   variables: {
                     user_name: this.$store.state.lists.profile.username,
                     id: this.$route.params.post,
@@ -605,7 +685,7 @@ export default {
               this.liked = false
               try {
                 this.$apollo.mutate({
-                  mutation: INSERT_UNLIKED,
+                  mutation: INSERT_UNLIKED_THREADS,
                   variables: {
                     user_name: this.$store.state.lists.profile.username,
                     id: this.$route.params.post,
@@ -625,7 +705,7 @@ export default {
 }
 </script>
 
-<style scoped>
+<style>
 .click-cursor {
   cursor: pointer;
 }

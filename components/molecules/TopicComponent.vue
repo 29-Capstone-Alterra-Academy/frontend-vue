@@ -11,10 +11,7 @@
           </v-col>
           <v-col cols="2" class="px-2" style="max-width: 45px">
             <v-img
-              :src="
-                'https://staking-spade-production.up.railway.app' +
-                topic.profile_image
-              "
+              :src="topic.profile_image"
               class="rounded-circle"
               width="30"
               height="30"
@@ -26,7 +23,7 @@
         </v-row>
       </router-link>
     </v-col>
-    <v-col cols="3" class="pa-0">
+    <v-col cols="2" class="pr-4" style="max-width: 10rem">
       <v-btn
         v-if="isAdmin"
         class="text-capitalize"
@@ -54,9 +51,9 @@ export default {
       required: true,
     },
     index: {
-        type: Number,
-        required: true,
-    }
+      type: Number,
+      required: true,
+    },
   },
   computed: {
     ...mapGetters('lists', ['isAdmin']),

@@ -1,0 +1,12 @@
+mutation insert($user_name: String, $id: Int){
+  insert_topicsui(objects: {username: $user_name, topic_id: $id}) {
+    returning {
+      id
+    }
+  }
+  update_topicsui(where: {username: {_eq: $user_name}, topic_id: {_eq: $id}}, _set: {subscribe: true}) {
+    returning {
+      id
+    }
+  }
+}

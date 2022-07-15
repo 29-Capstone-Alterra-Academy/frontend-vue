@@ -80,10 +80,7 @@
                   <v-row v-row align="center" class="pa-1">
                     <v-col cols="auto" class="pa-1">
                       <v-img
-                        :src="
-                          'https://staking-spade-production.up.railway.app' +
-                          data.item.profile_image
-                        "
+                        :src="data.item.profile_image"
                         class="rounded-circle"
                         width="30"
                         height="30"
@@ -98,10 +95,7 @@
                   <v-row align="center" class="pa-1">
                     <v-col cols="auto" class="pa-1">
                       <v-img
-                        :src="
-                          'https://staking-spade-production.up.railway.app' +
-                          data.item.profile_image
-                        "
+                        :src="data.item.profile_image"
                         class="rounded-circle"
                         width="30"
                         height="30"
@@ -212,11 +206,7 @@
                       </v-card>
                     </div>
                     <div class="py-2">
-                      <v-btn
-                        color="teal"
-                        text
-                        outlined
-                        @click="addPost"
+                      <v-btn color="teal" text outlined @click="addPost"
                         >Post</v-btn
                       >
                     </div>
@@ -299,7 +289,7 @@ export default {
   watch: {
     dialog() {
       this.intersected()
-    }
+    },
   },
   created() {
     this.$store.dispatch('lists/fetchTopics')

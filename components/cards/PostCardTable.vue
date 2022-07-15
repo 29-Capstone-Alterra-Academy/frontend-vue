@@ -62,7 +62,7 @@
               </p>
             </div>
           </div>
-          <v-flex class="text-center">
+          <!-- <v-flex class="text-center">
             <v-carousel
               v-if="thread.image_1 != ''"
               :continuous="false"
@@ -79,7 +79,7 @@
                 ></v-img>
               </v-carousel-item>
             </v-carousel>
-          </v-flex>
+          </v-flex> -->
         </div>
       </v-list-item-content>
     </v-list-item>
@@ -205,36 +205,36 @@ export default {
       }
       return Math.floor(seconds) + ' detik'
     },
-    postImages() {
-      const images = []
-      if (this.thread.image_5 !== '') {
-        images.push(this.thread.image_1)
-        images.push(this.thread.image_2)
-        images.push(this.thread.image_3)
-        images.push(this.thread.image_4)
-        images.push(this.thread.image_5)
-      }
-      if (this.thread.image_4 !== '' && this.thread.image_5 === '') {
-        images.push(this.thread.image_1)
-        images.push(this.thread.image_2)
-        images.push(this.thread.image_3)
-        images.push(this.thread.image_4)
-      }
-      if (this.thread.image_3 !== '' && this.thread.image_4 === '') {
-        images.push(this.thread.image_1)
-        images.push(this.thread.image_2)
-        images.push(this.thread.image_3)
-      }
-      if (this.thread.image_2 !== '' && this.thread.image_3 === '') {
-        images.push(this.thread.image_1)
-        images.push(this.thread.image_2)
-      }
-      if (this.thread.image_1 !== '' && this.thread.image_2 === '') {
-        images.push(this.thread.image_1)
-      }
-      console.log(images.length)
-      return images
-    },
+    // postImages() {
+    //   const images = []
+    //   if (this.thread.image_5 !== '') {
+    //     images.push(this.thread.image_1)
+    //     images.push(this.thread.image_2)
+    //     images.push(this.thread.image_3)
+    //     images.push(this.thread.image_4)
+    //     images.push(this.thread.image_5)
+    //   }
+    //   if (this.thread.image_4 !== '' && this.thread.image_5 === '') {
+    //     images.push(this.thread.image_1)
+    //     images.push(this.thread.image_2)
+    //     images.push(this.thread.image_3)
+    //     images.push(this.thread.image_4)
+    //   }
+    //   if (this.thread.image_3 !== '' && this.thread.image_4 === '') {
+    //     images.push(this.thread.image_1)
+    //     images.push(this.thread.image_2)
+    //     images.push(this.thread.image_3)
+    //   }
+    //   if (this.thread.image_2 !== '' && this.thread.image_3 === '') {
+    //     images.push(this.thread.image_1)
+    //     images.push(this.thread.image_2)
+    //   }
+    //   if (this.thread.image_1 !== '' && this.thread.image_2 === '') {
+    //     images.push(this.thread.image_1)
+    //   }
+    //   console.log(images.length)
+    //   return images
+    // },
   },
   methods: {
     toDetails(post, topic) {

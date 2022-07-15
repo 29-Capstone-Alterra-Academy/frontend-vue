@@ -1,0 +1,9 @@
+subscription {
+  commentsui {
+    id
+    comment_id
+    liked
+    unliked
+    username
+  }
+}
