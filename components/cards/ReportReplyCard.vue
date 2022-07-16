@@ -6,7 +6,7 @@
     @input="$emit('input', $event)"
   >
     <v-snackbar v-model="snackbar" :timeout="5000">
-      Postingan berhasil dilaporkan
+      Komentar berhasil dilaporkan
       <template #action="{ attrs }">
         <v-btn color="primary" text v-bind="attrs" @click="snackbar = false"
           >Close</v-btn
@@ -14,7 +14,7 @@
       </template>
     </v-snackbar>
     <v-snackbar v-model="snackbarFalse" :timeout="5000">
-      Terjadi kesalahan saat melaporkan postingan
+      Terjadi kesalahan saat melaporkan komentar
       <template #action="{ attrs }">
         <v-btn
           color="warning"
@@ -27,7 +27,7 @@
     </v-snackbar>
     <v-card>
       <v-card-title class="text-h5">
-        <v-col cols="auto" class="pa-0"> Ada apa dengan postingan ini? </v-col>
+        <v-col cols="auto" class="pa-0"> Ada apa dengan komentar ini? </v-col>
         <v-spacer />
         <v-col cols="auto" class="pa-0">
           <v-btn icon @click.native="$emit('input', false)">
@@ -66,7 +66,7 @@
                 <v-btn
                   color="error"
                   class="text-capitalize rounded-lg"
-                  @click="reportThread"
+                  @click="reportReply"
                   >Laporkan</v-btn
                 >
               </v-col>
@@ -85,7 +85,7 @@ export default {
       type: Boolean,
       default: false,
     },
-    thread: {
+    reply: {
       type: Object,
       required: true,
     },
@@ -107,10 +107,10 @@ export default {
     this.$store.dispatch('lists/fetchReportReasons')
   },
   methods: {
-    reportThread() {
+    reportReply() {
       this.$axios
         .post(
-          `/thread/${this.thread.id}/report?reasonId=${
+          `/reply/${this.reply.id}/report?reasonId=${
             this.reasons[this.selectedItem].id
           }`,
           {},

@@ -26,107 +26,110 @@
         <v-row>
           <v-col cols="auto" class="pb-1">
             <v-card class="rounded-lg" flat>
-              <v-select
-                v-model="selectedTopic"
-                :items="topics"
-                item-text="name"
-                item-value="id"
-                label="Choose Topic"
-                class="rounded-lg"
-                menu-props="{ top: true, offsetY: true }"
-                dense
-                outlined
-                hide-details
-                style="width: 321px"
-              >
-                <div slot="prepend-item" class="px-3 py-1">
-                  <v-text-field
-                    v-model="search"
-                    clearable
-                    outlined
-                    dense
-                    flat
-                    hide-details
-                    class="rounded-lg"
-                    prepend-inner-icon="mdi-magnify"
-                    label="Search"
-                  ></v-text-field>
-                  <v-list-item-title
-                    class="text--disabled body-2 pt-2"
-                    v-text="`Following`"
-                  />
-                </div>
-                <div slot="append-item" class="px-3 py-1">
-                  <v-card
-                    class="rounded-lg"
-                    outlined
-                    dense
-                    @click="dialog = true"
-                  >
-                    <v-list-item>
-                      <v-list-item-content>
-                        <v-row align="center">
-                          <v-col cols="auto">
-                            <v-icon>mdi-plus</v-icon>
-                          </v-col>
-                          <v-col cols="auto"> Tambah Topic </v-col>
-                        </v-row>
-                      </v-list-item-content>
-                    </v-list-item>
-                  </v-card>
-                  <Observer @intersect="intersected" />
-                </div>
-                <template slot="selection" slot-scope="data">
-                  <v-row v-row align="center" class="pa-1">
-                    <v-col cols="auto" class="pa-1">
-                      <v-img
-                        :src="data.item.profile_image"
-                        class="rounded-circle"
-                        width="30"
-                        height="30"
-                      ></v-img>
-                    </v-col>
-                    <v-col cols="auto" class="pa-1">
-                      <TopicShortener :name="data.item.name" />
-                    </v-col>
-                  </v-row>
-                </template>
-                <template slot="item" slot-scope="data">
-                  <v-row align="center" class="pa-1">
-                    <v-col cols="auto" class="pa-1">
-                      <v-img
-                        :src="data.item.profile_image"
-                        class="rounded-circle"
-                        width="30"
-                        height="30"
-                      ></v-img>
-                    </v-col>
-                    <v-col cols="auto" class="pa-1">
-                      <TopicShortener :name="data.item.name" />
-                    </v-col>
-                  </v-row>
-                </template>
-              </v-select>
+              <v-form v-model="valid">
+                <v-select
+                  v-model="selectedTopic"
+                  :items="topics"
+                  item-text="name"
+                  item-value="id"
+                  label="Choose Topic"
+                  class="rounded-lg"
+                  menu-props="{ top: true, offsetY: true }"
+                  dense
+                  outlined
+                  :rules="topicRules"
+                  hide-details="auto"
+                  style="width: 321px"
+                >
+                  <div slot="prepend-item" class="px-3 py-1">
+                    <v-text-field
+                      v-model="search"
+                      clearable
+                      outlined
+                      dense
+                      flat
+                      hide-details
+                      class="rounded-lg"
+                      prepend-inner-icon="mdi-magnify"
+                      label="Search"
+                    ></v-text-field>
+                    <v-list-item-title
+                      class="text--disabled body-2 pt-2"
+                      v-text="`Following`"
+                    />
+                  </div>
+                  <div slot="append-item" class="px-3 py-1">
+                    <v-card
+                      class="rounded-lg"
+                      outlined
+                      dense
+                      @click="dialog = true"
+                    >
+                      <v-list-item>
+                        <v-list-item-content>
+                          <v-row align="center">
+                            <v-col cols="auto">
+                              <v-icon>mdi-plus</v-icon>
+                            </v-col>
+                            <v-col cols="auto"> Tambah Topic </v-col>
+                          </v-row>
+                        </v-list-item-content>
+                      </v-list-item>
+                    </v-card>
+                    <Observer @intersect="intersected" />
+                  </div>
+                  <template slot="selection" slot-scope="data">
+                    <v-row v-row align="center" class="pa-1">
+                      <v-col cols="auto" class="pa-1">
+                        <v-img
+                          :src="data.item.profile_image"
+                          class="rounded-circle"
+                          width="30"
+                          height="30"
+                        ></v-img>
+                      </v-col>
+                      <v-col cols="auto" class="pa-1">
+                        <TopicShortener :name="data.item.name" />
+                      </v-col>
+                    </v-row>
+                  </template>
+                  <template slot="item" slot-scope="data">
+                    <v-row align="center" class="pa-1">
+                      <v-col cols="auto" class="pa-1">
+                        <v-img
+                          :src="data.item.profile_image"
+                          class="rounded-circle"
+                          width="30"
+                          height="30"
+                        ></v-img>
+                      </v-col>
+                      <v-col cols="auto" class="pa-1">
+                        <TopicShortener :name="data.item.name" />
+                      </v-col>
+                    </v-row>
+                  </template>
+                </v-select>
+              </v-form>
             </v-card>
             <AddTopic v-model="dialog" />
           </v-col>
           <v-col cols="12" class="py-1 my-1">
             <v-card class="rounded-lg mx-auto py-3 px-3" outlined>
-              <v-form>
-                <v-row>
-                  <v-col cols="12">
+              <v-row>
+                <v-col cols="12">
+                  <v-form v-model="valid" @submit.prevent="addPost">
                     <div class="">
                       <v-textarea
                         v-model="title"
+                        :rules="titleRules"
                         rows="1"
                         class="rounded-lg"
                         label="Title"
                         placeholder="Input Your Title"
-                        counter
+                        hide-details="auto"
                         auto-grow
                         outlined
                         dense
-                        hide-details
                       ></v-textarea>
                     </div>
                     <div class="py-2">
@@ -144,7 +147,7 @@
                       ></v-textarea>
                     </div>
                     <div class="py-2">
-                      <p class="text-h6">Image or Video</p>
+                      <p class="text-h6">Image</p>
                       <v-card
                         outlined
                         dense
@@ -168,9 +171,32 @@
                             >
                               mdi-cloud-upload
                             </v-icon>
-                            <p>
-                              Drop your file(s) here, or click to select them.
-                            </p>
+                            <v-row align="center">
+                              <v-col cols="7">
+                                <p class="ma-0">Drop your image here, or</p>
+                              </v-col>
+                              <v-col cols="5">
+                                <div>
+                                  <v-btn
+                                    class="text-none rounded-lg"
+                                    text
+                                    outlined
+                                    depressed
+                                    :loading="isSelecting"
+                                    @click="onButtonClick"
+                                  >
+                                    Upload File
+                                  </v-btn>
+                                  <input
+                                    ref="uploader"
+                                    class="d-none"
+                                    type="file"
+                                    accept="image/*"
+                                    @change="inputChanged"
+                                  />
+                                </div>
+                              </v-col>
+                            </v-row>
                           </v-row>
                           <v-virtual-scroll
                             v-if="images.length > 0"
@@ -206,13 +232,17 @@
                       </v-card>
                     </div>
                     <div class="py-2">
-                      <v-btn color="teal" text outlined @click="addPost"
+                      <v-btn
+                        type="submit"
+                        color="primary"
+                        class="rounded-lg"
+                        :disabled="!valid"
                         >Post</v-btn
                       >
                     </div>
-                  </v-col>
-                </v-row>
-              </v-form>
+                  </v-form>
+                </v-col>
+              </v-row>
             </v-card>
           </v-col>
         </v-row>
@@ -273,15 +303,20 @@ export default {
       title: '',
       content: '',
       search: '',
+      valid: false,
       snackbar: false,
       snackbarFalse: false,
       dragover: false,
       dialog: false,
+      isSelecting: false,
       images: [],
+      addedImages: [],
       multiple: true,
       topics: [],
       newTopics: [],
       offset: 0,
+      topicRules: [(v) => !!v || 'Silahkan pilih topik'],
+      titleRules: [(v) => !!v || 'Silahkan masukkan judul thread anda'],
       basicRules:
         '1. Selalu ingat postingan Anda akan dibaca banyak orang\n2. Berperilaku seperti yang Anda lakukan di kehidupan nyata\n3. Cari sumber konten asli\n4. Cari duplikat sebelum memposting\n5. Baca aturan Topik\n',
     }
@@ -295,6 +330,23 @@ export default {
     this.$store.dispatch('lists/fetchTopics')
   },
   methods: {
+    onButtonClick() {
+      this.isSelecting = true
+      window.addEventListener(
+        'focus',
+        () => {
+          this.isSelecting = false
+        },
+        { once: true }
+      )
+
+      this.$refs.uploader.click()
+    },
+    inputChanged(e) {
+      if (this.images.length < 5) {
+        this.images = [...this.images, ...e.target.files]
+      }
+    },
     removeFile(fileName) {
       // Find the index of the
       const index = this.images.findIndex((file) => file.name === fileName)

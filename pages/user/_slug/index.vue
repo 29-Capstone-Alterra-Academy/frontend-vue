@@ -67,6 +67,27 @@
             overflow-y: scroll;
           "
         >
+          <v-col
+            v-if="isAdmin && userReported.length > 0"
+            cols="12"
+            class="pt-3 py-1"
+          >
+            <v-card class="rounded-lg red-border" outlined>
+              <v-list-item three-line>
+                <v-list-item-content>
+                  <v-row>
+                    <v-col>
+                      <h4 class="font-weight-medium">
+                        Dilaporkan oleh @{{ userReported[0].reporter.username }}
+                        dengan alasan
+                        {{ userReported[0].reason.detail }}
+                      </h4>
+                    </v-col>
+                  </v-row>
+                </v-list-item-content>
+              </v-list-item>
+            </v-card>
+          </v-col>
           <v-col cols="12" class="pt-3 py-1">
             <v-card class="rounded-lg" outlined>
               <v-list-item three-line>
@@ -105,33 +126,26 @@
                             </v-list-item>
                           </v-list>
                         </v-menu>
-                        <ReportUserCard v-model="reportUser" :user="user"/>
+                        <ReportUserCard v-model="reportUser" :user="user" />
                       </v-col>
                     </v-row>
                   </div>
                   <v-row>
-                    <v-col cols="12" justify="center" align="center">
-                      <v-col cols="auto" class="px-2" style="max-width: none">
+                    <v-col cols="12" justify="center">
+                      <v-col align="center" cols="auto" class="px-2" style="max-width: none">
                         <v-img
                           :src="user.profile_image"
                           class="rounded-circle"
                           width="75"
                         ></v-img>
                       </v-col>
-                      <v-col cols="auto" class="pl-0">
+                      <v-col align="center" cols="auto" class="pl-0">
                         <div class="text-overline">
                           <NameShortener :username="user.Username" />
                         </div>
                       </v-col>
-                      <v-col cols="2" style="max-width: 10rem">
-                        <v-btn
-                          v-if="isAdmin"
-                          color="error"
-                          class="text-capitalize"
-                        >
-                          Blokir
-                        </v-btn>
-                        <v-btn v-else class="text-capitalize">Follow</v-btn>
+                      <v-col v-if="!isAdmin" align="center" cols="2" style="max-width: 10rem">
+                        <v-btn class="text-capitalize">Follow</v-btn>
                       </v-col>
                       <div class="py-1">
                         <h4>
@@ -152,6 +166,11 @@
                         Joined
                         <DateShortener :date="user.created_at" />
                       </div>
+                      <v-col v-if="isAdmin" align="center" cols="2" style="max-width: 10rem">
+                        <v-btn color="error" class="text-capitalize">
+                          Blokir
+                        </v-btn>
+                      </v-col>
                     </v-col>
                   </v-row>
                 </v-list-item-content>
@@ -242,6 +261,7 @@ export default {
       offset: 0,
       threads: [],
       newThreads: [],
+      userReported: [],
     }
   },
   computed: {
@@ -275,11 +295,35 @@ export default {
       return this.$store.state.lists.detailUser
     },
   },
+  watch: {
+    user() {
+      this.reportedUser()
+    },
+  },
   created() {
     this.$store.dispatch('lists/fetchTopics')
     this.$store.dispatch('lists/fetchUserById', this.$route.params.slug)
   },
   methods: {
+    reportedUser() {
+      this.$axios
+        .get('/report?scope=user&limit=100&offset=0', {
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: 'Bearer ' + this.$store.state.auth.accessToken,
+          },
+        })
+        .then((res) => {
+          let data = res.data
+          data = data.filter((item) => {
+            return item.suspect.id === this.user.ID
+          })
+          this.userReported = data
+        })
+        .catch((err) => {
+          console.log(err)
+        })
+    },
     intersected() {
       if (this.newThreads.length === 5 || this.newThreads.length === 0) {
         this.$axios
@@ -317,6 +361,10 @@ export default {
 }
 .v-tab.v-tab--active {
   border: 1px solid black;
+  border-radius: 15px;
+}
+.red-border {
+  border: 2px solid rgb(237, 0, 0, 0.4);
   border-radius: 15px;
 }
 </style>

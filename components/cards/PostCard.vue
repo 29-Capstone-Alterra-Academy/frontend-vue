@@ -114,7 +114,7 @@
                     </p>
                   </template>
                   <v-list class="pa-0">
-                    <v-list-item v-if="isAdmin" to="/">
+                    <v-list-item v-if="isAdmin" to="/" @click="dialogAdmin = true">
                       <v-list-item-action>
                         <v-icon>mdi-bullhorn-outline</v-icon>
                       </v-list-item-action>
@@ -132,7 +132,8 @@
                     </v-list-item>
                   </v-list>
                 </v-menu>
-                <ReportCard v-model="dialog" />
+                <DeleteCard v-model="dialogAdmin" :thread="thread"/>
+                <ReportCard v-model="dialog" :thread="thread"/>
               </v-col>
             </v-row>
           </v-col>
@@ -146,6 +147,7 @@
 import { mapGetters } from 'vuex'
 
 import ReportCard from '~/components/cards/ReportCard'
+import DeleteCard from '~/components/cards/DeleteCard'
 import TopicShortener from '~/components/utils/TopicShortener'
 import NameShortener from '~/components/utils/NameShortener'
 import FollowerShortener from '~/components/utils/FollowerShortener'
@@ -153,6 +155,7 @@ import FollowerShortener from '~/components/utils/FollowerShortener'
 export default {
   components: {
     ReportCard,
+    DeleteCard,
     TopicShortener,
     NameShortener,
     FollowerShortener,
@@ -174,6 +177,7 @@ export default {
       images: [],
       dialogm1: '',
       dialog: false,
+      dialogAdmin: false,
     }
   },
   computed: {

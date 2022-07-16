@@ -54,18 +54,34 @@
       </v-row>
       <v-row align="center">
         <v-col cols="auto"> Deskripsi </v-col>
-        <v-col cols="auto"><v-btn class="text-capitalize">Ubah</v-btn></v-col>
+        <v-col cols="auto"
+          ><v-btn class="text-capitalize" @click="editDesc">Ubah</v-btn></v-col
+        >
       </v-row>
-      <section>
-        <div>
-          {{ topic.description }}
-        </div>
-        <v-row align="center">
-          <v-col cols="auto"> Rules </v-col>
-          <v-col cols="auto"><v-btn class="text-capitalize">Ubah</v-btn></v-col>
-        </v-row>
+      <div v-if="!isEditDesc">
+        {{ topic.description }}
+      </div>
+      <v-textarea
+        v-else
+        v-model="description"
+        rows="6"
+        class="rounded-lg"
+        placeholder="Ubah Deskripsi"
+        counter
+        auto-grow
+        outlined
+        dense
+        hide-details
+      ></v-textarea>
+      <v-row align="center">
+        <v-col cols="auto"> Rules </v-col>
+        <v-col cols="auto"
+          ><v-btn class="text-capitalize" @click="editRules">Ubah</v-btn></v-col
+        >
+      </v-row>
+      <section v-if="!isEditRules">
         <template v-if="topic.rules != ''">
-          <div v-for="(rule, index) in topic.rules.split('\n')" :key="index">
+          <div v-for="(rule, index) in topic.rules.split('\r\n')" :key="index">
             <div
               class="subtitle-1 font-weight-light py-1"
               style="line-height: inherit"
@@ -75,6 +91,18 @@
           </div>
         </template>
       </section>
+      <v-textarea
+        v-else
+        v-model="rules"
+        rows="6"
+        class="rounded-lg"
+        placeholder="Ubah Rules"
+        counter
+        auto-grow
+        outlined
+        dense
+        hide-details
+      ></v-textarea>
       <v-row>
         <v-col>
           <v-card class="rounded-lg pa-4" outlined>
@@ -131,10 +159,22 @@ export default {
   data() {
     return {
       tab: null,
+      isEditDesc: false,
+      isEditRules: false,
       items: [{ tab: 'Rekomendasi', icon: 'mdi-fire' }, { tab: 'Mengikuti' }],
     }
   },
   computed: {
+    rules: {
+      get() {
+        return this.topic.rules
+      },
+    },
+    description: {
+      get() {
+        return this.topic.description
+      },
+    },
     threads() {
       if (this.searchPost) {
         const threads = this.$store.state.lists.threads.filter((item) => {
@@ -156,6 +196,9 @@ export default {
           .toLowerCase()
           .includes(this.$route.params.slug.toLowerCase())
       })
+    },
+    topics() {
+      return this.$store.state.lists.topics
     },
     topic() {
       return this.$store.state.lists.detailTopic
@@ -187,6 +230,14 @@ export default {
     this.$store.dispatch('lists/fetchThreads')
     this.$store.dispatch('lists/fetchTopicById', this.$route.params.slug)
     this.$store.dispatch('lists/fetchUsers')
+  },
+  methods: {
+    editDesc() {
+      this.isEditDesc = !this.isEditDesc
+    },
+    editRules() {
+      this.isEditRules = !this.isEditRules
+    },
   },
 }
 </script>

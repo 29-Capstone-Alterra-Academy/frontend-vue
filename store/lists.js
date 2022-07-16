@@ -1,5 +1,3 @@
-import axios from 'axios'
-
 const state = () => ({
   threads: [],
   topics: [],
@@ -94,7 +92,7 @@ const actions = {
   },
   fetchTopics({ commit }) {
     this.$axios
-      .get('/topic?limit=10&offset=0')
+      .get('/topic?limit=100&offset=0')
       .then((res) => {
         commit('setTopics', res.data)
       })
@@ -147,16 +145,6 @@ const actions = {
         console.log(err)
       })
   },
-  fetchReplies({ commit }) {
-    axios
-      .get('https://nomizo-json-server.herokuapp.com/replies')
-      .then((res) => {
-        commit('setReplies', res.data)
-      })
-      .catch((err) => {
-        console.log(err)
-      })
-  },
   fetchRepliesByThreadId({ commit, rootState }, param) {
     this.$axios
       .get('reply?scope=thread&limit=5&offset=0&threadId=' + param, {
@@ -187,6 +175,51 @@ const actions = {
         console.log(err)
       })
   },
+  fetchReportedThreads({ commit, rootState }) {
+    this.$axios
+      .get('/report?scope=thread&limit=100&offset=0', {
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: 'Bearer ' + rootState.auth.accessToken,
+        },
+      })
+      .then((res) => {
+        commit('setThreads', res.data)
+      })
+      .catch((err) => {
+        console.log(err)
+      })
+  },
+  fetchReportedTopics({ commit, rootState }) {
+    this.$axios
+      .get('/report?scope=topic&limit=100&offset=0', {
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: 'Bearer ' + rootState.auth.accessToken,
+        },
+      })
+      .then((res) => {
+        commit('setTopics', res.data)
+      })
+      .catch((err) => {
+        console.log(err)
+      })
+  },
+  fetchReportedUsers({ commit, rootState }) {
+    this.$axios
+      .get('/report?scope=user&limit=100&offset=0', {
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: 'Bearer ' + rootState.auth.accessToken,
+        },
+      })
+      .then((res) => {
+        commit('setUsers', res.data)
+      })
+      .catch((err) => {
+        console.log(err)
+      })
+  },
   loggedUser({ commit, rootState }) {
     this.$axios
       .get('/profile', {
@@ -201,6 +234,24 @@ const actions = {
       })
       .catch((error) => {
         console.log(error)
+      })
+  },
+  updateLoggedUser({ commit, rootState }, data) {
+    this.$axios
+      .put('/profile', data, {
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: 'Bearer ' + rootState.auth.accessToken,
+        },
+      })
+      .then((response) => {
+        console.log(response.data)
+        commit('setProfile', response.data)
+        this.snackbar = true
+      })
+      .catch((error) => {
+        console.log(error)
+        this.snackbarFalse = true
       })
   },
   isAdmin({ commit, rootState }) {

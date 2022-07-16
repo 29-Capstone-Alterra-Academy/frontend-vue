@@ -95,11 +95,11 @@
       </v-col>
       <v-col cols="4" style="width: 373.75px">
         <v-row
-          class="hide-scrollbar"
+          class="hide-scrollbar pb-1"
           style="
             position: fixed;
             width: inherit;
-            height: 86%;
+            height: 91%;
             overflow-y: scroll;
           "
         >
@@ -108,8 +108,8 @@
               <v-list-item three-line>
                 <v-list-item-content>
                   <v-row>
-                    <v-col cols="12" justify="center" align="center">
-                      <v-col cols="auto" class="px-2" style="max-width: none">
+                    <v-col cols="12" justify="center">
+                      <v-col align="center" cols="auto" class="px-2">
                         <v-img
                           :src="
                             'https://staking-spade-production.up.railway.app' +
@@ -119,13 +119,18 @@
                           width="75"
                         ></v-img>
                       </v-col>
-                      <v-col cols="auto" class="pl-0">
+                      <v-col align="center" cols="auto" class="pl-0">
                         <div class="text-overline">
                           <NameShortener :username="profile.username" />
                         </div>
                       </v-col>
-                      <v-col cols="2" style="max-width: 10rem">
-                        <v-btn class="text-capitalize">Follow</v-btn>
+                      <v-col align="center" cols="12">
+                        <v-btn
+                          class="text-capitalize"
+                          outlined
+                          @click="dialog = true"
+                          >Edit Profile</v-btn
+                        >
                       </v-col>
                       <div class="py-1">
                         <h4>
@@ -150,6 +155,20 @@
                         Joined
                         <DateShortener :date="profile.created_at" />
                       </div>
+                      <v-col cols="12" class="pa-0 py-3">
+                        <v-btn
+                          outlined
+                          block
+                          class="rounded-lg text-capitalize my-auto"
+                          to="/create-post"
+                        >
+                          <div class="mr-auto">
+                            <v-icon>mdi-plus</v-icon>
+                            Create New Post
+                          </div>
+                        </v-btn>
+                      </v-col>
+                      <EditProfile v-model="dialog" />
                     </v-col>
                   </v-row>
                 </v-list-item-content>
@@ -160,19 +179,35 @@
             <v-card class="rounded-lg" outlined>
               <v-list-item>
                 <v-list-item-content>
+                  <h4 class="text-capitalize mb-3">Atur Topik</h4>
+                  <div class="pb-5">
+                    <v-divider />
+                  </div>
                   <v-row>
-                    <v-col cols="12" class="py-3">
-                      <v-btn
-                        outlined
-                        block
-                        class="rounded-lg text-capitalize my-auto"
-                        to="/create-post"
-                      >
-                        <div class="mr-auto">
-                          <v-icon>mdi-plus</v-icon>
-                          Create New Post
-                        </div>
-                      </v-btn>
+                    <v-col v-for="topic in topics" :key="topic.id" cols="12">
+                      <v-row>
+                        <v-col cols="auto" class="px-3" style="max-width: none">
+                          <v-img
+                            :src="topic.profile_image"
+                            class="rounded-circle"
+                            width="30"
+                            height="30"
+                          ></v-img>
+                        </v-col>
+                        <v-col class="pl-0">
+                          <div class="text-overline">
+                            <TopicShortener :name="topic.name" />
+                          </div>
+                        </v-col>
+                        <v-col cols="2" style="max-width: 10rem">
+                          <v-btn
+                            class="text-capitalize"
+                            @click="$router.push(`/topic/${topic.id}/details`)"
+                          >
+                            Details
+                          </v-btn>
+                        </v-col>
+                      </v-row>
                     </v-col>
                   </v-row>
                 </v-list-item-content>
@@ -188,7 +223,9 @@
 <script>
 import Observer from '~/components/ObserverScroll'
 import PostCard from '~/components/cards/PostCard'
+import EditProfile from '~/components/cards/EditProfile'
 import NameShortener from '~/components/utils/NameShortener'
+import TopicShortener from '~/components/utils/TopicShortener'
 import DateShortener from '~/components/utils/DateShortener'
 import FollowerShortener from '~/components/utils/FollowerShortener'
 
@@ -197,7 +234,9 @@ export default {
   components: {
     Observer,
     PostCard,
+    EditProfile,
     NameShortener,
+    TopicShortener,
     DateShortener,
     FollowerShortener,
   },
@@ -213,6 +252,7 @@ export default {
       tab: null,
       items: [{ tab: 'Terpopuler', icon: 'mdi-fire' }, { tab: 'Terbaru' }],
       offset: 0,
+      dialog: false,
       threads: [],
       newThreads: [],
     }
@@ -244,6 +284,9 @@ export default {
       console.log(this.$store.state.lists.profile)
       return this.$store.state.lists.profile
     },
+    topics() {
+      return this.$store.state.lists.topics
+    },
     currentUser() {
       console.log(this.$store.state.lists.detailUser)
       return this.$store.state.lists.detailUser
@@ -255,7 +298,7 @@ export default {
       this.user()
     },
   },
-  created() {
+  mounted() {
     this.$store.dispatch('lists/fetchTopics')
   },
   methods: {

@@ -6,7 +6,7 @@
     @input="$emit('input', $event)"
   >
     <v-snackbar v-model="snackbar" :timeout="5000">
-      Postingan berhasil dilaporkan
+      Postingan berhasil dihapus
       <template #action="{ attrs }">
         <v-btn color="primary" text v-bind="attrs" @click="snackbar = false"
           >Close</v-btn
@@ -14,7 +14,7 @@
       </template>
     </v-snackbar>
     <v-snackbar v-model="snackbarFalse" :timeout="5000">
-      Terjadi kesalahan saat melaporkan postingan
+      Terjadi kesalahan saat menghapus postingan
       <template #action="{ attrs }">
         <v-btn
           color="warning"
@@ -27,7 +27,7 @@
     </v-snackbar>
     <v-card>
       <v-card-title class="text-h5">
-        <v-col cols="auto" class="pa-0"> Ada apa dengan postingan ini? </v-col>
+        <v-col cols="auto" class="pa-0"> Hapus postingan ini? </v-col>
         <v-spacer />
         <v-col cols="auto" class="pa-0">
           <v-btn icon @click.native="$emit('input', false)">
@@ -37,26 +37,7 @@
       </v-card-title>
       <v-divider></v-divider>
       <v-card-text class="pa-0">
-        <v-list dense>
-          <v-list-item-group
-            v-model="selectedItem"
-            color="primary"
-            style="
-              max-height: 200px;
-              display: flex;
-              flex-flow: column wrap;
-              align-items: center;
-              gap: 15px;
-              row-gap: 15px;
-            "
-          >
-            <v-list-item v-for="item in reasons" :key="item.id">
-              <v-list-item-content>
-                <v-list-item-title v-text="item.detail"></v-list-item-title>
-              </v-list-item-content>
-            </v-list-item>
-          </v-list-item-group>
-        </v-list>
+        Yakin ingin menghapus postingan ini?
       </v-card-text>
       <v-card-actions>
         <v-list-item>
@@ -66,8 +47,8 @@
                 <v-btn
                   color="error"
                   class="text-capitalize rounded-lg"
-                  @click="reportThread"
-                  >Laporkan</v-btn
+                  @click="deleteThread"
+                  >Ya</v-btn
                 >
               </v-col>
             </v-row>
@@ -107,12 +88,10 @@ export default {
     this.$store.dispatch('lists/fetchReportReasons')
   },
   methods: {
-    reportThread() {
+    deleteThread() {
       this.$axios
-        .post(
-          `/thread/${this.thread.id}/report?reasonId=${
-            this.reasons[this.selectedItem].id
-          }`,
+        .delete(
+          `/thread/${this.thread.id}`,
           {},
           {
             headers: {

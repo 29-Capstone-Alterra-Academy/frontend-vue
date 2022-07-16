@@ -92,7 +92,15 @@
               </p>
             </template>
             <v-list class="pa-0">
-              <v-list-item to="/">
+              <v-list-item v-if="isAdmin" to="/" @click="dialogAdmin = true">
+                <v-list-item-action>
+                  <v-icon>mdi-bullhorn-outline</v-icon>
+                </v-list-item-action>
+                <v-list-item-content>
+                  <v-list-item-title v-text="`Hapus`" />
+                </v-list-item-content>
+              </v-list-item>
+              <v-list-item v-else @click="dialog = true">
                 <v-list-item-action>
                   <v-icon>mdi-bullhorn-outline</v-icon>
                 </v-list-item-action>
@@ -102,6 +110,8 @@
               </v-list-item>
             </v-list>
           </v-menu>
+          <DeleteCard v-model="dialogAdmin" :reply="reply" />
+          <ReportReplyCard v-model="dialog" :reply="reply" />
         </v-col>
       </v-row>
     </v-col>
@@ -117,6 +127,8 @@ import UNLIKED_REPLIES from '~/apollo/mutations/unliked-replies'
 import REVERT_REPLIES from '~/apollo/mutations/revert-replies'
 import SUBS_REPLIES from '~/apollo/subscriptions/subs-replies'
 
+import ReportReplyCard from '~/components/cards/ReportReplyCard'
+import DeleteCard from '~/components/cards/DeleteCard'
 import NameShortener from '~/components/utils/NameShortener'
 import FollowerShortener from '~/components/utils/FollowerShortener'
 
@@ -149,6 +161,8 @@ export default {
     },
   },
   components: {
+    ReportReplyCard,
+    DeleteCard,
     NameShortener,
     FollowerShortener,
   },
@@ -177,6 +191,11 @@ export default {
       type: Object,
       required: true,
     },
+  },
+  data() {
+    return {
+      dialog: false,
+    }
   },
   methods: {
     async like(param) {
@@ -398,6 +417,6 @@ export default {
           })
       }
     },
-  }
+  },
 }
 </script>

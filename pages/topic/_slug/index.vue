@@ -164,6 +164,22 @@
                 overflow-y: scroll;
               "
             >
+              <v-col v-if="isAdmin" cols="12" class="py-1">
+                <v-card class="rounded-lg red-border" outlined>
+                  <v-list-item three-line>
+                    <v-list-item-content>
+                      <v-row>
+                        <v-col>
+                          <h4 class="font-weight-medium">
+                            Dilaporkan oleh
+                            {{ topicReportedTimes.length }} orang
+                          </h4>
+                        </v-col>
+                      </v-row>
+                    </v-list-item-content>
+                  </v-list-item>
+                </v-card>
+              </v-col>
               <v-col cols="12" class="py-1">
                 <v-card class="rounded-lg" outlined>
                   <v-list-item three-line>
@@ -203,7 +219,10 @@
                               </v-list-item>
                             </v-list>
                           </v-menu>
-                          <ReportTopicCard v-model="reportTopic" :topic="topic"/>
+                          <ReportTopicCard
+                            v-model="reportTopic"
+                            :topic="topic"
+                          />
                         </v-col>
                       </v-row>
                       <div class="pb-1">
@@ -345,6 +364,7 @@ export default {
       offset: 0,
       threads: [],
       newThreads: [],
+      topicReportedTimes: [],
     }
   },
   apollo: {
@@ -376,11 +396,40 @@ export default {
       return this.$store.state.lists.users
     },
   },
+  watch: {
+    topic() {
+      this.reportedTimes()
+    },
+  },
   created() {
     this.$store.dispatch('lists/fetchTopicById', this.$route.params.slug)
-    this.$store.dispatch('lists/fetchModeratorsByTopic', this.$route.params.slug)
+    this.$store.dispatch(
+      'lists/fetchModeratorsByTopic',
+      this.$route.params.slug
+    )
   },
   methods: {
+    reportedTimes() {
+      this.$axios
+        .get('/report?scope=topic&limit=100&offset=0', {
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: 'Bearer ' + this.$store.state.auth.accessToken,
+          },
+        })
+        .then((res) => {
+          let data = res.data
+          data = data.filter((item) => {
+            return item.topic.name
+              .toLowerCase()
+              .includes(this.topic.name.toLowerCase())
+          })
+          this.topicReportedTimes = data
+        })
+        .catch((err) => {
+          console.log(err)
+        })
+    },
     intersected() {
       if (this.newThreads.length === 2 || this.newThreads.length === 0) {
         this.$axios
@@ -562,6 +611,10 @@ export default {
 }
 .v-tab.v-tab--active {
   border: 1px solid black;
+  border-radius: 15px;
+}
+.red-border {
+  border: 2px solid rgb(237, 0, 0, 0.4);
   border-radius: 15px;
 }
 </style>

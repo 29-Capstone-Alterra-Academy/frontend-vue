@@ -41,7 +41,14 @@
           <v-list-item-group
             v-model="selectedItem"
             color="primary"
-            style="max-height: 200px; display: flex; flex-flow: column wrap; align-items: center; gap: 15px; row-gap: 15px;"
+            style="
+              max-height: 200px;
+              display: flex;
+              flex-flow: column wrap;
+              align-items: center;
+              gap: 15px;
+              row-gap: 15px;
+            "
           >
             <v-list-item v-for="item in reasons" :key="item.id">
               <v-list-item-content>
@@ -81,7 +88,7 @@ export default {
     topic: {
       type: Object,
       required: true,
-    }
+    },
   },
   data() {
     return {
@@ -102,11 +109,17 @@ export default {
   methods: {
     reportTopic() {
       this.$axios
-        .post(`/topic/${this.topic.id}/report?reasonId=${this.reasons[this.selectedItem].id}`, {}, {
-          headers: {
-            Authorization: 'Bearer ' + this.$store.state.auth.accessToken,
-          },
-        })
+        .post(
+          `/topic/${this.topic.id}/report?reasonId=${
+            this.reasons[this.selectedItem].id
+          }`,
+          {},
+          {
+            headers: {
+              Authorization: 'Bearer ' + this.$store.state.auth.accessToken,
+            },
+          }
+        )
         .then((response) => {
           if (response.status === 201) {
             this.snackbar = true
@@ -114,18 +127,19 @@ export default {
           }
         })
         .catch((error) => {
+          this.snackbarFalse = true
           if (error.status) {
             console.log(error)
           }
         })
-    }
+    },
   },
 }
 </script>
 
 <style scoped>
 .v-list-item-group .v-list-item {
-  border: 1px solid rgba(0, 0, 0, .1) !important;
+  border: 1px solid rgba(0, 0, 0, 0.1) !important;
   border-radius: 8px !important;
 }
 .v-list-item-group .v-list-item--active {

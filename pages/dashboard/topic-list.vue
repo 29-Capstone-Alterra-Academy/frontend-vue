@@ -29,8 +29,11 @@
               <template #[`item.name`]="{ item }">
                 <TopicShortener :name="item.name" />
               </template>
+              <template #[`item.total_post`]="{ item }">
+                <FollowerShortener :follower="item.activity_count" />
+              </template>
               <template #[`item.followers`]="{ item }">
-                <FollowerShortener :follower="item.followers" />
+                <FollowerShortener :follower="item.contributor_count" />
               </template>
               <template #[`item.created_at`]="{ item }">
                 <DateShortener :date="item.created_at" />
@@ -38,7 +41,7 @@
               <template #[`item.details`]="{ item }">
                 <v-btn
                   class="mx-2"
-                  @click="$router.push(`/topic/${item.name}/details`)"
+                  @click="$router.push(`/topic/${item.id}/details`)"
                 >
                   Details
                 </v-btn>
@@ -83,15 +86,10 @@ export default {
   },
   computed: {
     topics() {
-      // if (this.searchPost) {
-      //   return this.$store.state.topics.lists.filter((item) => {
-      //     return item.name.toLowerCase().includes(this.searchPost.toLowerCase())
-      //   })
-      // }
       return this.$store.state.lists.topics
     },
   },
-  created() {
+  mounted() {
     this.$store.dispatch('lists/fetchTopics')
   },
 }

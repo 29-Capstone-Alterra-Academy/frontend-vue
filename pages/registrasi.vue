@@ -22,7 +22,8 @@
                 outlined
                 dense
                 clearable
-                class="rounded-lg"
+                class="rounded-lg py-2"
+                hide-details="auto"
               ></v-text-field>
               <v-text-field
                 v-model="username"
@@ -32,7 +33,8 @@
                 outlined
                 dense
                 clearable
-                class="rounded-lg"
+                class="rounded-lg py-2"
+                hide-details="auto"
               ></v-text-field>
               <v-text-field
                 id="password"
@@ -42,7 +44,8 @@
                 :type="showPassword ? 'text' : 'password'"
                 name="input-10-2"
                 placeholder="Password"
-                class="input-group--focused rounded-lg"
+                class="input-group--focused rounded-lg py-2"
+                hide-details="auto"
                 outlined
                 dense
                 @click:append="showPassword = !showPassword"
@@ -56,7 +59,8 @@
                 placeholder="Confirm Password"
                 hint="Sesuaikan dengan password!"
                 autocomplete="confirm-password"
-                class="input-group--focused rounded-lg"
+                class="input-group--focused rounded-lg py-2"
+                hide-details="auto"
                 outlined
                 dense
                 @click:append="showPassword2 = !showPassword2"

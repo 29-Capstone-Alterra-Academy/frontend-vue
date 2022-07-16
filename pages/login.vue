@@ -27,7 +27,8 @@
                 outlined
                 dense
                 clearable
-                class="rounded-lg"
+                class="rounded-lg py-2"
+                hide-details="auto"
               ></v-text-field>
               <v-text-field
                 id="password"
@@ -37,7 +38,8 @@
                 :type="showPassword ? 'text' : 'password'"
                 placeholder="Password"
                 name="input-10-2"
-                class="input-group--focused rounded-lg"
+                class="input-group--focused rounded-lg py-2"
+                hide-details="auto"
                 outlined
                 dense
                 @click:append="showPassword = !showPassword"

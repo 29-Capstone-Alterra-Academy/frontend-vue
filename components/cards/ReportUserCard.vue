@@ -87,7 +87,7 @@ export default {
     user: {
       type: Object,
       required: true,
-    }
+    },
   },
   data() {
     return {
@@ -126,6 +126,7 @@ export default {
           }
         })
         .catch((error) => {
+          this.snackbarFalse = true
           if (error.status) {
             console.log(error)
           }

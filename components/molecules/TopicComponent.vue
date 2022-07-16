@@ -6,7 +6,7 @@
         style="text-decoration: none; color: black"
       >
         <v-row>
-          <v-col cols="2" class="pr-0" style="max-width: 2rem">
+          <v-col cols="2" class="pr-0" style="max-width: 3rem">
             <div class="text-overline">{{ index + 1 }}.</div>
           </v-col>
           <v-col cols="2" class="px-2" style="max-width: 45px">

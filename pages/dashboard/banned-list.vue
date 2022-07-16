@@ -52,7 +52,7 @@
                           </v-col>
                           <v-col cols="auto">
                             <router-link
-                              :to="`/topic/${item.topic.name}`"
+                              :to="`/topic/${item.topic.id}`"
                               style="text-decoration: none; color: black"
                             >
                               <TopicShortener :name="item.topic.name" />
@@ -63,7 +63,7 @@
                               <small class="text--disabled"
                                 >diposting oleh
                                 <router-link
-                                  :to="`/user/${item.author.username}`"
+                                  :to="`/user/${item.author.id}`"
                                   ><NameShortener
                                     :username="item.author.username"
                                 /></router-link>
@@ -141,12 +141,12 @@
                     class="elevation-1"
                   >
                     <template #[`item.name`]="{ item }">
-                      <TopicShortener :name="item.name" />
+                      <TopicShortener :name="item.topic.name" />
                     </template>
                     <template #[`item.details`]="{ item }">
                       <v-btn
                         class="text-capitalize mx-2"
-                        @click="$router.push(`/topic/${item.name}/details`)"
+                        @click="$router.push(`/topic/${item.topic.id}/details`)"
                       >
                         Details
                       </v-btn>
@@ -162,12 +162,12 @@
                     class="elevation-1"
                   >
                     <template #[`item.username`]="{ item }">
-                      <NameShortener :username="item.username" />
+                      <NameShortener :username="item.suspect.username" />
                     </template>
                     <template #[`item.details`]="{ item }">
                       <v-btn
                         class="text-capitalize mx-2"
-                        @click="$router.push(`/user/${item.username}`)"
+                        @click="$router.push(`/user/${item.suspect.id}`)"
                       >
                         Details
                       </v-btn>
@@ -194,7 +194,7 @@
                           </v-col>
                           <v-col cols="auto">
                             <router-link
-                              :to="`/topic/${item.topic.name}`"
+                              :to="`/topic/${item.topic.id}`"
                               style="text-decoration: none; color: black"
                             >
                               <TopicShortener :name="item.topic.name" />
@@ -205,7 +205,7 @@
                               <small class="text--disabled"
                                 >diposting oleh
                                 <router-link
-                                  :to="`/user/${item.author.username}`"
+                                  :to="`/user/${item.author.id}`"
                                   ><NameShortener
                                     :username="item.author.username"
                                 /></router-link>
@@ -382,10 +382,10 @@ export default {
       return this.$store.state.lists.users
     },
   },
-  created() {
-    this.$store.dispatch('lists/fetchThreads')
-    this.$store.dispatch('lists/fetchTopics')
-    this.$store.dispatch('lists/fetchUsers')
+  mounted() {
+    this.$store.dispatch('lists/fetchReportedThreads')
+    this.$store.dispatch('lists/fetchReportedTopics')
+    this.$store.dispatch('lists/fetchReportedUsers')
   },
 }
 </script>

@@ -4,25 +4,25 @@
       <v-list-item-content>
         <v-row align="center">
           <v-snackbar v-model="snackbar" :timeout="5000">
-            Thread anda berhasil diposting
+            Komentar anda berhasil diposting
             <template #action="{ attrs }">
               <v-btn
                 color="primary"
                 text
                 v-bind="attrs"
-                @click="snackbar = false"
+                @click="snackbarComment = false"
                 >Close</v-btn
               >
             </template>
           </v-snackbar>
           <v-snackbar v-model="snackbarFalse" :timeout="5000">
-            Terjadi kesalahan saat memposting thread
+            Terjadi kesalahan saat memposting komentar
             <template #action="{ attrs }">
               <v-btn
                 color="warning"
                 text
                 v-bind="attrs"
-                @click="snackbarFalse = false"
+                @click="snackbarCommentFalse = false"
                 >Close</v-btn
               >
             </template>
@@ -77,7 +77,7 @@
                     </p>
                   </template>
                   <v-list class="pa-0">
-                    <v-list-item v-if="isAdmin" to="/">
+                    <v-list-item v-if="isAdmin" to="/" @click="dialogAdmin = true">
                       <v-list-item-action>
                         <v-icon>mdi-bullhorn-outline</v-icon>
                       </v-list-item-action>
@@ -95,7 +95,8 @@
                     </v-list-item>
                   </v-list>
                 </v-menu>
-                <ReportCard v-model="dialog" />
+                <DeleteCard v-model="dialogAdmin" :thread="thread"/>
+                <ReportCard v-model="dialog" :thread="thread"/>
               </v-col>
             </v-row>
           </v-col>
@@ -295,6 +296,7 @@ import SUBS_THREADS from '~/apollo/subscriptions/subs-threads'
 
 import Observer from '~/components/ObserverScroll'
 import ReportCard from '~/components/cards/ReportCard'
+import DeleteCard from '~/components/cards/DeleteCard'
 import CommentCard from '~/components/cards/CommentCard'
 import TopicShortener from '~/components/utils/TopicShortener'
 import NameShortener from '~/components/utils/NameShortener'
@@ -304,6 +306,7 @@ export default {
   components: {
     Observer,
     ReportCard,
+    DeleteCard,
     CommentCard,
     TopicShortener,
     NameShortener,
@@ -323,7 +326,11 @@ export default {
       liked: false,
       unliked: false,
       dialog: false,
+      dialogAdmin: false,
       snackbar: false,
+      snackbarFalse: false,
+      snackbarComment: false,
+      snackbarCommentFalse: false,
       replies: [],
       newReplies: [],
       offset: 0,
@@ -461,7 +468,7 @@ export default {
         .then((response) => {
           if (response.status === 201) {
             console.log(response)
-            this.snackbar = true
+            this.snackbarComment = true
             this.images = []
             try {
               this.$apollo.mutate({
@@ -472,6 +479,8 @@ export default {
                 },
               })
             } catch (error) {
+              this.snackbarCommentFalse = true
+              this.images = []
               console.log(error)
             }
           }

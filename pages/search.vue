@@ -17,6 +17,7 @@
               dense
               solo
               class="rounded-lg"
+              @keydown.enter.prevent="submit"
             ></v-text-field>
           </v-col>
           <v-col cols="12"> </v-col>
@@ -25,7 +26,10 @@
     </section>
     <v-container>
       <v-row justify="center">
-        <v-col cols="12">
+        <v-col
+          v-if="threads.length > 0 || topics.length > 0 || users.length > 0"
+          cols="12"
+        >
           <v-card class="shadow rounded px-5 py-2">
             <v-tabs v-model="tab" color="grey">
               <v-tab v-for="item in items" :key="item.tab">
@@ -38,7 +42,6 @@
                   <v-data-table
                     :headers="thread"
                     :items="threads"
-                    :search="search"
                     hide-default-header
                     :items-per-page="5"
                   >
@@ -51,7 +54,6 @@
                   <v-data-table
                     :headers="topic"
                     :items="topics"
-                    :search="search"
                     hide-default-header
                     class="elevation-1"
                   >
@@ -60,11 +62,13 @@
                     </template>
                     <template #[`item.details`]="{ item }">
                       <v-btn
-                        class="text-capitalize mx-2"
-                        @click="$router.push(`/topic/${item.name}/details`)"
+                        v-if="isAdmin"
+                        class="text-capitalize"
+                        @click="$router.push(`/topic/${item.id}/details`)"
                       >
                         Details
                       </v-btn>
+                      <v-btn v-else class="text-capitalize">Follow</v-btn>
                     </template>
                   </v-data-table>
                 </section>
@@ -72,7 +76,6 @@
                   <v-data-table
                     :headers="user"
                     :items="users"
-                    :search="search"
                     hide-default-header
                     class="elevation-1"
                   >
@@ -81,11 +84,13 @@
                     </template>
                     <template #[`item.details`]="{ item }">
                       <v-btn
-                        class="text-capitalize mx-2"
-                        @click="$router.push(`/user/${item.username}`)"
+                        v-if="isAdmin"
+                        class="text-capitalize"
+                        @click="$router.push(`/user/${item.id}`)"
                       >
                         Details
                       </v-btn>
+                      <v-btn v-else class="text-capitalize">Follow</v-btn>
                     </template>
                   </v-data-table>
                 </section>
@@ -99,6 +104,8 @@
 </template>
 
 <script>
+import { mapGetters } from 'vuex'
+
 import PostCard from '~/components/cards/PostCardTable'
 import TopicShortener from '~/components/utils/TopicShortener'
 import NameShortener from '~/components/utils/NameShortener'
@@ -143,6 +150,9 @@ export default {
       tab: null,
       search: '',
       items: [{ tab: 'Thread' }, { tab: 'Topic' }, { tab: 'User' }],
+      threads: [],
+      topics: [],
+      users: [],
       topic: [
         {
           text: 'Username',
@@ -182,20 +192,35 @@ export default {
     }
   },
   computed: {
-    threads() {
-      return this.$store.state.lists.threads
-    },
-    topics() {
-      return this.$store.state.lists.topics
-    },
-    users() {
-      return this.$store.state.lists.users
-    },
+    ...mapGetters('lists', ['isAdmin']),
   },
-  created() {
-    this.$store.dispatch('lists/fetchThreads')
-    this.$store.dispatch('lists/fetchTopics')
-    this.$store.dispatch('lists/fetchUsers')
+  methods: {
+    submit() {
+      this.$axios
+        .get(`/search?scope=thread&keyword=${this.search}&limit=100&offset=0`)
+        .then((res) => {
+          this.threads = [...res.data]
+        })
+        .catch((err) => {
+          console.log(err)
+        })
+      this.$axios
+        .get(`/search?scope=topic&keyword=${this.search}&limit=100&offset=0`)
+        .then((res) => {
+          this.topics = [...res.data]
+        })
+        .catch((err) => {
+          console.log(err)
+        })
+      this.$axios
+        .get(`/search?scope=user&keyword=${this.search}&limit=100&offset=0`)
+        .then((res) => {
+          this.users = [...res.data]
+        })
+        .catch((err) => {
+          console.log(err)
+        })
+    },
   },
 }
 </script>
