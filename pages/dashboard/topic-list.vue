@@ -41,7 +41,7 @@
               <template #[`item.details`]="{ item }">
                 <v-btn
                   class="mx-2"
-                  @click="$router.push(`/topic/${item.id}/details`)"
+                  @click="$router.push(`/topic/${item.id}/details-admin`)"
                 >
                   Details
                 </v-btn>

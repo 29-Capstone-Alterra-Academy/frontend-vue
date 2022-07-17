@@ -64,7 +64,7 @@
                   <v-btn
                     class="text-capitalize"
                     @click="
-                      $router.push(`/topic/${$route.params.slug}/details`)
+                      $router.push(`/topic/${$route.params.slug}/details-admin`)
                     "
                     >Details</v-btn
                   >
