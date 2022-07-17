@@ -111,10 +111,7 @@
                     <v-col cols="12" justify="center">
                       <v-col align="center" cols="auto" class="px-2">
                         <v-img
-                          :src="
-                            'https://staking-spade-production.up.railway.app' +
-                            profile.profile_image
-                          "
+                          :src="profile.profile_image"
                           class="rounded-circle"
                           width="75"
                         ></v-img>
