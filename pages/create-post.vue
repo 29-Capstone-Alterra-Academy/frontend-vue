@@ -52,6 +52,7 @@
                       class="rounded-lg"
                       prepend-inner-icon="mdi-magnify"
                       label="Search"
+                      @keydown.enter.prevent="submit"
                     ></v-text-field>
                     <v-list-item-title
                       class="text--disabled body-2 pt-2"
@@ -76,7 +77,7 @@
                         </v-list-item-content>
                       </v-list-item>
                     </v-card>
-                    <Observer @intersect="intersected" />
+                    <Observer v-if="search === ''" @intersect="intersected" />
                   </div>
                   <template slot="selection" slot-scope="data">
                     <v-row v-row align="center" class="pa-1">
@@ -436,6 +437,16 @@ export default {
             console.log(err)
           })
       }
+    },
+    submit() {
+      this.$axios
+        .get(`/search?scope=topic&keyword=${this.search}&limit=100&offset=0`)
+        .then((res) => {
+          this.topics = [...res.data]
+        })
+        .catch((err) => {
+          console.log(err)
+        })
     },
   },
 }

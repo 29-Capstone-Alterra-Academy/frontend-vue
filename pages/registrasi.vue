@@ -104,7 +104,11 @@ export default {
       snackbar: false,
       showPassword: false,
       showPassword2: false,
-      nameRules: [(v) => !!v || 'Masukkan username anda'],
+      nameRules: [
+        (v) => !!v || 'Masukkan username anda',
+        (value) =>
+          (value && value.length >= 8) || 'Username minimal 6 karakter',
+      ],
       emailRules: [
         (v) => !!v || 'Masukkan alamat e-mail anda',
         (v) =>
@@ -114,13 +118,14 @@ export default {
       ],
       rules: [
         (value) => !!value || 'Masukkan password anda',
-        (value) => (value && /\d/.test(value)) || 'Password harus mengandung setidaknya satu angka',
         (value) =>
-          (value && /[A-Z]{1}/.test(value)) || 'Password harus mengandung setidaknya satu huruf kapital',
+          (value && /\d/.test(value)) ||
+          'Password harus mengandung setidaknya satu angka',
         (value) =>
-          (value && /[^A-Za-z0-9]/.test(value)) ||
-          'Password harus mengandung setidaknya satu karakter spesial',
-        (value) => (value && value.length >= 8) || 'Password minimal 8 karakter',
+          (value && /[A-Z]{1}/.test(value)) ||
+          'Password harus mengandung setidaknya satu huruf kapital',
+        (value) =>
+          (value && value.length >= 8) || 'Password minimal 8 karakter',
       ],
       confirmPasswordRules: [
         (v) => !!v || 'Masukkan ulang password anda',
