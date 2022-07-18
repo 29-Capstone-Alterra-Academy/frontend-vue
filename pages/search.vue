@@ -113,13 +113,21 @@
             </v-tabs-items>
           </v-card>
         </v-col>
-        <v-col v-else align="center" cols="12">
+        <!-- <v-col
+          v-if="
+            threads.length === 0 &&
+            topics.length === 0 &&
+            users.length === 0
+          "
+          align="center"
+          cols="12"
+        >
           <v-card class="shadow rounded-lg px-5 py-2" outlined>
             <v-card-title>
               <h3>Tidak ada data pencarian yang cocok</h3>
             </v-card-title>
           </v-card>
-        </v-col>
+        </v-col> -->
       </v-row>
     </v-container>
   </section>

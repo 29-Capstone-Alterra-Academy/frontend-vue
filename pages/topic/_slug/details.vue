@@ -47,7 +47,7 @@
         </v-col>
         <v-spacer />
         <v-col cols="auto">
-          <v-btn color="error" class="text-capitalize" text outlined
+          <v-btn color="error" class="text-capitalize"
             >Keluar Sebagai Moderator</v-btn
           >
         </v-col>

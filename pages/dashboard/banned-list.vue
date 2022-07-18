@@ -144,21 +144,12 @@
                     </template>
                     <template #[`item.details`]="{ item }">
                       <v-btn
-                        v-if="isAdmin"
                         class="text-capitalize"
                         text
                         outlined
                         @click="
                           $router.push(`/topic/${item.topic.id}/details-admin`)
                         "
-                        >Details
-                      </v-btn>
-                      <v-btn
-                        v-else
-                        class="text-capitalize"
-                        text
-                        outlined
-                        @click="$router.push(`/topic/${item.topic.id}/details`)"
                         >Details
                       </v-btn>
                     </template>

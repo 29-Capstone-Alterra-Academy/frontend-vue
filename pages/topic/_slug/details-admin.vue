@@ -52,8 +52,6 @@
           <v-btn
             color="error"
             class="text-capitalize"
-            text
-            outlined
             @click="dialog = true"
             >Blokir</v-btn
           >
@@ -84,8 +82,6 @@
         <v-col cols="2" align="end" style="max-width: 18.66666%">
           <v-btn
             class="rounded-lg text-capitalize"
-            text
-            outlined
             color="primary"
           >
             <v-icon>mdi-plus</v-icon>
@@ -118,7 +114,7 @@
               <DateShortener :date="item.created_at" />
             </template>
             <template #[`item.followers`]="{ item }">
-              <FollowerShortener :follower="item.followers" />
+              <FollowerShortener :follower="item.followers_count" />
             </template>
             <template #[`item.status`]="{ item }">
               <v-chip color="green" outlined>

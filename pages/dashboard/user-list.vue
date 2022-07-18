@@ -56,7 +56,7 @@
                 <DateShortener :date="item.created_at" />
               </template>
               <template #[`item.followers`]="{ item }">
-                <FollowerShortener :follower="item.followers" />
+                <FollowerShortener :follower="item.followers_count" />
               </template>
               <template #[`item.status`]="{ item }">
                 <v-chip color="green" outlined>
