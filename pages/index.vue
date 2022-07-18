@@ -119,7 +119,7 @@
                       :key="topic.id"
                       cols="12"
                     >
-                      <TopicComponent :topic="topic" :index="index" />
+                      <TopicComponent :topic="topic" :topicsui="topicsui" :index="index" />
                     </v-col>
                   </v-row>
                   <v-row justify="center" align="center">
@@ -206,6 +206,9 @@
 <script>
 import { mapGetters } from 'vuex'
 
+import FETCH_TOPICS from '~/apollo/queries/fetch-all-topics'
+import SUBS_TOPICS from '~/apollo/subscriptions/subs-topics'
+
 import Observer from '~/components/ObserverScroll'
 import PostCard from '~/components/cards/PostCard'
 import TopicComponent from '~/components/molecules/TopicComponent'
@@ -239,6 +242,25 @@ export default {
       threads: [],
       newThreads: [],
     }
+  },
+  apollo: {
+    topicsui: {
+      prefetch: true,
+      query: FETCH_TOPICS,
+      variables() {
+        return {
+          user_name: this.$store.state.lists.profile.username
+        }
+      },
+      subscribeToMore: {
+        document: SUBS_TOPICS,
+        updateQuery: ({ subscriptionData }) => {
+          return {
+            topicsui: subscriptionData.data,
+          }
+        },
+      },
+    },
   },
   computed: {
     ...mapGetters('lists', ['isAdmin']),

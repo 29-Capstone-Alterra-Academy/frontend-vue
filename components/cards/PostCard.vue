@@ -122,12 +122,20 @@
                         <v-list-item-title v-text="`Hapus`" />
                       </v-list-item-content>
                     </v-list-item>
-                    <v-list-item v-else @click="dialog = true">
+                    <v-list-item v-if="!isAdmin && thread.author.username !== profile.username" @click="dialog = true">
                       <v-list-item-action>
                         <v-icon>mdi-bullhorn-outline</v-icon>
                       </v-list-item-action>
                       <v-list-item-content>
                         <v-list-item-title v-text="`Laporkan`" />
+                      </v-list-item-content>
+                    </v-list-item>
+                    <v-list-item v-if="thread.author.username === profile.username" @click="dialogEdit = true">
+                      <v-list-item-action>
+                        <v-icon>mdi-bullhorn-outline</v-icon>
+                      </v-list-item-action>
+                      <v-list-item-content>
+                        <v-list-item-title v-text="`Edit`" />
                       </v-list-item-content>
                     </v-list-item>
                   </v-list>
@@ -182,6 +190,9 @@ export default {
   },
   computed: {
     ...mapGetters('lists', ['isAdmin']),
+    profile () {
+      return this.$store.state.lists.profile
+    },
     timepost() {
       const seconds = Math.floor(
         (new Date() - new Date(String(this.thread.created_at))) / 1000

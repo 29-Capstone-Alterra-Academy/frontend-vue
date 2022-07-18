@@ -67,6 +67,7 @@
         </v-col>
         <v-col
           v-if="commentsui.length > 0"
+          cols="1"
           class="click-cursor"
           @click="unlike(reply.id)"
         >
@@ -100,12 +101,26 @@
                   <v-list-item-title v-text="`Hapus`" />
                 </v-list-item-content>
               </v-list-item>
-              <v-list-item v-else @click="dialog = true">
+              <v-list-item
+                v-if="!isAdmin && reply.author.username !== profile.username"
+                @click="dialog = true"
+              >
                 <v-list-item-action>
                   <v-icon>mdi-bullhorn-outline</v-icon>
                 </v-list-item-action>
                 <v-list-item-content>
                   <v-list-item-title v-text="`Laporkan`" />
+                </v-list-item-content>
+              </v-list-item>
+              <v-list-item
+                v-if="reply.author.username === profile.username"
+                @click="dialogEdit = true"
+              >
+                <v-list-item-action>
+                  <v-icon>mdi-bullhorn-outline</v-icon>
+                </v-list-item-action>
+                <v-list-item-content>
+                  <v-list-item-title v-text="`Edit`" />
                 </v-list-item-content>
               </v-list-item>
             </v-list>
@@ -196,6 +211,11 @@ export default {
     return {
       dialog: false,
     }
+  },
+  computed: {
+    profile() {
+      return this.$store.state.lists.profile
+    },
   },
   methods: {
     async like(param) {

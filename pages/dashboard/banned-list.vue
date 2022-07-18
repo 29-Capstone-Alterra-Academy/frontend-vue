@@ -45,7 +45,7 @@
                         <v-row>
                           <v-col cols="auto">
                             <v-img
-                              :src="item.author.profile_image"
+                              :src="item.topic.profile_image"
                               class="rounded-circle"
                               width="35"
                             ></v-img>
@@ -60,23 +60,23 @@
                           </v-col>
                           <v-col>
                             <div>
-                              <small class="text--disabled"
-                                >diposting oleh
-                                <router-link
-                                  :to="`/user/${item.author.id}`"
-                                  ><NameShortener
-                                    :username="item.author.username"
-                                /></router-link>
-                                {{ item.created_at | timepost }} yang
-                                lalu</small
-                              >
+                              <small class="text--disabled">
+                                dilaporkan oleh
+                                <router-link :to="`/user/${item.reporter.id}`">
+                                  <NameShortener
+                                    :username="item.reporter.username"
+                                  />
+                                </router-link>
+                                {{ item.created_at | timepost }} yang lalu
+                                dengan alasan {{ item.reason.detail }}
+                              </small>
                             </div>
                           </v-col>
                         </v-row>
                         <v-row>
                           <v-col class="py-0">
                             <p class="text-h6 my-0">
-                              {{ item.title }}
+                              {{ item.thread.title }}
                             </p>
                           </v-col>
                         </v-row>
@@ -112,18 +112,20 @@
                                     </p>
                                   </template>
                                   <v-list class="pa-0">
-                                    <v-list-item to="/">
+                                    <v-list-item @click="dialogAdmin = true">
                                       <v-list-item-action>
                                         <v-icon>mdi-bullhorn-outline</v-icon>
                                       </v-list-item-action>
                                       <v-list-item-content>
-                                        <v-list-item-title
-                                          v-text="`Laporkan`"
-                                        />
+                                        <v-list-item-title v-text="`Hapus`" />
                                       </v-list-item-content>
                                     </v-list-item>
                                   </v-list>
                                 </v-menu>
+                                <DeleteCard
+                                  v-model="dialogAdmin"
+                                  :thread="item.thread"
+                                />
                               </v-col>
                             </v-row>
                           </v-col>
@@ -142,13 +144,29 @@
                   >
                     <template #[`item.name`]="{ item }">
                       <TopicShortener :name="item.topic.name" />
+                      <small>
+                        dilaporkan oleh
+                        <router-link :to="`/user/${item.reporter.id}`">
+                          <NameShortener :username="item.reporter.username" />
+                        </router-link>
+                        {{ item.created_at | timepost }} yang lalu dengan alasan
+                        {{ item.reason.detail }}
+                      </small>
                     </template>
                     <template #[`item.details`]="{ item }">
                       <v-btn
-                        class="text-capitalize mx-2"
+                        v-if="isAdmin"
+                        class="text-capitalize"
+                        @click="
+                          $router.push(`/topic/${item.topic.id}/details-admin`)
+                        "
+                        >Details
+                      </v-btn>
+                      <v-btn
+                        v-else
+                        class="text-capitalize"
                         @click="$router.push(`/topic/${item.topic.id}/details`)"
-                      >
-                        Details
+                        >Details
                       </v-btn>
                     </template>
                   </v-data-table>
@@ -163,6 +181,14 @@
                   >
                     <template #[`item.username`]="{ item }">
                       <NameShortener :username="item.suspect.username" />
+                      <small>
+                        dilaporkan oleh
+                        <router-link :to="`/user/${item.reporter.id}`">
+                          <NameShortener :username="item.reporter.username" />
+                        </router-link>
+                        {{ item.created_at | timepost }} yang lalu dengan alasan
+                        {{ item.reason.detail }}
+                      </small>
                     </template>
                     <template #[`item.details`]="{ item }">
                       <v-btn
@@ -176,8 +202,8 @@
                 </section>
                 <section v-if="item.tab == `Comment`">
                   <v-data-table
-                    :headers="thread"
-                    :items="threads"
+                    :headers="reply"
+                    :items="replies"
                     :search="search"
                     hide-default-header
                     :items-per-page="5"
@@ -204,8 +230,7 @@
                             <div>
                               <small class="text--disabled"
                                 >diposting oleh
-                                <router-link
-                                  :to="`/user/${item.author.id}`"
+                                <router-link :to="`/user/${item.author.id}`"
                                   ><NameShortener
                                     :username="item.author.username"
                                 /></router-link>
@@ -284,6 +309,9 @@
 </template>
 
 <script>
+import { mapGetters } from 'vuex'
+
+import DeleteCard from '~/components/cards/DeleteCard'
 import TopicShortener from '~/components/utils/TopicShortener'
 import NameShortener from '~/components/utils/NameShortener'
 import FollowerShortener from '~/components/utils/FollowerShortener'
@@ -291,6 +319,7 @@ import FollowerShortener from '~/components/utils/FollowerShortener'
 export default {
   name: 'BannedList',
   components: {
+    DeleteCard,
     TopicShortener,
     NameShortener,
     FollowerShortener,
@@ -327,6 +356,7 @@ export default {
     return {
       tab: null,
       search: '',
+      dialogAdmin: false,
       items: [
         { tab: 'Thread' },
         { tab: 'Topic' },
@@ -369,23 +399,36 @@ export default {
           value: 'title',
         },
       ],
+      reply: [
+        {
+          text: 'ID',
+          align: 'start',
+          sortable: false,
+          value: 'title',
+        },
+      ],
     }
   },
   computed: {
+    ...mapGetters('lists', ['isAdmin']),
     threads() {
-      return this.$store.state.lists.threads
+      return this.$store.state.lists.reportedThreads
     },
     topics() {
-      return this.$store.state.lists.topics
+      return this.$store.state.lists.reportedTopics
     },
     users() {
-      return this.$store.state.lists.users
+      return this.$store.state.lists.reportedUsers
     },
+    replies() {
+      return this.$store.state.lists.reportedReplies
+    }
   },
   mounted() {
     this.$store.dispatch('lists/fetchReportedThreads')
     this.$store.dispatch('lists/fetchReportedTopics')
     this.$store.dispatch('lists/fetchReportedUsers')
+    this.$store.dispatch('lists/fetchReportedReplies')
   },
 }
 </script>

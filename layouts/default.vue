@@ -58,7 +58,10 @@
                           </div>
                         </v-col>
                         <v-col cols="12" class="pa-0">
-                          <div class="text-capitalize text--disabled caption">
+                          <div v-if="isAdmin" class="text-capitalize text--disabled caption">
+                            Admin
+                          </div>
+                          <div v-else class="text-capitalize text--disabled caption">
                             User
                           </div>
                         </v-col>
@@ -116,7 +119,7 @@
 </template>
 
 <script>
-import { mapMutations } from 'vuex'
+import { mapMutations, mapGetters } from 'vuex'
 import AuthButton from '~/components/navbar/AuthButton'
 import AuthButtonSide from '~/components/navbar/AuthButtonSide'
 
@@ -167,6 +170,7 @@ export default {
     }
   },
   computed: {
+    ...mapGetters('lists', ['isAdmin']),
     route() {
       return this.$route.path
     },

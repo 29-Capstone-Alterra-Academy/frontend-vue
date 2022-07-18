@@ -8,10 +8,7 @@
       <v-row align="center">
         <v-col cols="auto">
           <v-img
-            :src="
-              'https://staking-spade-production.up.railway.app' +
-              topic.profile_image
-            "
+            :src="topic.profile_image"
             class="rounded-circle"
             width="100"
           ></v-img>
@@ -52,7 +49,10 @@
         </v-col>
         <v-spacer />
         <v-col cols="auto">
-          <v-btn color="error" class="text-capitalize">Blokir</v-btn>
+          <v-btn color="error" class="text-capitalize" @click="dialog = true"
+            >Blokir</v-btn
+          >
+          <DeleteTopicCard v-model="dialog" :topic="topic"/>
         </v-col>
       </v-row>
       <v-row align="center">
@@ -130,6 +130,7 @@
 </template>
 
 <script>
+import DeleteTopicCard from '~/components/cards/DeleteTopicCard'
 import NameShortener from '~/components/utils/NameShortener'
 import TopicShortener from '~/components/utils/TopicShortener'
 import DateShortener from '~/components/utils/DateShortener'
@@ -138,21 +139,17 @@ import FollowerShortener from '~/components/utils/FollowerShortener'
 export default {
   name: 'IndexPage',
   components: {
+    DeleteTopicCard,
     NameShortener,
     TopicShortener,
     DateShortener,
     FollowerShortener,
   },
-  middleware: 'authenticated',
-  props: {
-    searchPost: {
-      type: String,
-      default: '',
-    },
-  },
+  middleware: ['authenticated', 'admin'],
   data() {
     return {
       tab: null,
+      dialog: false,
       isEditDesc: false,
       isEditRules: false,
       items: [{ tab: 'Rekomendasi', icon: 'mdi-fire' }, { tab: 'Mengikuti' }],

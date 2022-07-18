@@ -273,7 +273,7 @@ export default {
           })
           .then((response) => {
             console.log(response.data)
-            if (response.status === 201) {
+            if (response.status === 204) {
               this.snackbar = true
               this.username = ''
               this.bio = ''

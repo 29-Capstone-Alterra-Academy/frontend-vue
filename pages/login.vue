@@ -38,7 +38,7 @@
                 :type="showPassword ? 'text' : 'password'"
                 placeholder="Password"
                 name="input-10-2"
-                class="input-group--focused rounded-lg py-2"
+                class="input-group--focused rounded-lg py-2 pb-4"
                 hide-details="auto"
                 outlined
                 dense

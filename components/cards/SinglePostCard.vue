@@ -77,7 +77,11 @@
                     </p>
                   </template>
                   <v-list class="pa-0">
-                    <v-list-item v-if="isAdmin" to="/" @click="dialogAdmin = true">
+                    <v-list-item
+                      v-if="isAdmin"
+                      to="/"
+                      @click="dialogAdmin = true"
+                    >
                       <v-list-item-action>
                         <v-icon>mdi-bullhorn-outline</v-icon>
                       </v-list-item-action>
@@ -85,7 +89,12 @@
                         <v-list-item-title v-text="`Hapus`" />
                       </v-list-item-content>
                     </v-list-item>
-                    <v-list-item v-else @click="dialog = true">
+                    <v-list-item
+                      v-if="
+                        !isAdmin && thread.author.username !== profile.username
+                      "
+                      @click="dialog = true"
+                    >
                       <v-list-item-action>
                         <v-icon>mdi-bullhorn-outline</v-icon>
                       </v-list-item-action>
@@ -93,10 +102,21 @@
                         <v-list-item-title v-text="`Laporkan`" />
                       </v-list-item-content>
                     </v-list-item>
+                    <v-list-item
+                      v-if="thread.author.username === profile.username"
+                      @click="dialogEdit = true"
+                    >
+                      <v-list-item-action>
+                        <v-icon>mdi-bullhorn-outline</v-icon>
+                      </v-list-item-action>
+                      <v-list-item-content>
+                        <v-list-item-title v-text="`Edit`" />
+                      </v-list-item-content>
+                    </v-list-item>
                   </v-list>
                 </v-menu>
-                <DeleteCard v-model="dialogAdmin" :thread="thread"/>
-                <ReportCard v-model="dialog" :thread="thread"/>
+                <DeleteCard v-model="dialogAdmin" :thread="thread" />
+                <ReportCard v-model="dialog" :thread="thread" />
               </v-col>
             </v-row>
           </v-col>
@@ -272,7 +292,7 @@
           </v-row>
           <div v-if="replies.length > 0">
             <v-col v-for="reply in replies" :key="reply.id">
-              <CommentCard :reply="reply" @change="refetchReplies"/>
+              <CommentCard :reply="reply" @change="refetchReplies" />
             </v-col>
           </div>
           <Observer @intersect="intersected" />
@@ -358,6 +378,9 @@ export default {
   },
   computed: {
     ...mapGetters('lists', ['isAdmin']),
+    profile() {
+      return this.$store.state.lists.profile
+    },
     timepost() {
       const seconds = Math.floor(
         (new Date() - new Date(String(this.thread.created_at))) / 1000

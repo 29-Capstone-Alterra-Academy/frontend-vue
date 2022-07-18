@@ -59,7 +59,7 @@
                 placeholder="Confirm Password"
                 hint="Sesuaikan dengan password!"
                 autocomplete="confirm-password"
-                class="input-group--focused rounded-lg py-2"
+                class="input-group--focused rounded-lg py-2 pb-4"
                 hide-details="auto"
                 outlined
                 dense

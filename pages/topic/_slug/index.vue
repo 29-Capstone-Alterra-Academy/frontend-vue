@@ -62,12 +62,21 @@
                 <v-spacer v-if="isAdmin" />
                 <v-col v-if="isAdmin" cols="auto" style="max-width: 10rem">
                   <v-btn
+                    v-if="isAdmin"
                     class="text-capitalize"
                     @click="
                       $router.push(`/topic/${$route.params.slug}/details-admin`)
                     "
-                    >Details</v-btn
-                  >
+                    >Details
+                  </v-btn>
+                  <v-btn
+                    v-else
+                    class="text-capitalize"
+                    @click="
+                      $router.push(`/topic/${$route.params.slug}/details`)
+                    "
+                    >Details
+                  </v-btn>
                 </v-col>
               </v-row>
             </v-card>
@@ -164,7 +173,11 @@
                 overflow-y: scroll;
               "
             >
-              <v-col v-if="isAdmin" cols="12" class="py-1">
+              <v-col
+                v-if="isAdmin && topicReportedTimes.length > 0"
+                cols="12"
+                class="py-1"
+              >
                 <v-card class="rounded-lg red-border" outlined>
                   <v-list-item three-line>
                     <v-list-item-content>
@@ -349,12 +362,6 @@ export default {
     NameShortener,
   },
   middleware: 'authenticated',
-  props: {
-    searchPost: {
-      type: String,
-      default: null,
-    },
-  },
   data() {
     return {
       tab: null,
@@ -450,7 +457,7 @@ export default {
       const response = await this.$apollo.queries.topicsui.refetch()
       if (response.data.topicsui.length > 0) {
         this.$axios
-          .get(
+          .post(
             '/topic/' + param + '/subscribe',
             {},
             {
@@ -484,7 +491,7 @@ export default {
           })
       } else {
         this.$axios
-          .get(
+          .post(
             '/topic/' + param + '/subscribe',
             {},
             {
@@ -522,7 +529,7 @@ export default {
       const response = await this.$apollo.queries.topicsui.refetch()
       if (response.data.topicsui.length > 0) {
         this.$axios
-          .get(
+          .post(
             '/topic/' + param + '/unsubscribe',
             {},
             {
@@ -556,7 +563,7 @@ export default {
           })
       } else {
         this.$axios
-          .get(
+          .post(
             '/topic/' + param + '/unsubscribe',
             {},
             {

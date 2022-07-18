@@ -50,13 +50,7 @@
                       <TopicShortener :name="item.name" />
                     </template>
                     <template #[`item.details`]="{ item }">
-                      <v-btn
-                        v-if="isAdmin"
-                        class="text-capitalize"
-                        @click="$router.push(`/topic/${item.id}/details`)"
-                        >Details</v-btn
-                      >
-                      <v-btn v-else class="text-capitalize">Follow</v-btn>
+                      <TopicTableComponent :topic="item" :topicsui="topicsui"/>
                     </template>
                   </v-data-table>
                 </section>
@@ -94,12 +88,17 @@
 <script>
 import { mapGetters } from 'vuex'
 
+import FETCH_TOPICS from '~/apollo/queries/fetch-all-topics'
+import SUBS_TOPICS from '~/apollo/subscriptions/subs-topics'
+
+import TopicTableComponent from '~/components/molecules/TopicTableComponent'
 import TopicShortener from '~/components/utils/TopicShortener'
 import NameShortener from '~/components/utils/NameShortener'
 
 export default {
   name: 'BannedList',
   components: {
+    TopicTableComponent,
     TopicShortener,
     NameShortener,
   },
@@ -178,6 +177,25 @@ export default {
       ],
     }
   },
+  apollo: {
+    topicsui: {
+      prefetch: true,
+      query: FETCH_TOPICS,
+      variables() {
+        return {
+          user_name: this.$store.state.lists.profile.username,
+        }
+      },
+      subscribeToMore: {
+        document: SUBS_TOPICS,
+        updateQuery: ({ subscriptionData }) => {
+          return {
+            topicsui: subscriptionData.data,
+          }
+        },
+      },
+    },
+  },
   computed: {
     ...mapGetters('lists', ['isAdmin']),
     topics() {
@@ -185,6 +203,9 @@ export default {
     },
     users() {
       return this.$store.state.lists.users
+    },
+    profile() {
+      return this.$store.state.lists.profile
     },
   },
   created() {

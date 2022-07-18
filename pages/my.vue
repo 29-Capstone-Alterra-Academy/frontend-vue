@@ -114,6 +114,7 @@
                           :src="profile.profile_image"
                           class="rounded-circle"
                           width="75"
+                          height="75"
                         ></v-img>
                       </v-col>
                       <v-col align="center" cols="auto" class="pl-0">
@@ -152,7 +153,7 @@
                         Joined
                         <DateShortener :date="profile.created_at" />
                       </div>
-                      <v-col cols="12" class="pa-0 py-3">
+                      <v-col v-if="!isAdmin" cols="12" class="pa-0 py-3">
                         <v-btn
                           outlined
                           block
@@ -218,6 +219,8 @@
 </template>
 
 <script>
+import { mapGetters } from 'vuex'
+
 import Observer from '~/components/ObserverScroll'
 import PostCard from '~/components/cards/PostCard'
 import EditProfile from '~/components/cards/EditProfile'
@@ -255,6 +258,7 @@ export default {
     }
   },
   computed: {
+    ...mapGetters('lists', ['isAdmin']),
     orderThreads() {
       if (this.searchPost) {
         const threads = this.$store.state.lists.threads.filter((item) => {
@@ -291,12 +295,13 @@ export default {
   },
   watch: {
     profile() {
-      this.intersected()
       this.user()
+      this.intersected()
     },
   },
   mounted() {
     this.$store.dispatch('lists/fetchTopics')
+    this.$store.dispatch('lists/loggedUser')
   },
   methods: {
     intersected() {

@@ -1,11 +1,15 @@
 const state = () => ({
   threads: [],
+  reportedThreads: [],
   topics: [],
+  reportedTopics: [],
   detailTopic: {},
   detailThread: {},
   detailUser: {},
   users: [],
+  reportedUsers: [],
   replies: [],
+  reportedReplies: [],
   profile: [],
   reasons: [],
   isAdmin: null,
@@ -15,8 +19,14 @@ const mutations = {
   setThreads(state, threads) {
     state.threads = [...threads]
   },
+  setReportedThreads(state, reportedThreads) {
+    state.reportedThreads = [...reportedThreads]
+  },
   setTopics(state, topics) {
     state.topics = [...topics]
+  },
+  setReportedTopics(state, reportedTopics) {
+    state.reportedTopics = [...reportedTopics]
   },
   setDetailTopics(state, detailTopic) {
     state.detailTopic = detailTopic
@@ -30,8 +40,14 @@ const mutations = {
   setUsers(state, users) {
     state.users = [...users]
   },
+  setReportedUsers(state, reportedUsers) {
+    state.reportedUsers = [...reportedUsers]
+  },
   setReplies(state, replies) {
     state.replies = [...replies]
+  },
+  setReportedReplies(state, reportedReplies) {
+    state.reportedReplies = [...reportedReplies]
   },
   setReasons(state, reasons) {
     state.reasons = [...reasons]
@@ -184,7 +200,7 @@ const actions = {
         },
       })
       .then((res) => {
-        commit('setThreads', res.data)
+        commit('setReportedThreads', res.data)
       })
       .catch((err) => {
         console.log(err)
@@ -199,7 +215,7 @@ const actions = {
         },
       })
       .then((res) => {
-        commit('setTopics', res.data)
+        commit('setReportedTopics', res.data)
       })
       .catch((err) => {
         console.log(err)
@@ -214,7 +230,22 @@ const actions = {
         },
       })
       .then((res) => {
-        commit('setUsers', res.data)
+        commit('setReportedUsers', res.data)
+      })
+      .catch((err) => {
+        console.log(err)
+      })
+  },
+  fetchReportedReplies({ commit, rootState }) {
+    this.$axios
+      .get('/report?scope=reply&limit=100&offset=0', {
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: 'Bearer ' + rootState.auth.accessToken,
+        },
+      })
+      .then((res) => {
+        commit('setReportedReplies', res.data)
       })
       .catch((err) => {
         console.log(err)
