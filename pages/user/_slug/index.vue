@@ -132,7 +132,12 @@
                   </div>
                   <v-row>
                     <v-col cols="12" justify="center">
-                      <v-col align="center" cols="auto" class="px-2" style="max-width: none">
+                      <v-col
+                        align="center"
+                        cols="auto"
+                        class="px-2"
+                        style="max-width: none"
+                      >
                         <v-img
                           :src="user.profile_image"
                           class="rounded-circle"
@@ -144,8 +149,52 @@
                           <NameShortener :username="user.Username" />
                         </div>
                       </v-col>
-                      <v-col v-if="!isAdmin" align="center" cols="2" style="max-width: 10rem">
-                        <v-btn class="text-capitalize">Follow</v-btn>
+                      <v-col v-if="!isAdmin" align="center" cols="auto">
+                        <section v-if="usersui.length > 0">
+                          <section
+                            v-for="(userdata, index) in usersui"
+                            :key="index"
+                          >
+                            <v-btn
+                              v-if="userdata.follow"
+                              class="text-capitalize"
+                              text
+                              outlined
+                              @click="unfollowing(user.id)"
+                            >
+                              Unfollow
+                            </v-btn>
+                            <v-btn
+                              v-else
+                              class="text-capitalize"
+                              text
+                              outlined
+                              @click="following(user.id)"
+                            >
+                              Follow
+                            </v-btn>
+                          </section>
+                        </section>
+                        <section v-else>
+                          <v-btn
+                            v-if="follow"
+                            class="text-capitalize"
+                            text
+                            outlined
+                            @click="unfollowing(user.id)"
+                          >
+                            Unfollow
+                          </v-btn>
+                          <v-btn
+                            v-else
+                            class="text-capitalize"
+                            text
+                            outlined
+                            @click="following(user.id)"
+                          >
+                            Follow
+                          </v-btn>
+                        </section>
                       </v-col>
                       <div class="py-1">
                         <h4>
@@ -166,7 +215,7 @@
                         Joined
                         <DateShortener :date="user.created_at" />
                       </div>
-                      <v-col v-if="isAdmin" align="center" cols="2" style="max-width: 10rem">
+                      <v-col v-if="isAdmin" align="center" cols="auto">
                         <v-btn color="error" class="text-capitalize">
                           Blokir
                         </v-btn>
@@ -202,14 +251,10 @@
                           </div>
                         </v-col>
                         <v-col cols="2" style="max-width: 10rem">
-                          <v-btn
-                            v-if="isAdmin"
-                            class="text-capitalize"
-                            @click="$router.push(`/topic/${topic.id}/details`)"
-                          >
-                            Details
-                          </v-btn>
-                          <v-btn v-else class="text-capitalize">Follow</v-btn>
+                          <TopicTableComponent
+                            :topic="topic"
+                            :topicsui="topicsui"
+                          />
                         </v-col>
                       </v-row>
                     </v-col>
@@ -227,6 +272,16 @@
 <script>
 import { mapGetters } from 'vuex'
 
+import FETCH_TOPICS from '~/apollo/queries/fetch-all-topics'
+import SUBS_TOPICS from '~/apollo/subscriptions/subs-topics'
+import FETCH_USERS from '~/apollo/queries/fetch-users'
+import SUBS_USERS from '~/apollo/subscriptions/subs-users'
+import FOLLOWED_USERS from '~/apollo/mutations/followed-users'
+import INSERT_FOLLOWED_USERS from '~/apollo/mutations/insert-followed-users'
+import INSERT_UNFOLLOWED_USERS from '~/apollo/mutations/insert-unfollowed-users'
+import UNFOLLOWED_USERS from '~/apollo/mutations/unfollowed-users'
+
+import TopicTableComponent from '~/components/molecules/TopicTableComponent'
 import ReportUserCard from '~/components/cards/ReportUserCard'
 import Observer from '~/components/ObserverScroll'
 import PostCard from '~/components/cards/PostCard'
@@ -238,6 +293,7 @@ import FollowerShortener from '~/components/utils/FollowerShortener'
 export default {
   name: 'IndexPage',
   components: {
+    TopicTableComponent,
     ReportUserCard,
     Observer,
     PostCard,
@@ -295,6 +351,43 @@ export default {
       return this.$store.state.lists.detailUser
     },
   },
+  apollo: {
+    topicsui: {
+      prefetch: true,
+      query: FETCH_TOPICS,
+      variables() {
+        return {
+          user_name: this.$store.state.lists.profile.username,
+        }
+      },
+      subscribeToMore: {
+        document: SUBS_TOPICS,
+        updateQuery: ({ subscriptionData }) => {
+          return {
+            topicsui: subscriptionData.data,
+          }
+        },
+      },
+    },
+    usersui: {
+      prefetch: true,
+      query: FETCH_USERS,
+      variables() {
+        return {
+          user_name: this.$store.state.lists.profile.username,
+          id: this.$route.params.slug,
+        }
+      },
+      subscribeToMore: {
+        document: SUBS_USERS,
+        updateQuery: ({ subscriptionData }) => {
+          return {
+            usersui: subscriptionData.data,
+          }
+        },
+      },
+    },
+  },
   watch: {
     user() {
       this.reportedUser()
@@ -337,6 +430,138 @@ export default {
           })
           .catch((err) => {
             console.log(err)
+          })
+      }
+    },
+    async following(param) {
+      const response = await this.$apollo.queries.usersui.refetch()
+      if (response.data.usersui.length > 0) {
+        this.$axios
+          .post(
+            '/user/' + param + '/follow',
+            {},
+            {
+              headers: {
+                Authorization: 'Bearer ' + this.$store.state.auth.accessToken,
+              },
+            }
+          )
+          .then((response) => {
+            if (response.status === 200) {
+              this.$store.dispatch('lists/fetchUserById', this.$route.params.slug)
+              this.follow = true
+              try {
+                this.$apollo.mutate({
+                  mutation: FOLLOWED_USERS,
+                  variables: {
+                    user_name: this.$store.state.lists.profile.username,
+                    id: this.$route.params.slug,
+                  },
+                })
+              } catch (error) {
+                console.log(error)
+              }
+            }
+          })
+          .catch((error) => {
+            console.log(error)
+          })
+      } else {
+        this.$axios
+          .post(
+            '/user/' + param + '/follow',
+            {},
+            {
+              headers: {
+                Authorization: 'Bearer ' + this.$store.state.auth.accessToken,
+              },
+            }
+          )
+          .then((response) => {
+            if (response.status === 200) {
+              this.$store.dispatch('lists/fetchUserById', this.$route.params.slug)
+              this.follow = true
+              try {
+                this.$apollo.mutate({
+                  mutation: INSERT_FOLLOWED_USERS,
+                  variables: {
+                    user_name: this.$store.state.lists.profile.username,
+                    id: this.$route.params.slug,
+                  },
+                })
+              } catch (error) {
+                console.log(error)
+              }
+            }
+          })
+          .catch((error) => {
+            console.log(error)
+          })
+      }
+    },
+    async unfollowing(param) {
+      const response = await this.$apollo.queries.usersui.refetch()
+      if (response.data.usersui.length > 0) {
+        this.$axios
+          .post(
+            '/user/' + param + '/unfollow',
+            {},
+            {
+              headers: {
+                Authorization: 'Bearer ' + this.$store.state.auth.accessToken,
+              },
+            }
+          )
+          .then((response) => {
+            if (response.status === 200) {
+              this.$store.dispatch('lists/fetchUserById', this.$route.params.slug)
+              this.follow = false
+              try {
+                this.$apollo.mutate({
+                  mutation: UNFOLLOWED_USERS,
+                  variables: {
+                    user_name: this.$store.state.lists.profile.username,
+                    id: this.$route.params.slug,
+                  },
+                })
+              } catch (error) {
+                console.log(error)
+              }
+            }
+          })
+          .catch((error) => {
+            console.log(error)
+          })
+      } else {
+        this.$axios
+          .post(
+            '/user/' + param + '/unfollow',
+            {},
+            {
+              headers: {
+                Authorization: 'Bearer ' + this.$store.state.auth.accessToken,
+              },
+            }
+          )
+          .then((response) => {
+            if (response.status === 200) {
+              this.$store.dispatch('lists/fetchUserById', this.$route.params.slug)
+              this.follow = false
+              try {
+                this.$apollo.mutate({
+                  mutation: INSERT_UNFOLLOWED_USERS,
+                  variables: {
+                    user_name: this.$store.state.lists.profile.username,
+                    id: this.$route.params.slug,
+                  },
+                })
+              } catch (error) {
+                console.log(error)
+              }
+            }
+          })
+          .catch((error) => {
+            console.log(error)
           })
       }
     },
