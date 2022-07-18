@@ -10,6 +10,11 @@
     </v-snackbar>
     <v-row justify="center" align="center" class="pa-0 ma-0">
       <v-col cols="4">
+        <v-row justify="center">
+          <v-col cols="auto">
+            <v-img src="/Logo.svg" class="" width="110"></v-img>
+          </v-col>
+        </v-row>
         <v-list-item three-line>
           <v-list-item-content>
             <h1 class="mb-4">Daftar</h1>
@@ -134,7 +139,8 @@ export default {
           v === (this.password ? this.password.value : undefined) ||
           'Passwords tidak sama',
         (v) =>
-          v.length === (this.password.length ? this.password.value : undefined) ||
+          v.length ===
+            (this.password.length ? this.password.value : undefined) ||
           'Passwords tidak sama',
       ],
     }
