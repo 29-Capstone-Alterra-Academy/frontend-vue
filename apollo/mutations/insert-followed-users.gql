@@ -1,0 +1,12 @@
+mutation insert($user_name: String, $id: Int){
+  insert_usersui(objects: {username: $user_name, user_id: $id}) {
+    returning {
+      id
+    }
+  }
+  update_usersui(where: {username: {_eq: $user_name}, user_id: {_eq: $id}}, _set: {follow: true}) {
+    returning {
+      id
+    }
+  }
+}

@@ -13,7 +13,7 @@
     <v-container>
       <v-row justify="center">
         <v-col cols="12">
-          <v-card>
+          <v-card class="rounded-lg" outlined>
             <v-card-title>
               Topic List
               <v-spacer></v-spacer>
@@ -27,7 +27,13 @@
             </v-card-title>
             <v-data-table :headers="headers" :search="search" :items="topics">
               <template #[`item.name`]="{ item }">
-                <TopicShortener :name="item.name" />
+                <router-link
+                  :to="`/topic/${item.id}`"
+                  style="text-decoration: none; color: black"
+                >
+                  <TopicShortener v-if="item.name != null" :name="item.name" />
+                  <section v-else>{{ item.name }}</section>
+                </router-link>
               </template>
               <template #[`item.total_post`]="{ item }">
                 <FollowerShortener :follower="item.activity_count" />
@@ -41,6 +47,8 @@
               <template #[`item.details`]="{ item }">
                 <v-btn
                   class="mx-2"
+                  text
+                  outlined
                   @click="$router.push(`/topic/${item.id}/details-admin`)"
                 >
                   Details

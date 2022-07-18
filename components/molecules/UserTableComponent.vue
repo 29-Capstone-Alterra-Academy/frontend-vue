@@ -5,37 +5,29 @@
       class="text-capitalize"
       text
       outlined
-      @click="$router.push(`/topic/${topic.id}/details-admin`)"
+      @click="$router.push(`/user/${user.id}`)"
       >Details
     </v-btn>
-    <v-btn
-      v-if="!isAdmin && profile.username === 'moderator'"
-      class="text-capitalize"
-      text
-      outlined
-      @click="$router.push(`/topic/${topic.id}/details`)"
-      >Details
-    </v-btn>
-    <section v-if="!isAdmin">
+    <section v-else>
       <section
         v-if="
-          topicsui.filter((item) => {
-            return item.topic_id === topic.id
+          usersui.filter((item) => {
+            return item.user_id === user.id
           }).length > 0
         "
       >
         <section
-          v-for="(topicdata, id) in topicsui.filter((item) => {
-            return item.topic_id === topic.id
+          v-for="(userdata, id) in usersui.filter((item) => {
+            return item.user_id === user.id
           })"
           :key="id"
         >
           <v-btn
-            v-if="topicdata.subscribe"
+            v-if="userdata.follow"
             class="text-capitalize"
             text
             outlined
-            @click="unfollow(topic.id)"
+            @click="unfollowing(user.id)"
           >
             Unfollow
           </v-btn>
@@ -44,7 +36,7 @@
             class="text-capitalize"
             text
             outlined
-            @click="follow(topic.id)"
+            @click="following(user.id)"
           >
             Follow
           </v-btn>
@@ -52,11 +44,11 @@
       </section>
       <section v-else>
         <v-btn
-          v-if="subscribe"
+          v-if="follow"
           class="text-capitalize"
           text
           outlined
-          @click="unfollow(topic.id)"
+          @click="unfollowing(user.id)"
         >
           Unfollow
         </v-btn>
@@ -65,7 +57,7 @@
           class="text-capitalize"
           text
           outlined
-          @click="follow(topic.id)"
+          @click="following(user.id)"
         >
           Follow
         </v-btn>
@@ -77,18 +69,18 @@
 <script>
 import { mapGetters } from 'vuex'
 
-import SUBSCRIBE_TOPICS from '~/apollo/mutations/subscribed-topics'
-import INSERT_SUBSCRIBE_TOPICS from '~/apollo/mutations/insert-subscribed-topics'
-import INSERT_UNSUBSCRIBE_TOPICS from '~/apollo/mutations/insert-unsubscribed-topics'
-import UNSUBSCRIBE_TOPICS from '~/apollo/mutations/unsubscribed-topic'
+import FOLLOWED_USERS from '~/apollo/mutations/followed-users'
+import INSERT_FOLLOWED_USERS from '~/apollo/mutations/insert-followed-users'
+import INSERT_UNFOLLOWED_USERS from '~/apollo/mutations/insert-unfollowed-users'
+import UNFOLLOWED_USERS from '~/apollo/mutations/unfollowed-users'
 
 export default {
   props: {
-    topic: {
+    user: {
       type: Object,
       required: true,
     },
-    topicsui: {
+    usersui: {
       type: Array,
       required: true,
     },
@@ -100,15 +92,15 @@ export default {
     },
   },
   methods: {
-    follow(param) {
+    following(param) {
       if (
-        this.topicsui.filter((item) => {
-          return item.topic_id === this.topic.id
+        this.usersui.filter((item) => {
+          return item.user_id === this.user.id
         }).length > 0
       ) {
         this.$axios
           .post(
-            '/topic/' + param + '/subscribe',
+            '/user/' + param + '/follow',
             {},
             {
               headers: {
@@ -118,14 +110,14 @@ export default {
           )
           .then((response) => {
             if (response.status === 200) {
-              this.$store.dispatch('lists/fetchTopicById', this.topic.id)
-              this.subscribe = true
+              this.$store.dispatch('lists/fetchUserById', this.user.id)
+              this.follow = true
               try {
                 this.$apollo.mutate({
-                  mutation: SUBSCRIBE_TOPICS,
+                  mutation: FOLLOWED_USERS,
                   variables: {
                     user_name: this.$store.state.lists.profile.username,
-                    id: this.topic.id,
+                    id: this.user.id,
                   },
                 })
               } catch (error) {
@@ -139,7 +131,7 @@ export default {
       } else {
         this.$axios
           .post(
-            '/topic/' + param + '/subscribe',
+            '/user/' + param + '/follow',
             {},
             {
               headers: {
@@ -149,14 +141,14 @@ export default {
           )
           .then((response) => {
             if (response.status === 200) {
-              this.$store.dispatch('lists/fetchTopicById', this.topic.id)
-              this.subscribe = true
+              this.$store.dispatch('lists/fetchUserById', this.user.id)
+              this.follow = true
               try {
                 this.$apollo.mutate({
-                  mutation: INSERT_SUBSCRIBE_TOPICS,
+                  mutation: INSERT_FOLLOWED_USERS,
                   variables: {
                     user_name: this.$store.state.lists.profile.username,
-                    id: this.topic.id,
+                    id: this.user.id,
                   },
                 })
               } catch (error) {
@@ -169,15 +161,15 @@ export default {
           })
       }
     },
-    unfollow(param) {
+    unfollowing(param) {
       if (
-        this.topicsui.filter((item) => {
-          return item.topic_id === this.topic.id
+        this.usersui.filter((item) => {
+          return item.user_id === this.user.id
         }).length > 0
       ) {
         this.$axios
           .post(
-            '/topic/' + param + '/unsubscribe',
+            '/user/' + param + '/unfollow',
             {},
             {
               headers: {
@@ -187,14 +179,14 @@ export default {
           )
           .then((response) => {
             if (response.status === 200) {
-              this.$store.dispatch('lists/fetchTopicById', this.topic.id)
-              this.subscribe = false
+              this.$store.dispatch('lists/fetchUserById', this.user.id)
+              this.follow = false
               try {
                 this.$apollo.mutate({
-                  mutation: UNSUBSCRIBE_TOPICS,
+                  mutation: UNFOLLOWED_USERS,
                   variables: {
                     user_name: this.$store.state.lists.profile.username,
-                    id: this.topic.id,
+                    id: this.user.id,
                   },
                 })
               } catch (error) {
@@ -208,7 +200,7 @@ export default {
       } else {
         this.$axios
           .post(
-            '/topic/' + param + '/unsubscribe',
+            '/user/' + param + '/unfollow',
             {},
             {
               headers: {
@@ -218,14 +210,14 @@ export default {
           )
           .then((response) => {
             if (response.status === 200) {
-              this.$store.dispatch('lists/fetchTopicById', this.topic.id)
-              this.subscribe = false
+              this.$store.dispatch('lists/fetchUserById', this.user.id)
+              this.follow = false
               try {
                 this.$apollo.mutate({
-                  mutation: INSERT_UNSUBSCRIBE_TOPICS,
+                  mutation: INSERT_UNFOLLOWED_USERS,
                   variables: {
                     user_name: this.$store.state.lists.profile.username,
-                    id: this.topic.id,
+                    id: this.user.id,
                   },
                 })
               } catch (error) {

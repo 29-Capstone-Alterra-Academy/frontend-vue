@@ -1,5 +1,25 @@
 <template>
   <v-container>
+    <v-snackbar v-model="snackbarMod" :timeout="5000">
+      Berhasil meminta menjadi moderator
+      <template #action="{ attrs }">
+        <v-btn color="primary" text v-bind="attrs" @click="snackbarMod = false"
+          >Close</v-btn
+        >
+      </template>
+    </v-snackbar>
+    <v-snackbar v-model="snackbarFalseMod" :timeout="5000">
+      Terjadi kesalahan saat meminta menjadi moderator
+      <template #action="{ attrs }">
+        <v-btn
+          color="warning"
+          text
+          v-bind="attrs"
+          @click="snackbarFalseMod = false"
+          >Close</v-btn
+        >
+      </template>
+    </v-snackbar>
     <v-row>
       <v-col cols="12">
         <v-row justify="center">
@@ -29,6 +49,8 @@
                       <v-btn
                         v-if="topicdata.subscribe"
                         class="text-capitalize"
+                        text
+                        outlined
                         @click="unfollow(topic.id)"
                       >
                         Unfollow
@@ -36,6 +58,8 @@
                       <v-btn
                         v-else
                         class="text-capitalize"
+                        text
+                        outlined
                         @click="follow(topic.id)"
                       >
                         Follow
@@ -46,6 +70,8 @@
                     <v-btn
                       v-if="subscribe"
                       class="text-capitalize"
+                      text
+                      outlined
                       @click="unfollow(topic.id)"
                     >
                       Unfollow
@@ -53,6 +79,8 @@
                     <v-btn
                       v-else
                       class="text-capitalize"
+                      text
+                      outlined
                       @click="follow(topic.id)"
                     >
                       Follow
@@ -64,6 +92,8 @@
                   <v-btn
                     v-if="isAdmin"
                     class="text-capitalize"
+                    text
+                    outlined
                     @click="
                       $router.push(`/topic/${$route.params.slug}/details-admin`)
                     "
@@ -72,6 +102,8 @@
                   <v-btn
                     v-else
                     class="text-capitalize"
+                    text
+                    outlined
                     @click="
                       $router.push(`/topic/${$route.params.slug}/details`)
                     "
@@ -270,6 +302,13 @@
                           </div>
                         </v-col>
                       </v-row>
+                      <h4
+                        style="color: #016273"
+                        class="click-cursor"
+                        @click="requestModerator"
+                      >
+                        Request as Moderator
+                      </h4>
                     </v-list-item-content>
                   </v-list-item>
                 </v-card>
@@ -368,6 +407,8 @@ export default {
       reportTopic: false,
       items: [{ tab: 'Rekomendasi', icon: 'mdi-fire' }, { tab: 'Mengikuti' }],
       subscribe: false,
+      snackbarMod: false,
+      snackbarFalseMod: false,
       offset: 0,
       threads: [],
       newThreads: [],
@@ -416,6 +457,26 @@ export default {
     )
   },
   methods: {
+    requestModerator() {
+      this.$axios
+        .post(`/topic/${this.$route.params.slug}/modrequest`, {
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: 'Bearer ' + this.$store.state.auth.accessToken,
+          },
+        })
+        .then((res) => {
+          if (res.status === 200) {
+            this.snackbarMod = true
+          }
+        })
+        .catch((err) => {
+          console.log(err)
+          if (err) {
+            this.snackbarFalseMod = true
+          }
+        })
+    },
     reportedTimes() {
       this.$axios
         .get('/report?scope=topic&limit=100&offset=0', {
@@ -602,6 +663,9 @@ export default {
 </script>
 
 <style scoped>
+.click-cursor {
+  cursor: pointer;
+}
 .hide-scrollbar {
   -ms-overflow-style: none;
   scrollbar-width: none;

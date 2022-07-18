@@ -47,7 +47,7 @@
         </v-col>
         <v-spacer />
         <v-col cols="auto">
-          <v-btn color="error" class="text-capitalize"
+          <v-btn color="error" class="text-capitalize" text outlined
             >Keluar Sebagai Moderator</v-btn
           >
         </v-col>
@@ -55,7 +55,9 @@
       <v-row align="center">
         <v-col cols="auto"> Deskripsi </v-col>
         <v-col cols="auto"
-          ><v-btn class="text-capitalize" @click="editDesc">Ubah</v-btn></v-col
+          ><v-btn class="text-capitalize" text outlined @click="editDesc"
+            >Ubah</v-btn
+          ></v-col
         >
       </v-row>
       <div v-if="!isEditDesc">
@@ -76,7 +78,9 @@
       <v-row align="center">
         <v-col cols="auto"> Rules </v-col>
         <v-col cols="auto"
-          ><v-btn class="text-capitalize" @click="editRules">Ubah</v-btn></v-col
+          ><v-btn class="text-capitalize" text outlined @click="editRules"
+            >Ubah</v-btn
+          ></v-col
         >
       </v-row>
       <section v-if="!isEditRules">

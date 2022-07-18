@@ -77,7 +77,7 @@
                         </v-list-item-content>
                       </v-list-item>
                     </v-card>
-                    <Observer v-if="search === ''" @intersect="intersected" />
+                    <Observer v-if="search === '' || search === null" @intersect="intersected" />
                   </div>
                   <template slot="selection" slot-scope="data">
                     <v-row v-row align="center" class="pa-1">
@@ -439,6 +439,11 @@ export default {
       }
     },
     submit() {
+      if (this.search === '' || this.search === null) {
+        this.offset = 0
+        this.intersected()
+        return
+      }
       this.$axios
         .get(`/search?scope=topic&keyword=${this.search}&limit=100&offset=0`)
         .then((res) => {

@@ -146,6 +146,16 @@ const actions = {
         console.log(err)
       })
   },
+  fetchUsers({ commit }) {
+    this.$axios
+      .get(`/search?scope=user&keyword=u&limit=10&offset=0`)
+      .then((res) => {
+        commit('setUsers', res.data)
+      })
+      .catch((err) => {
+        console.log(err)
+      })
+  },
   fetchUserById({ commit, rootState }, param) {
     this.$axios
       .get('/user/' + param, {
@@ -246,6 +256,32 @@ const actions = {
       })
       .then((res) => {
         commit('setReportedReplies', res.data)
+      })
+      .catch((err) => {
+        console.log(err)
+      })
+  },
+  fetchSearch({ commit }, search) {
+    this.$axios
+      .get(`/search?scope=thread&keyword=${search}&limit=100&offset=0`)
+      .then((res) => {
+        commit('setThreads', res.data)
+      })
+      .catch((err) => {
+        console.log(err)
+      })
+    this.$axios
+      .get(`/search?scope=topic&keyword=${search}&limit=100&offset=0`)
+      .then((res) => {
+        commit('setTopics', res.data)
+      })
+      .catch((err) => {
+        console.log(err)
+      })
+    this.$axios
+      .get(`/search?scope=user&keyword=${search}&limit=100&offset=0`)
+      .then((res) => {
+        commit('setUsers', res.data)
       })
       .catch((err) => {
         console.log(err)

@@ -17,7 +17,7 @@
               height="30"
             ></v-img>
           </v-col>
-          <v-col cols="auto" class="pl-0" align-self="center">
+          <v-col cols="auto" class="px-0" align-self="center">
             <TopicShortener :name="topic.name" />
           </v-col>
         </v-row>
@@ -27,12 +27,16 @@
       <v-btn
         v-if="isAdmin"
         class="text-capitalize"
+        text
+        outlined
         @click="$router.push(`/topic/${topic.id}/details-admin`)"
         >Details
       </v-btn>
       <v-btn
         v-if="!isAdmin && profile.username === 'moderator'"
         class="text-capitalize"
+        text
+        outlined
         @click="$router.push(`/topic/${topic.id}/details`)"
         >Details
       </v-btn>
@@ -53,11 +57,19 @@
             <v-btn
               v-if="topicdata.subscribe"
               class="text-capitalize"
+              text
+              outlined
               @click="unfollow(topic.id)"
             >
               Unfollow
             </v-btn>
-            <v-btn v-else class="text-capitalize" @click="follow(topic.id)">
+            <v-btn
+              v-else
+              class="text-capitalize"
+              text
+              outlined
+              @click="follow(topic.id)"
+            >
               Follow
             </v-btn>
           </section>
@@ -66,11 +78,19 @@
           <v-btn
             v-if="subscribe"
             class="text-capitalize"
+            text
+            outlined
             @click="unfollow(topic.id)"
           >
             Unfollow
           </v-btn>
-          <v-btn v-else class="text-capitalize" @click="follow(topic.id)">
+          <v-btn
+            v-else
+            class="text-capitalize"
+            text
+            outlined
+            @click="follow(topic.id)"
+          >
             Follow
           </v-btn>
         </section>
@@ -184,9 +204,11 @@ export default {
       }
     },
     unfollow(param) {
-      if (this.topicsui.filter((item) => {
+      if (
+        this.topicsui.filter((item) => {
           return item.topic_id === this.topic.id
-        }).length > 0) {
+        }).length > 0
+      ) {
         this.$axios
           .post(
             '/topic/' + param + '/unsubscribe',

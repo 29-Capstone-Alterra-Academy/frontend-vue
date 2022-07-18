@@ -48,12 +48,13 @@
                 hide-details="auto"
                 outlined
                 dense
+                @input="confirmPassword = ''"
                 @click:append="showPassword = !showPassword"
               ></v-text-field>
               <v-text-field
                 v-model="confirmPassword"
                 :append-icon="showPassword2 ? 'mdi-eye' : 'mdi-eye-off'"
-                :rules="confirmPasswordRules"
+                :rules="[confirmPasswordRules, passwordConfirmationRule]"
                 :type="showPassword2 ? 'text' : 'password'"
                 name="input-10-2"
                 placeholder="Confirm Password"
@@ -130,16 +131,21 @@ export default {
       confirmPasswordRules: [
         (v) => !!v || 'Masukkan ulang password anda',
         (v) =>
-          v ===
-            (document.getElementById('password')
-              ? document.getElementById('password').value
-              : undefined) || 'Passwords tidak sama',
+          v === (this.password ? this.password.value : undefined) ||
+          'Passwords tidak sama',
+        (v) =>
+          v.length === (this.password.length ? this.password.value : undefined) ||
+          'Passwords tidak sama',
       ],
     }
   },
   computed: {
     error() {
       return this.$store.state.error
+    },
+    passwordConfirmationRule() {
+      return () =>
+        this.password === this.confirmPassword || 'Passwords tidak sama'
     },
   },
   methods: {

@@ -1,0 +1,7 @@
+subscription {
+  usersui {
+    id
+    user_id
+    follow
+  }
+}

@@ -49,20 +49,25 @@
         </v-col>
         <v-spacer />
         <v-col cols="auto">
-          <v-btn color="error" class="text-capitalize" @click="dialog = true"
+          <v-btn
+            color="error"
+            class="text-capitalize"
+            text
+            outlined
+            @click="dialog = true"
             >Blokir</v-btn
           >
-          <DeleteTopicCard v-model="dialog" :topic="topic"/>
+          <DeleteTopicCard v-model="dialog" :topic="topic" />
         </v-col>
       </v-row>
       <v-row align="center">
-        <v-col cols="4">
+        <v-col cols="auto">
           <h3 class="font-weight-bold">
             Moderators of
             <TopicShortener :name="topic.name" class="font-weight-bold" />
           </h3>
         </v-col>
-        <v-col cols="5">
+        <v-col cols="7" style="max-width: 57.1111%">
           <v-text-field
             v-model="search"
             append-icon="mdi-magnify"
@@ -76,8 +81,13 @@
             @keydown.enter.prevent="submit"
           ></v-text-field>
         </v-col>
-        <v-col cols="3" align="center">
-          <v-btn class="rounded-lg text-capitalize" color="primary">
+        <v-col cols="2" align="end" style="max-width: 18.66666%">
+          <v-btn
+            class="rounded-lg text-capitalize"
+            text
+            outlined
+            color="primary"
+          >
             <v-icon>mdi-plus</v-icon>
             Add Moderators
           </v-btn>
@@ -89,6 +99,7 @@
             :headers="headers"
             :items="users"
             :search="search"
+            flat
             class="elevation-1"
           >
             <template #[`item.username`]="{ item }">
@@ -118,6 +129,8 @@
           <template #[`item.delete`]="{ item }">
             <v-btn
               class="mx-2"
+              text
+              outlined
               @click="$router.push(`/topic/${item.id}/details-admin`)"
             >
               Delete

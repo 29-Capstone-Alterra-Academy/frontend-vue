@@ -2,29 +2,18 @@
   <section>
     <section style="background-color: #ffffff">
       <v-container>
-        <v-row justify="center" class="px-4">
+        <v-row class="px-4">
           <v-col cols="8" class="my-2">
             <h2>Banned</h2>
             <p>Lists to all of Banned Request</p>
           </v-col>
-          <v-spacer></v-spacer>
-          <v-col cols="4">
-            <v-text-field
-              v-model="search"
-              append-icon="mdi-magnify"
-              label="Search"
-              single-line
-              hide-details
-            ></v-text-field>
-          </v-col>
-          <v-col cols="12"> </v-col>
         </v-row>
       </v-container>
     </section>
     <v-container>
       <v-row justify="center">
         <v-col cols="12">
-          <v-card class="shadow rounded px-5 py-2">
+          <v-card class="shadow rounded-lg px-5 py-2" outlined>
             <v-tabs v-model="tab" color="grey">
               <v-tab v-for="item in items" :key="item.tab">
                 {{ item.tab }}
@@ -41,7 +30,7 @@
                     :items-per-page="5"
                   >
                     <template #[`item.title`]="{ item }">
-                      <v-card class="rounded-lg px-2 py-2 mb-1 mt-1">
+                      <v-card class="rounded-lg px-2 py-2 mb-1 mt-1" outlined>
                         <v-row>
                           <v-col cols="auto">
                             <v-img
@@ -157,6 +146,8 @@
                       <v-btn
                         v-if="isAdmin"
                         class="text-capitalize"
+                        text
+                        outlined
                         @click="
                           $router.push(`/topic/${item.topic.id}/details-admin`)
                         "
@@ -165,6 +156,8 @@
                       <v-btn
                         v-else
                         class="text-capitalize"
+                        text
+                        outlined
                         @click="$router.push(`/topic/${item.topic.id}/details`)"
                         >Details
                       </v-btn>
@@ -193,6 +186,8 @@
                     <template #[`item.details`]="{ item }">
                       <v-btn
                         class="text-capitalize mx-2"
+                        text
+                        outlined
                         @click="$router.push(`/user/${item.suspect.id}`)"
                       >
                         Details
@@ -209,7 +204,7 @@
                     :items-per-page="5"
                   >
                     <template #[`item.title`]="{ item }">
-                      <v-card class="rounded-lg px-2 py-2 mb-1 mt-1">
+                      <v-card class="rounded-lg px-2 py-2 mb-1 mt-1" outlined>
                         <v-row>
                           <v-col cols="auto">
                             <v-img
@@ -422,7 +417,7 @@ export default {
     },
     replies() {
       return this.$store.state.lists.reportedReplies
-    }
+    },
   },
   mounted() {
     this.$store.dispatch('lists/fetchReportedThreads')
@@ -430,6 +425,7 @@ export default {
     this.$store.dispatch('lists/fetchReportedUsers')
     this.$store.dispatch('lists/fetchReportedReplies')
   },
+  methods: {},
 }
 </script>
 
