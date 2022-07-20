@@ -28,10 +28,7 @@
               <v-row align="center">
                 <v-col cols="auto">
                   <v-img
-                    :src="
-                      'https://staking-spade-production.up.railway.app' +
-                      topic.profile_image
-                    "
+                    :src="topic.profile_image"
                     class="rounded-circle"
                     width="100"
                     height="100"
@@ -87,8 +84,8 @@
                     </v-btn>
                   </section>
                 </v-col>
-                <v-spacer v-if="isAdmin" />
-                <v-col v-if="isAdmin" cols="auto" style="max-width: 10rem">
+                <v-spacer v-if="isAdmin || moderating.includes(topic.id)" />
+                <v-col v-if="isAdmin || moderating.includes(topic.id)" cols="auto" style="max-width: 10rem">
                   <v-btn
                     v-if="isAdmin"
                     class="text-capitalize"
@@ -100,7 +97,7 @@
                     >Details
                   </v-btn>
                   <v-btn
-                    v-else
+                    v-if="moderating.includes(topic.id)"
                     class="text-capitalize"
                     text
                     outlined
@@ -133,7 +130,7 @@
                     outlined
                     block
                     class="rounded-lg text-capitalize"
-                    :to="`${$route.params.slug}/create-post`"
+                    :to="`/create-post`"
                   >
                     <div class="mr-auto">
                       <v-icon>mdi-plus</v-icon>
@@ -303,6 +300,7 @@
                         </v-col>
                       </v-row>
                       <h4
+                        v-if="!isAdmin && !moderating.includes(topic.id)"
                         style="color: #016273"
                         class="click-cursor"
                         @click="requestModerator"
@@ -443,6 +441,9 @@ export default {
     users() {
       return this.$store.state.lists.users
     },
+    moderating() {
+      return this.$store.state.lists.isModerating
+    }
   },
   watch: {
     topic() {
@@ -455,16 +456,20 @@ export default {
       'lists/fetchModeratorsByTopic',
       this.$route.params.slug
     )
+    this.$store.dispatch('lists/isModerating')
   },
   methods: {
     requestModerator() {
       this.$axios
-        .post(`/topic/${this.$route.params.slug}/modrequest`, {
-          headers: {
-            'Content-Type': 'application/json',
-            Authorization: 'Bearer ' + this.$store.state.auth.accessToken,
-          },
-        })
+        .post(
+          `/topic/${this.$route.params.slug}/modrequest`,
+          {},
+          {
+            headers: {
+              Authorization: 'Bearer ' + this.$store.state.auth.accessToken,
+            },
+          }
+        )
         .then((res) => {
           if (res.status === 200) {
             this.snackbarMod = true

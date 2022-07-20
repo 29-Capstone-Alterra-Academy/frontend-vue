@@ -3,7 +3,7 @@
     <v-row justify="center" style="position: relative">
       <v-col cols="7">
         <v-row>
-          <v-col v-if="!isAdmin" cols="12" class="py-1">
+          <v-col v-if="!isAdmin" cols="12" class="py-3">
             <v-card class="rounded-lg mx-auto py-2 px-4" outlined>
               <v-btn
                 outlined
@@ -82,7 +82,7 @@
                   <v-list-item three-line>
                     <v-list-item-content>
                       <v-list-item-title class="text-h6 my-2">
-                        Ups ada yang salah nih
+                        Anda belum membuat postingan apapun!
                       </v-list-item-title>
                     </v-list-item-content>
                   </v-list-item>
@@ -182,22 +182,37 @@
                     <v-divider />
                   </div>
                   <v-row>
-                    <v-col v-for="topic in topics" :key="topic.id" cols="12">
+                    <v-col v-for="topic in topics.filter(item => moderating.includes(item.id))" :key="topic.id" cols="12">
                       <v-row>
-                        <v-col cols="auto" class="px-3" style="max-width: none">
-                          <v-img
-                            :src="topic.profile_image"
-                            class="rounded-circle"
-                            width="30"
-                            height="30"
-                          ></v-img>
+                        <v-col>
+                          <router-link
+                            :to="`/topic/${topic.id}`"
+                            style="text-decoration: none; color: black"
+                          >
+                            <v-row>
+                              <v-col
+                                cols="2"
+                                class="px-2"
+                                style="max-width: 45px"
+                              >
+                                <v-img
+                                  :src="topic.profile_image"
+                                  class="rounded-circle"
+                                  width="30"
+                                  height="30"
+                                ></v-img>
+                              </v-col>
+                              <v-col
+                                cols="auto"
+                                class="px-0"
+                                align-self="center"
+                              >
+                                <TopicShortener :name="topic.name" />
+                              </v-col>
+                            </v-row>
+                          </router-link>
                         </v-col>
-                        <v-col class="pl-0">
-                          <div class="text-overline">
-                            <TopicShortener :name="topic.name" />
-                          </div>
-                        </v-col>
-                        <v-col cols="2" style="max-width: 10rem">
+                        <v-col cols="2" class="pr-4" style="max-width: 10rem">
                           <v-btn
                             class="text-capitalize"
                             @click="$router.push(`/topic/${topic.id}/details`)"
@@ -241,12 +256,6 @@ export default {
     FollowerShortener,
   },
   middleware: 'authenticated',
-  props: {
-    searchPost: {
-      type: String,
-      default: '',
-    },
-  },
   data() {
     return {
       tab: null,
@@ -282,14 +291,15 @@ export default {
       })
     },
     profile() {
-      console.log(this.$store.state.lists.profile)
       return this.$store.state.lists.profile
+    },
+    moderating() {
+      return this.$store.state.lists.isModerating
     },
     topics() {
       return this.$store.state.lists.topics
     },
     currentUser() {
-      console.log(this.$store.state.lists.detailUser)
       return this.$store.state.lists.detailUser
     },
   },
@@ -302,6 +312,7 @@ export default {
   mounted() {
     this.$store.dispatch('lists/fetchTopics')
     this.$store.dispatch('lists/loggedUser')
+    this.$store.dispatch('lists/isModerating')
   },
   methods: {
     intersected() {

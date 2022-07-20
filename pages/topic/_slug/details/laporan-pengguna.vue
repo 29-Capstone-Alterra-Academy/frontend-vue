@@ -124,12 +124,96 @@
                     :key="thread.id"
                     cols="12"
                   >
-                    <div
-                      class="subtitle-1 font-weight-light py-1"
-                      style="line-height: inherit"
-                    >
-                      {{ thread.title }}
-                    </div>
+                    <v-card class="rounded-lg px-2 py-2 mb-1 mt-1" outlined>
+                      <v-row>
+                        <v-col cols="auto">
+                          <v-img
+                            :src="thread.topic.profile_image"
+                            class="rounded-circle"
+                            width="35"
+                          ></v-img>
+                        </v-col>
+                        <v-col cols="auto">
+                          <router-link
+                            :to="`/topic/${thread.topic.id}`"
+                            style="text-decoration: none; color: black"
+                          >
+                            <TopicShortener :name="thread.topic.name" />
+                          </router-link>
+                        </v-col>
+                        <v-col>
+                          <div>
+                            <small class="text--disabled">
+                              dilaporkan oleh
+                              <router-link :to="`/user/${thread.reporter.id}`">
+                                <NameShortener
+                                  :username="thread.reporter.username"
+                                />
+                              </router-link>
+                              {{ thread.created_at | timepost }} yang lalu dengan
+                              alasan {{ thread.reason.detail }}
+                            </small>
+                          </div>
+                        </v-col>
+                      </v-row>
+                      <v-row>
+                        <v-col class="py-0">
+                          <p class="text-h6 my-0">
+                            {{ thread.thread.title }}
+                          </p>
+                        </v-col>
+                      </v-row>
+                      <v-row>
+                        <v-col cols="5">
+                          <v-row align="center">
+                            <v-col cols="auto" justify="center">
+                              <p
+                                class="ma-0"
+                                style="width: 50%; display: inline"
+                              >
+                                <FollowerShortener :follower="50" /> Likes
+                              </p>
+                            </v-col>
+                            <v-col cols="auto" justify="center">
+                              <p
+                                class="ma-0"
+                                style="width: 50%; display: inline"
+                              >
+                                <FollowerShortener :follower="50" /> Comments
+                              </p>
+                            </v-col>
+                            <v-col>
+                              <v-menu offset-y>
+                                <template #activator="{ on, attrs }">
+                                  <p
+                                    class="ma-0"
+                                    style="width: 50%; display: inline"
+                                    v-bind="attrs"
+                                    v-on="on"
+                                  >
+                                    ···
+                                  </p>
+                                </template>
+                                <v-list class="pa-0">
+                                  <v-list-item @click="dialogAdmin = true">
+                                    <v-list-item-action>
+                                      <v-icon>mdi-bullhorn-outline</v-icon>
+                                    </v-list-item-action>
+                                    <v-list-item-content>
+                                      <v-list-item-title v-text="`Hapus`" />
+                                    </v-list-item-content>
+                                  </v-list-item>
+                                </v-list>
+                              </v-menu>
+                              <DeleteCard
+                                v-model="dialogAdmin"
+                                :thread="thread.thread"
+                              />
+                            </v-col>
+                          </v-row>
+                        </v-col>
+                      </v-row>
+                    </v-card>
                   </v-col>
                 </v-row>
               </v-list-item-content>
@@ -153,7 +237,7 @@ export default {
     DateShortener,
     FollowerShortener,
   },
-  middleware: 'authenticated',
+  middleware: ['authenticated', 'moderator'],
   props: {
     searchPost: {
       type: String,
@@ -180,26 +264,7 @@ export default {
       },
     },
     threads() {
-      if (this.searchPost) {
-        const threads = this.$store.state.lists.threads.filter((item) => {
-          return item.topic.name
-            .toLowerCase()
-            .includes(this.$route.params.slug.toLowerCase())
-        })
-        return threads.filter((item) => {
-          return (
-            item.title.toLowerCase().includes(this.searchPost.toLowerCase()) ||
-            item.author.username
-              .toLowerCase()
-              .includes(this.searchPost.toLowerCase())
-          )
-        })
-      }
-      return this.$store.state.lists.threads.filter((item) => {
-        return item.topic.name
-          .toLowerCase()
-          .includes(this.$route.params.slug.toLowerCase())
-      })
+      return this.$store.state.lists.reportedThreads
     },
     topics() {
       return this.$store.state.lists.topics
@@ -224,6 +289,11 @@ export default {
         },
         {
           text: 'Details',
+          disabled: false,
+          href: '/details',
+        },
+        {
+          text: 'Laporan Pengguna',
           disabled: true,
           href: 'breadcrumbs_link_2',
         },
@@ -231,7 +301,7 @@ export default {
     },
   },
   created() {
-    this.$store.dispatch('lists/fetchThreads')
+    this.$store.dispatch('lists/fetchReportedThreads')
     this.$store.dispatch('lists/fetchTopicById', this.$route.params.slug)
     this.$store.dispatch('lists/fetchUsers')
   },

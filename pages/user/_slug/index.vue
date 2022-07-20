@@ -237,20 +237,35 @@
                   <v-row>
                     <v-col v-for="topic in topics" :key="topic.id" cols="12">
                       <v-row>
-                        <v-col cols="auto" class="px-3" style="max-width: none">
-                          <v-img
-                            :src="topic.profile_image"
-                            class="rounded-circle"
-                            width="30"
-                            height="30"
-                          ></v-img>
+                        <v-col>
+                          <router-link
+                            :to="`/topic/${topic.id}`"
+                            style="text-decoration: none; color: black"
+                          >
+                            <v-row>
+                              <v-col
+                                cols="2"
+                                class="px-2"
+                                style="max-width: 45px"
+                              >
+                                <v-img
+                                  :src="topic.profile_image"
+                                  class="rounded-circle"
+                                  width="30"
+                                  height="30"
+                                ></v-img>
+                              </v-col>
+                              <v-col
+                                cols="auto"
+                                class="px-0"
+                                align-self="center"
+                              >
+                                <TopicShortener :name="topic.name" />
+                              </v-col>
+                            </v-row>
+                          </router-link>
                         </v-col>
-                        <v-col class="pl-0">
-                          <div class="text-overline">
-                            <TopicShortener :name="topic.name" />
-                          </div>
-                        </v-col>
-                        <v-col cols="2" style="max-width: 10rem">
+                        <v-col cols="2" class="pr-4" style="max-width: 10rem">
                           <TopicTableComponent
                             :topic="topic"
                             :topicsui="topicsui"
@@ -394,7 +409,7 @@ export default {
     },
   },
   created() {
-    this.$store.dispatch('lists/fetchTopics')
+    this.$store.dispatch('lists/fetchFollowedTopics', this.$route.params.slug)
     this.$store.dispatch('lists/fetchUserById', this.$route.params.slug)
   },
   methods: {
@@ -448,7 +463,10 @@ export default {
           )
           .then((response) => {
             if (response.status === 200) {
-              this.$store.dispatch('lists/fetchUserById', this.$route.params.slug)
+              this.$store.dispatch(
+                'lists/fetchUserById',
+                this.$route.params.slug
+              )
               this.follow = true
               try {
                 this.$apollo.mutate({
@@ -479,7 +497,10 @@ export default {
           )
           .then((response) => {
             if (response.status === 200) {
-              this.$store.dispatch('lists/fetchUserById', this.$route.params.slug)
+              this.$store.dispatch(
+                'lists/fetchUserById',
+                this.$route.params.slug
+              )
               this.follow = true
               try {
                 this.$apollo.mutate({
@@ -514,7 +535,10 @@ export default {
           )
           .then((response) => {
             if (response.status === 200) {
-              this.$store.dispatch('lists/fetchUserById', this.$route.params.slug)
+              this.$store.dispatch(
+                'lists/fetchUserById',
+                this.$route.params.slug
+              )
               this.follow = false
               try {
                 this.$apollo.mutate({
@@ -545,7 +569,10 @@ export default {
           )
           .then((response) => {
             if (response.status === 200) {
-              this.$store.dispatch('lists/fetchUserById', this.$route.params.slug)
+              this.$store.dispatch(
+                'lists/fetchUserById',
+                this.$route.params.slug
+              )
               this.follow = false
               try {
                 this.$apollo.mutate({

@@ -1,5 +1,25 @@
 <template>
   <v-container>
+    <v-snackbar v-model="snackbarMod" :timeout="5000">
+      Berhasil meminta menjadi moderator
+      <template #action="{ attrs }">
+        <v-btn color="primary" text v-bind="attrs" @click="snackbarMod = false"
+          >Close</v-btn
+        >
+      </template>
+    </v-snackbar>
+    <v-snackbar v-model="snackbarFalseMod" :timeout="5000">
+      Terjadi kesalahan saat meminta menjadi moderator
+      <template #action="{ attrs }">
+        <v-btn
+          color="warning"
+          text
+          v-bind="attrs"
+          @click="snackbarFalseMod = false"
+          >Close</v-btn
+        >
+      </template>
+    </v-snackbar>
     <v-row justify="center" style="position: relative">
       <v-col cols="7">
         <v-row>
@@ -57,7 +77,7 @@
                           </v-list-item>
                         </v-list>
                       </v-menu>
-                      <ReportTopicCard v-model="reportTopic" :topic="topic"/>
+                      <ReportTopicCard v-model="reportTopic" :topic="topic" />
                     </v-col>
                   </v-row>
                   <div class="pb-1">
@@ -92,7 +112,13 @@
                       </div>
                     </v-col>
                     <v-col v-if="!isAdmin" cols="12" class="py-0">
-                      <v-btn class="text-capitalize">Follow</v-btn>
+                      <h4
+                        style="color: #016273"
+                        class="click-cursor"
+                        @click="requestModerator"
+                      >
+                        Request as Moderator
+                      </h4>
                     </v-col>
                   </v-row>
                 </v-list-item-content>
@@ -151,15 +177,11 @@ export default {
     NameShortener,
   },
   middleware: 'authenticated',
-  props: {
-    searchPost: {
-      type: String,
-      default: '',
-    },
-  },
   data() {
     return {
       reportTopic: false,
+      snackbarMod: false,
+      snackbarFalseMod: false,
     }
   },
   computed: {
@@ -177,7 +199,29 @@ export default {
   mounted() {
     this.$store.dispatch('lists/fetchTopicById', this.$route.params.topic)
     this.$store.dispatch('lists/fetchThreadById', this.$route.params.post)
-    this.$store.dispatch('lists/fetchUsers')
+    this.$store.dispatch('lists/fetchModeratorsByTopic', this.$route.params.topic)
+  },
+  methods: {
+    requestModerator() {
+      this.$axios
+        .post(`/topic/${this.$route.params.topic}/modrequest`, {
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: 'Bearer ' + this.$store.state.auth.accessToken,
+          },
+        })
+        .then((res) => {
+          if (res.status === 200) {
+            this.snackbarMod = true
+          }
+        })
+        .catch((err) => {
+          console.log(err)
+          if (err) {
+            this.snackbarFalseMod = true
+          }
+        })
+    },
   },
 }
 </script>

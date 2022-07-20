@@ -37,7 +37,7 @@
         <v-form v-model="valid" @submit.prevent="editProfile">
           <div class="">
             <v-textarea
-              v-model="username"
+              v-model="profile.username"
               :rules="usernameRules"
               rows="1"
               class="rounded-lg"
@@ -50,7 +50,7 @@
           </div>
           <div class="py-2">
             <v-textarea
-              v-model="bio"
+              v-model="profile.bio"
               rows="6"
               class="rounded-lg"
               placeholder="Bio (Optional)"
@@ -62,7 +62,7 @@
           </div>
           <div class="py-2">
             <v-textarea
-              v-model="email"
+              v-model="profile.email"
               :rules="emailRules"
               rows="1"
               class="rounded-lg"
@@ -75,7 +75,7 @@
           </div>
           <div class="py-2">
             <v-textarea
-              v-model="gender"
+              v-model="profile.gender"
               :rules="genderRules"
               rows="1"
               class="rounded-lg"
@@ -91,13 +91,13 @@
             <v-dialog
               ref="dialog"
               v-model="modal"
-              :return-value.sync="date"
+              :return-value.sync="profile.birth_date"
               persistent
               width="400px"
             >
               <template #activator="{ on, attrs }">
                 <v-text-field
-                  v-model="date"
+                  v-model="profile.birth_date"
                   :rules="dateRules"
                   prepend-icon="mdi-calendar"
                   class="rounded-lg"
@@ -109,12 +109,20 @@
                   v-on="on"
                 ></v-text-field>
               </template>
-              <v-date-picker v-model="date" max="2002-02-15" scrollable>
+              <v-date-picker
+                v-model="profile.birth_date"
+                max="2002-02-15"
+                scrollable
+              >
                 <v-spacer></v-spacer>
                 <v-btn text color="primary" @click="modal = false">
                   Cancel
                 </v-btn>
-                <v-btn text color="primary" @click="$refs.dialog.save(date)">
+                <v-btn
+                  text
+                  color="primary"
+                  @click="$refs.dialog.save(profile.birth_date)"
+                >
                   OK
                 </v-btn>
               </v-date-picker>
@@ -181,18 +189,13 @@ export default {
   },
   data() {
     return {
-      username: '',
-      date: '2022-07-16',
-      bio: '',
-      email: '',
-      gender: '',
       defaultButtonText: 'Unggah Foto',
       defaultImage: '',
       valid: false,
       modal: false,
       snackbar: false,
       snackbarFalse: false,
-      selectedFile: null,
+      profile_image: null,
       isSelecting: false,
       usernameRules: [
         (value) => !!value || 'Masukkan username baru anda',
@@ -218,11 +221,13 @@ export default {
   },
   computed: {
     buttonText() {
-      return this.selectedFile ? this.selectedFile.name : this.defaultButtonText
+      return this.profile_image
+        ? this.profile_image.name
+        : this.defaultButtonText
     },
     imageUrl() {
-      return this.selectedFile
-        ? URL.createObjectURL(this.selectedFile)
+      return this.profile_image
+        ? URL.createObjectURL(this.profile_image)
         : this.defaultButtonText
     },
     profile() {
@@ -243,53 +248,46 @@ export default {
       this.$refs.uploader.click()
     },
     onFileChanged(e) {
-      this.selectedFile = e.target.files[0]
+      this.profile_image = e.target.files[0]
 
       // do something
     },
     editProfile() {
       const formData = new FormData()
-      formData.append('username', this.username)
-      console.log(this.username)
-      formData.append('bio', this.bio)
-      console.log(this.bio)
-      formData.append('email', this.email)
-      console.log(this.email)
-      formData.append('gender', this.gender)
-      console.log(this.gender)
-      formData.append('birth_date', this.date)
-      console.log(this.date)
-      formData.append('profile_image', this.selectedFile)
-      console.log(this.selectedFile)
+      formData.append('username', this.profile.username)
+      console.log(this.profile.username)
+      formData.append('bio', this.profile.bio)
+      console.log(this.profile.bio)
+      formData.append('email', this.profile.email)
+      console.log(this.profile.email)
+      formData.append('gender', this.profile.gender)
+      console.log(this.profile.gender)
+      formData.append('birth_date', this.profile.birth_date)
+      console.log(this.profile.date)
+      formData.append('profile_image', this.profile_image)
+      console.log(this.profile_image)
       for (const pair of formData.entries()) {
         console.log(pair[0] + ', ' + pair[1])
       }
-        this.$axios
-          .put('/profile', formData, {
-            headers: {
-              'Content-Type': 'application/json',
-              Authorization: 'Bearer ' + this.$store.state.auth.accessToken,
-            },
-          })
-          .then((response) => {
-            console.log(response.data)
-            if (response.status === 204) {
-              this.snackbar = true
-              this.username = ''
-              this.bio = ''
-              this.email = ''
-              this.selectedFile = null
-            }
-          })
-          .catch((error) => {
-            if (error.status) {
-              this.snackbarFalse = true
-              this.username = ''
-              this.bio = ''
-              this.email = ''
-              this.selectedFile = null
-            }
-          })
+      this.$axios
+        .put('/profile', formData, {
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: 'Bearer ' + this.$store.state.auth.accessToken,
+          },
+        })
+        .then((response) => {
+          console.log(response.data)
+          if (response.status === 200) {
+            this.snackbar = true
+            this.$emit('input', false)
+          }
+        })
+        .catch((error) => {
+          if (error.status) {
+            this.snackbarFalse = true
+          }
+        })
     },
   },
 }

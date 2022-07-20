@@ -36,18 +36,20 @@
               <v-row justify="center" align="center">
                 <v-col cols="auto" style="width: 200px">
                   <v-row align="center" class="pa-0">
-                    <v-col cols="1" class="pa-0" style="max-width: none">
+                    <v-col cols="1" class="pa-0 pr-2" style="max-width: none">
                       <v-img
                         v-if="profile.profile_image != null"
                         :src="profile.profile_image"
                         class="rounded-circle"
                         width="30"
+                        height="30"
                       ></v-img>
                       <v-img
                         v-else
                         src="https://randomuser.me/api/portraits/women/84.jpg"
                         class="rounded-circle"
                         width="30"
+                        height="30"
                       ></v-img>
                     </v-col>
                     <v-col cols="auto">
@@ -177,21 +179,11 @@ export default {
     param() {
       return this.$store.state.layouts.layout
     },
-    topics() {
-      if (this.param) {
-        return this.$store.state.lists.topics.filter((item) => {
-          return item.id.toString().includes(this.param)
-        })
-      }
-      return this.$store.state.lists.topics
-    },
     profile() {
       return this.$store.state.lists.profile
     },
   },
   created() {
-    this.$store.dispatch('lists/fetchTopics')
-    this.$store.dispatch('lists/fetchUsers')
     this.$store.dispatch('lists/loggedUser')
     this.$store.dispatch('lists/isAdmin')
   },

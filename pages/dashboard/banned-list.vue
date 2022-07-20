@@ -106,14 +106,14 @@
                                         <v-icon>mdi-bullhorn-outline</v-icon>
                                       </v-list-item-action>
                                       <v-list-item-content>
-                                        <v-list-item-title v-text="`Hapus`" />
+                                        <v-list-item-title v-text="`Blokir`" />
                                       </v-list-item-content>
                                     </v-list-item>
                                   </v-list>
                                 </v-menu>
-                                <DeleteCard
+                                <BanCard
                                   v-model="dialogAdmin"
-                                  :thread="item.thread"
+                                  :thread="item"
                                 />
                               </v-col>
                             </v-row>
@@ -297,7 +297,7 @@
 <script>
 import { mapGetters } from 'vuex'
 
-import DeleteCard from '~/components/cards/DeleteCard'
+import BanCard from '~/components/cards/BanCard'
 import TopicShortener from '~/components/utils/TopicShortener'
 import NameShortener from '~/components/utils/NameShortener'
 import FollowerShortener from '~/components/utils/FollowerShortener'
@@ -305,7 +305,7 @@ import FollowerShortener from '~/components/utils/FollowerShortener'
 export default {
   name: 'BannedList',
   components: {
-    DeleteCard,
+    BanCard,
     TopicShortener,
     NameShortener,
     FollowerShortener,

@@ -3,7 +3,7 @@
     <v-list-item three-line>
       <v-list-item-content>
         <v-row align="center">
-          <v-snackbar v-model="snackbar" :timeout="5000">
+          <v-snackbar v-model="snackbarComment" :timeout="5000">
             Komentar anda berhasil diposting
             <template #action="{ attrs }">
               <v-btn
@@ -15,7 +15,7 @@
               >
             </template>
           </v-snackbar>
-          <v-snackbar v-model="snackbarFalse" :timeout="5000">
+          <v-snackbar v-model="snackbarCommentFalse" :timeout="5000">
             Terjadi kesalahan saat memposting komentar
             <template #action="{ attrs }">
               <v-btn

@@ -79,15 +79,18 @@
             @keydown.enter.prevent="submit"
           ></v-text-field>
         </v-col>
+        <v-spacer />
         <v-col cols="2" align="end" style="max-width: 18.66666%">
           <v-btn
             class="rounded-lg text-capitalize"
             color="primary"
+            @click="dialogMod = true"
           >
             <v-icon>mdi-plus</v-icon>
             Add Moderators
           </v-btn>
         </v-col>
+        <AddModerators v-model="dialogMod" />
       </v-row>
       <v-row>
         <v-col>
@@ -139,6 +142,7 @@
 </template>
 
 <script>
+import AddModerators from '~/components/cards/AddModerators'
 import DeleteTopicCard from '~/components/cards/DeleteTopicCard'
 import NameShortener from '~/components/utils/NameShortener'
 import TopicShortener from '~/components/utils/TopicShortener'
@@ -148,6 +152,7 @@ import FollowerShortener from '~/components/utils/FollowerShortener'
 export default {
   name: 'IndexPage',
   components: {
+    AddModerators,
     DeleteTopicCard,
     NameShortener,
     TopicShortener,
@@ -159,6 +164,7 @@ export default {
     return {
       tab: null,
       dialog: false,
+      dialogMod: false,
       isEditDesc: false,
       isEditRules: false,
       items: [{ tab: 'Rekomendasi', icon: 'mdi-fire' }, { tab: 'Mengikuti' }],

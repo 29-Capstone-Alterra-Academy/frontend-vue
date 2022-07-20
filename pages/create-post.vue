@@ -425,7 +425,7 @@ export default {
     intersected() {
       if (this.newTopics.length === 5 || this.newTopics.length === 0) {
         this.$axios
-          .get(`/topic?limit=5&offset=${this.offset}`)
+          .get(`/topic?userId=${this.$store.state.lists.profile.id}&limit=5&offset=${this.offset}`)
           .then((res) => {
             if (res.data.length !== 0) {
               this.offset += 5

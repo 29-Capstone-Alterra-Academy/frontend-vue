@@ -5,6 +5,7 @@
         :src="reply.author.profile_image"
         class="rounded-circle"
         width="50px"
+        height="50px"
       />
     </v-col>
     <v-col cols="10">

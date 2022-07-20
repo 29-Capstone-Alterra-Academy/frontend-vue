@@ -13,6 +13,7 @@ const state = () => ({
   profile: [],
   reasons: [],
   isAdmin: null,
+  isModerating: [],
 })
 
 const mutations = {
@@ -58,6 +59,9 @@ const mutations = {
   setUserRole(state, isAdmin) {
     state.isAdmin = isAdmin
   },
+  setUserModeration(state, isModerating) {
+    state.isModerating = [...isModerating]
+  }
 }
 
 const actions = {
@@ -131,9 +135,34 @@ const actions = {
         console.log(err)
       })
   },
+  fetchFollowedTopics({ commit }, param) {
+    this.$axios
+      .get(`/topic?userId=${param}&limit=100&offset=0`)
+      .then((res) => {
+        commit('setTopics', res.data)
+      })
+      .catch((err) => {
+        console.log(err)
+      })
+  },
   fetchModeratorsByTopic({ commit, rootState }, param) {
     this.$axios
       .get('/topic/' + param + '/moderator', {
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: 'Bearer ' + rootState.auth.accessToken,
+        },
+      })
+      .then((res) => {
+        commit('setUsers', res.data)
+      })
+      .catch((err) => {
+        console.log(err)
+      })
+  },
+  fetchModeratorsRequests({ commit, rootState }) {
+    this.$axios
+      .get('/modrequest', {
         headers: {
           'Content-Type': 'application/json',
           Authorization: 'Bearer ' + rootState.auth.accessToken,
@@ -206,6 +235,20 @@ const actions = {
       .get('/report?scope=thread&limit=100&offset=0', {
         headers: {
           'Content-Type': 'application/json',
+          Authorization: 'Bearer ' + rootState.auth.accessToken,
+        },
+      })
+      .then((res) => {
+        commit('setReportedThreads', res.data)
+      })
+      .catch((err) => {
+        console.log(err)
+      })
+  },
+  fetchReportedThreadsByModerator({ commit, rootState }, param) {
+    this.$axios
+      .get(`/topic/${param}/report?scope=thread&limit=100&offset=0`, {
+        headers: {
           Authorization: 'Bearer ' + rootState.auth.accessToken,
         },
       })
@@ -328,12 +371,21 @@ const actions = {
     console.log(tkData)
     commit('setUserRole', tkData.IsAdmin)
   },
+  isModerating({ commit, rootState }) {
+    const base64Payload = rootState.auth.accessToken.split('.')[1]
+    const payload = Buffer.from(base64Payload, 'base64')
+    const tkData = JSON.parse(payload.toString())
+    commit('setUserModeration', tkData.Moderating)
+  },
 }
 
 const getters = {
   isAdmin(state) {
     return state.isAdmin
   },
+  isModerating(state) {
+    return state.isModerating.includes(state.detailTopic.id)
+  }
 }
 
 export default {
