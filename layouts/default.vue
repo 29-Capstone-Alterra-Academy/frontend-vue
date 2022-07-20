@@ -28,7 +28,9 @@
       />
       <AuthButton v-else :items="items" />
       <v-spacer />
-      <v-icon class="pa-2"> mdi-bell-outline </v-icon>
+      <v-icon class="pa-2" @click="$router.push(`/notification`)">
+        mdi-bell-outline
+      </v-icon>
       <v-menu offset-y>
         <template #activator="{ on, attrs }">
           <v-card class="rounded-lg px-2" outlined v-bind="attrs" v-on="on">
@@ -60,10 +62,16 @@
                           </div>
                         </v-col>
                         <v-col cols="12" class="pa-0">
-                          <div v-if="isAdmin" class="text-capitalize text--disabled caption">
+                          <div
+                            v-if="isAdmin"
+                            class="text-capitalize text--disabled caption"
+                          >
                             Admin
                           </div>
-                          <div v-else class="text-capitalize text--disabled caption">
+                          <div
+                            v-else
+                            class="text-capitalize text--disabled caption"
+                          >
                             User
                           </div>
                         </v-col>
