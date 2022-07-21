@@ -1,7 +1,5 @@
 <template>
-  <span>
-    @{{ username | maxlength }}
-  </span>
+  <span>@{{ username | maxlength }} </span>
 </template>
 
 <script>
@@ -11,11 +9,11 @@ export default {
       if (!string) return ''
       string = string.toString()
 
-      if (string.length <= 12) {
+      if (string.length <= 10) {
         return string
       }
 
-      return string.substr(0, 12) + '...'
+      return string.substr(0, 10) + '...'
     },
   },
   props: {

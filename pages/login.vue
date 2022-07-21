@@ -27,7 +27,8 @@
                 outlined
                 dense
                 clearable
-                class="rounded-lg"
+                class="rounded-lg py-2"
+                hide-details="auto"
               ></v-text-field>
               <v-text-field
                 id="password"
@@ -37,7 +38,8 @@
                 :type="showPassword ? 'text' : 'password'"
                 placeholder="Password"
                 name="input-10-2"
-                class="input-group--focused rounded-lg"
+                class="input-group--focused rounded-lg py-2 pb-4"
+                hide-details="auto"
                 outlined
                 dense
                 @click:append="showPassword = !showPassword"
@@ -45,9 +47,9 @@
               <v-spacer />
               <small>
                 Lupa
-                <nuxt-link to="/registrasi">Username</nuxt-link>
+                <nuxt-link to="/forgot-password">Username</nuxt-link>
                 atau
-                <nuxt-link to="/registrasi">Password</nuxt-link>?
+                <nuxt-link to="/forgot-password">Password</nuxt-link>?
               </small>
               <v-btn
                 type="submit"
@@ -72,7 +74,6 @@
 </template>
 <script>
 import { mapMutations } from 'vuex'
-import axios from 'axios'
 
 export default {
   name: 'LoginPage',
@@ -103,15 +104,15 @@ export default {
     ...mapMutations('auth', [
       'setAccessToken',
       'setRefreshToken',
-      'setUserProfile',
+      'setUserRole'
     ]),
     handlelogin(e) {
       e.preventDefault()
       try {
         this.message = ''
-        axios
+        this.$axios
           .post(
-            'https://staking-spade-production.up.railway.app/login',
+            '/login',
             {
               username: this.username,
               password: this.password,
@@ -126,6 +127,11 @@ export default {
             this.setAccessToken(response.data.access_token)
             this.setRefreshToken(response.data.refresh_token)
             this.$router.push('/')
+            const base64Payload = response.data.access_token.split('.')[1];
+            const payload = Buffer.from(base64Payload, 'base64');
+            const tkData = JSON.parse(payload.toString());
+            this.setUserRole(tkData.IsAdmin)
+
           })
           .catch((error) => {
             this.message = error.message

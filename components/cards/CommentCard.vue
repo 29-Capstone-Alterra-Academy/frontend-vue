@@ -5,9 +5,10 @@
         :src="reply.author.profile_image"
         class="rounded-circle"
         width="50px"
+        height="50px"
       />
     </v-col>
-    <v-col cols="auto">
+    <v-col cols="10">
       <v-row align="center">
         <v-col cols="auto" class="pr-1">
           <NameShortener :username="reply.author.username" />
@@ -24,21 +25,63 @@
       <v-row>
         <v-col cols="auto"> Komentar </v-col>
         <v-col cols="auto">
-          <v-row justify="center" align="center">
-            <v-col cols="auto" class="pa-0 py-2 pr-1">
-              <v-icon>mdi-thumb-up-outline</v-icon>
-            </v-col>
-            <v-col cols="auto" class="pa-0 py-2 pl-1">
-              <p class="ma-0" style="width: 50%; display: inline">
-                <FollowerShortener :follower="reply.like - reply.dislike" />
-              </p>
+          <v-row justify="center">
+            <v-col>
+              <v-row v-if="commentsui.length > 0" align="center">
+                <v-col
+                  v-for="(replydata, index) in commentsui"
+                  :key="index"
+                  cols="auto"
+                  class="pr-2 click-cursor"
+                  @click="like(reply.id)"
+                >
+                  <v-icon v-if="replydata.liked">mdi-thumb-up</v-icon>
+                  <v-icon v-else>mdi-thumb-up-outline</v-icon>
+                </v-col>
+                <v-col cols="auto" class="pl-2">
+                  <p class="ma-0" style="width: 50%; display: inline">
+                    <FollowerShortener
+                      :follower="reply.liked_count - reply.unliked_count"
+                    />
+                  </p>
+                </v-col>
+              </v-row>
+              <v-row v-else align="center">
+                <v-col
+                  cols="auto"
+                  class="pr-2 click-cursor"
+                  @click="like(reply.id)"
+                >
+                  <v-icon v-if="liked">mdi-thumb-up</v-icon>
+                  <v-icon v-else>mdi-thumb-up-outline</v-icon>
+                </v-col>
+                <v-col cols="auto" class="pl-2">
+                  <p class="ma-0" style="width: 50%; display: inline">
+                    <FollowerShortener
+                      :follower="reply.liked_count - reply.unliked_count"
+                    />
+                  </p>
+                </v-col>
+              </v-row>
             </v-col>
           </v-row>
         </v-col>
-        <v-col cols="auto" class="py-2" justify="center">
-          <v-icon>mdi-thumb-down-outline</v-icon>
+        <v-col
+          v-if="commentsui.length > 0"
+          cols="1"
+          class="click-cursor"
+          @click="unlike(reply.id)"
+        >
+          <section v-for="(replydata, index) in commentsui" :key="index">
+            <v-icon v-if="replydata.unliked">mdi-thumb-down</v-icon>
+            <v-icon v-else>mdi-thumb-down-outline</v-icon>
+          </section>
         </v-col>
-        <v-col class="py-2">
+        <v-col v-else cols="1" class="click-cursor" @click="unlike(reply.id)">
+          <v-icon v-if="unliked">mdi-thumb-down</v-icon>
+          <v-icon v-else>mdi-thumb-down-outline</v-icon>
+        </v-col>
+        <v-col>
           <v-menu offset-y>
             <template #activator="{ on, attrs }">
               <p
@@ -51,7 +94,18 @@
               </p>
             </template>
             <v-list class="pa-0">
-              <v-list-item to="/">
+              <v-list-item v-if="isAdmin" to="/" @click="dialogAdmin = true">
+                <v-list-item-action>
+                  <v-icon>mdi-bullhorn-outline</v-icon>
+                </v-list-item-action>
+                <v-list-item-content>
+                  <v-list-item-title v-text="`Hapus`" />
+                </v-list-item-content>
+              </v-list-item>
+              <v-list-item
+                v-if="!isAdmin && reply.author.username !== profile.username"
+                @click="dialog = true"
+              >
                 <v-list-item-action>
                   <v-icon>mdi-bullhorn-outline</v-icon>
                 </v-list-item-action>
@@ -59,8 +113,21 @@
                   <v-list-item-title v-text="`Laporkan`" />
                 </v-list-item-content>
               </v-list-item>
+              <v-list-item
+                v-if="reply.author.username === profile.username"
+                @click="dialogEdit = true"
+              >
+                <v-list-item-action>
+                  <v-icon>mdi-bullhorn-outline</v-icon>
+                </v-list-item-action>
+                <v-list-item-content>
+                  <v-list-item-title v-text="`Edit`" />
+                </v-list-item-content>
+              </v-list-item>
             </v-list>
           </v-menu>
+          <DeleteCard v-model="dialogAdmin" :reply="reply" />
+          <ReportReplyCard v-model="dialog" :reply="reply" />
         </v-col>
       </v-row>
     </v-col>
@@ -68,6 +135,16 @@
 </template>
 
 <script>
+import FETCH_REPLIES from '~/apollo/queries/fetch-replies'
+import LIKED_REPLIES from '~/apollo/mutations/liked-replies'
+import INSERT_LIKED_REPLIES from '~/apollo/mutations/insert-liked-replies'
+import INSERT_UNLIKED_REPLIES from '~/apollo/mutations/insert-unliked-replies'
+import UNLIKED_REPLIES from '~/apollo/mutations/unliked-replies'
+import REVERT_REPLIES from '~/apollo/mutations/revert-replies'
+import SUBS_REPLIES from '~/apollo/subscriptions/subs-replies'
+
+import ReportReplyCard from '~/components/cards/ReportReplyCard'
+import DeleteCard from '~/components/cards/DeleteCard'
 import NameShortener from '~/components/utils/NameShortener'
 import FollowerShortener from '~/components/utils/FollowerShortener'
 
@@ -100,13 +177,266 @@ export default {
     },
   },
   components: {
+    ReportReplyCard,
+    DeleteCard,
     NameShortener,
     FollowerShortener,
+  },
+  apollo: {
+    commentsui: {
+      prefetch: true,
+      query: FETCH_REPLIES,
+      variables() {
+        return {
+          user_name: this.$store.state.lists.profile.username,
+          id: this.reply.id,
+        }
+      },
+      subscribeToMore: {
+        document: SUBS_REPLIES,
+        updateQuery: ({ subscriptionData }) => {
+          return {
+            commentsui: subscriptionData.data,
+          }
+        },
+      },
+    },
   },
   props: {
     reply: {
       type: Object,
       required: true,
+    },
+  },
+  data() {
+    return {
+      dialog: false,
+    }
+  },
+  computed: {
+    profile() {
+      return this.$store.state.lists.profile
+    },
+  },
+  methods: {
+    async like(param) {
+      const response = await this.$apollo.queries.commentsui.refetch()
+      if (response.data.commentsui.length > 0) {
+        if (this.commentsui[0].liked === true) {
+          this.$axios
+            .delete('/reply/' + param + '/like', {
+              headers: {
+                Authorization: 'Bearer ' + this.$store.state.auth.accessToken,
+              },
+            })
+            .then((response) => {
+              if (response.status === 200) {
+                this.$store.dispatch(
+                  'lists/fetchRepliesByThreadId',
+                  this.$route.params.post
+                )
+                this.liked = true
+                this.unliked = false
+                try {
+                  this.$apollo.mutate({
+                    mutation: REVERT_REPLIES,
+                    variables: {
+                      user_name: this.$store.state.lists.profile.username,
+                      id: this.reply.id,
+                    },
+                  })
+                } catch (error) {
+                  console.log(error)
+                }
+              }
+            })
+            .catch((error) => {
+              console.log(error)
+            })
+          return
+        }
+        this.$axios
+          .post(
+            '/reply/' + param + '/like',
+            {},
+            {
+              headers: {
+                Authorization: 'Bearer ' + this.$store.state.auth.accessToken,
+              },
+            }
+          )
+          .then((response) => {
+            if (response.status === 200) {
+              this.$store.dispatch(
+                'lists/fetchRepliesByThreadId',
+                this.$route.params.post
+              )
+              this.liked = true
+              this.unliked = false
+              try {
+                this.$apollo.mutate({
+                  mutation: LIKED_REPLIES,
+                  variables: {
+                    user_name: this.$store.state.lists.profile.username,
+                    id: this.reply.id,
+                  },
+                })
+              } catch (error) {
+                console.log(error)
+              }
+            }
+          })
+          .catch((error) => {
+            console.log(error)
+          })
+      } else {
+        this.$axios
+          .post(
+            '/reply/' + param + '/like',
+            {},
+            {
+              headers: {
+                Authorization: 'Bearer ' + this.$store.state.auth.accessToken,
+              },
+            }
+          )
+          .then((response) => {
+            if (response.status === 200) {
+              this.$store.dispatch(
+                'lists/fetchRepliesByThreadId',
+                this.$route.params.post
+              )
+              this.liked = true
+              this.unliked = false
+              try {
+                this.$apollo.mutate({
+                  mutation: INSERT_LIKED_REPLIES,
+                  variables: {
+                    user_name: this.$store.state.lists.profile.username,
+                    id: this.reply.id,
+                  },
+                })
+              } catch (error) {
+                console.log(error)
+              }
+            }
+          })
+          .catch((error) => {
+            console.log(error)
+          })
+      }
+    },
+    async unlike(param) {
+      const response = await this.$apollo.queries.commentsui.refetch()
+      if (response.data.commentsui.length > 0) {
+        if (this.commentsui[0].unliked === true) {
+          this.$axios
+            .delete('/reply/' + param + '/unlike', {
+              headers: {
+                Authorization: 'Bearer ' + this.$store.state.auth.accessToken,
+              },
+            })
+            .then((response) => {
+              console.log(response)
+              if (response.status === 200) {
+                this.$store.dispatch(
+                  'lists/fetchRepliesByThreadId',
+                  this.$route.params.post
+                )
+                this.liked = true
+                this.unliked = false
+                try {
+                  this.$apollo.mutate({
+                    mutation: REVERT_REPLIES,
+                    variables: {
+                      user_name: this.$store.state.lists.profile.username,
+                      id: this.reply.id,
+                    },
+                  })
+                } catch (error) {
+                  console.log(error)
+                }
+              }
+            })
+            .catch((error) => {
+              console.log(error)
+            })
+          return
+        }
+        this.$axios
+          .post(
+            '/reply/' + param + '/unlike',
+            {},
+            {
+              headers: {
+                'Content-Type': 'application/json',
+                Authorization: 'Bearer ' + this.$store.state.auth.accessToken,
+              },
+            }
+          )
+          .then((response) => {
+            console.log(response)
+            if (response.status === 200) {
+              this.$store.dispatch(
+                'lists/fetchRepliesByThreadId',
+                this.$route.params.post
+              )
+              this.unliked = true
+              this.liked = false
+              try {
+                this.$apollo.mutate({
+                  mutation: UNLIKED_REPLIES,
+                  variables: {
+                    user_name: this.$store.state.lists.profile.username,
+                    id: this.reply.id,
+                  },
+                })
+              } catch (error) {
+                console.log(error)
+              }
+            }
+          })
+          .catch((error) => {
+            console.log(error)
+          })
+      } else {
+        this.$axios
+          .post(
+            '/reply/' + param + '/unlike',
+            {},
+            {
+              headers: {
+                'Content-Type': 'application/json',
+                Authorization: 'Bearer ' + this.$store.state.auth.accessToken,
+              },
+            }
+          )
+          .then((response) => {
+            console.log(response)
+            if (response.status === 200) {
+              this.$store.dispatch(
+                'lists/fetchRepliesByThreadId',
+                this.$route.params.post
+              )
+              this.unliked = true
+              this.liked = false
+              try {
+                this.$apollo.mutate({
+                  mutation: INSERT_UNLIKED_REPLIES,
+                  variables: {
+                    user_name: this.$store.state.lists.profile.username,
+                    id: this.reply.id,
+                  },
+                })
+              } catch (error) {
+                console.log(error)
+              }
+            }
+          })
+          .catch((error) => {
+            console.log(error)
+          })
+      }
     },
   },
 }

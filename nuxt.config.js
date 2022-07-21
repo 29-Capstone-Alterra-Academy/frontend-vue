@@ -46,12 +46,26 @@ export default {
     '@nuxtjs/axios',
     // https://go.nuxtjs.dev/pwa
     '@nuxtjs/pwa',
+    '@nuxtjs/apollo',
   ],
+
+  // Apollo module configuration
+  apollo: {
+    cookieAttributes: {
+      expires: 7,
+    },
+    includeNodeModules: true,
+    authenticationType: "Bearer",
+    errorHandler: "~/plugins/apollo-error-handler.js",
+    clientConfigs: {
+      default: "~/apollo/client-config.js",
+    },
+  },
 
   // Axios module configuration: https://go.nuxtjs.dev/config-axios
   axios: {
     // Workaround to avoid enforcing hard-coded localhost:3000: https://github.com/nuxt-community/axios-module/issues/308
-    baseURL: 'https://nomizo-json-server.herokuapp.com/',
+    baseURL: 'https://staking-spade-production.up.railway.app/',
   },
 
   // PWA module configuration: https://go.nuxtjs.dev/pwa
@@ -68,8 +82,8 @@ export default {
       light: true,
       themes: {
         light: {
-          primary: colors.blue.darken2,
-          accent: colors.grey.darken3,
+          primary: '#016273',
+          accent: colors.blue.darken2,
           secondary: colors.amber.darken3,
           info: colors.teal.lighten1,
           warning: colors.amber.base,

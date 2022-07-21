@@ -1,0 +1,7 @@
+mutation subscribe($user_name: String, $id: Int) {
+  update_topicsui(where: {username: {_eq: $user_name}, topic_id: {_eq: $id}}, _set: {subscribe: false}) {
+    returning {
+      id
+    }
+  }
+}

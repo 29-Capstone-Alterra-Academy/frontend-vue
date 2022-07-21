@@ -1,0 +1,7 @@
+subscription {
+  topicsui {
+    id
+    topic_id
+    subscribe
+  }
+}

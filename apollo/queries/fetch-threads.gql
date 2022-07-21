@@ -1,0 +1,8 @@
+query user($user_name: String, $id: Int) {
+  threadsui(where: {user_name: {_eq: $user_name}, thread_id: {_eq: $id}}) {
+    id
+    thread_id
+    liked
+    unliked
+  }
+}

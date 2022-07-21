@@ -1,0 +1,7 @@
+query user($user_name: String, $id: Int) {
+  usersui(where: {username: {_eq: $user_name}, user_id: {_eq: $id}}) {
+    id
+    user_id
+    follow
+  }
+}

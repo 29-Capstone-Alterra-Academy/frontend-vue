@@ -5,25 +5,38 @@
         :src="topic.profile_image"
         class="rounded-circle"
         width="75"
+        height="75"
       ></v-img>
     </div>
     <div class="py-1">
       <h3>
-        <TopicShortener :name="topic.name" />
+        <TopicShortener v-if="topic.name != null" :name="topic.name" />
       </h3>
     </div>
     <div class="subtitle-1 font-weight-light py-1" style="line-height: inherit">
       {{ topic.description }}
     </div>
     <div class="py-1">
-      <h4><FollowerShortener :follower="topic.followers" /> Followers</h4>
+      <h4>
+        <FollowerShortener
+          v-if="topic.contributor_count != null"
+          :follower="topic.contributor_count"
+        />
+        Followers
+      </h4>
     </div>
     <div class="py-1">
-      <h4><FollowerShortener :follower="topic.followers" /> Total Posts</h4>
+      <h4>
+        <FollowerShortener
+          v-if="topic.activity_count != null"
+          :follower="topic.activity_count"
+        />
+        Total Posts
+      </h4>
     </div>
     <div class="subtitle-1 font-weight-light py-1" style="line-height: inherit">
       Created
-      <DateShortener :date="topic.created_at"/>
+      <DateShortener v-if="topic.created_at != null" :date="topic.created_at" />
     </div>
   </div>
 </template>
@@ -37,7 +50,7 @@ export default {
   components: {
     TopicShortener,
     DateShortener,
-    FollowerShortener
+    FollowerShortener,
   },
   props: {
     topic: {

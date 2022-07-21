@@ -1,0 +1,9 @@
+subscription {
+  threadsui {
+    id
+    thread_id
+    liked
+    unliked
+    user_name
+  }
+}

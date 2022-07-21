@@ -10,6 +10,11 @@
     </v-snackbar>
     <v-row justify="center" align="center" class="pa-0 ma-0">
       <v-col cols="4">
+        <v-row justify="center">
+          <v-col cols="auto">
+            <v-img src="/Logo.svg" class="" width="110"></v-img>
+          </v-col>
+        </v-row>
         <v-list-item three-line>
           <v-list-item-content>
             <h1 class="mb-4">Daftar</h1>
@@ -22,7 +27,8 @@
                 outlined
                 dense
                 clearable
-                class="rounded-lg"
+                class="rounded-lg py-2"
+                hide-details="auto"
               ></v-text-field>
               <v-text-field
                 v-model="username"
@@ -32,7 +38,8 @@
                 outlined
                 dense
                 clearable
-                class="rounded-lg"
+                class="rounded-lg py-2"
+                hide-details="auto"
               ></v-text-field>
               <v-text-field
                 id="password"
@@ -42,9 +49,11 @@
                 :type="showPassword ? 'text' : 'password'"
                 name="input-10-2"
                 placeholder="Password"
-                class="input-group--focused rounded-lg"
+                class="input-group--focused rounded-lg py-2"
+                hide-details="auto"
                 outlined
                 dense
+                @input="confirmPassword = ''"
                 @click:append="showPassword = !showPassword"
               ></v-text-field>
               <v-text-field
@@ -56,7 +65,8 @@
                 placeholder="Confirm Password"
                 hint="Sesuaikan dengan password!"
                 autocomplete="confirm-password"
-                class="input-group--focused rounded-lg"
+                class="input-group--focused rounded-lg py-2 pb-4"
+                hide-details="auto"
                 outlined
                 dense
                 @click:append="showPassword2 = !showPassword2"
@@ -84,7 +94,6 @@
 </template>
 <script>
 import { mapMutations } from 'vuex'
-import axios from 'axios'
 
 export default {
   name: 'LoginPage',
@@ -101,7 +110,11 @@ export default {
       snackbar: false,
       showPassword: false,
       showPassword2: false,
-      nameRules: [(v) => !!v || 'Masukkan username anda'],
+      nameRules: [
+        (v) => !!v || 'Masukkan username anda',
+        (value) =>
+          (value && value.length >= 8) || 'Username minimal 6 karakter',
+      ],
       emailRules: [
         (v) => !!v || 'Masukkan alamat e-mail anda',
         (v) =>
@@ -111,13 +124,14 @@ export default {
       ],
       rules: [
         (value) => !!value || 'Masukkan password anda',
-        (value) => (value && /\d/.test(value)) || 'Password harus mengandung setidaknya satu angka',
         (value) =>
-          (value && /[A-Z]{1}/.test(value)) || 'Password harus mengandung setidaknya satu huruf kapital',
+          (value && /\d/.test(value)) ||
+          'Password harus mengandung setidaknya satu angka',
         (value) =>
-          (value && /[^A-Za-z0-9]/.test(value)) ||
-          'Password harus mengandung setidaknya satu karakter spesial',
-        (value) => (value && value.length >= 8) || 'Password minimal 8 karakter',
+          (value && /[A-Z]{1}/.test(value)) ||
+          'Password harus mengandung setidaknya satu huruf kapital',
+        (value) =>
+          (value && value.length >= 8) || 'Password minimal 8 karakter',
       ],
       confirmPasswordRules: [
         (v) => !!v || 'Masukkan ulang password anda',
@@ -138,9 +152,9 @@ export default {
     ...mapMutations('auth', ['setAccessToken', 'setRefreshToken']),
     register() {
       this.message = ''
-      axios
+      this.$axios
         .post(
-          'https://staking-spade-production.up.railway.app/register',
+          '/register',
           {
             email: this.email,
             username: this.username,

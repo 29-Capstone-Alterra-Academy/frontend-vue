@@ -1,0 +1,12 @@
+mutation insert($user_name: String, $id: Int){
+  insert_threadsui(objects: {user_name: $user_name, thread_id: $id}) {
+    returning {
+      id
+    }
+  }
+  update_threadsui(where: {user_name: {_eq: $user_name}, thread_id: {_eq: $id}}, _set: {unliked: true, liked: false}) {
+    returning {
+      id
+    }
+  }
+}

@@ -1,10 +1,10 @@
 <template>
   <v-app dark>
-    <v-navigation-drawer v-model="drawer" temporary app color="primary">
+    <v-navigation-drawer v-model="drawer" temporary app flat color="primary">
       <v-list>
         <v-list-item>
           <v-list-item-content>
-            <v-list-item-title class="title">City Bike</v-list-item-title>
+            <v-list-item-title class="title">Nomizo</v-list-item-title>
           </v-list-item-content>
         </v-list-item>
       </v-list>
@@ -16,7 +16,7 @@
       </v-list>
     </v-navigation-drawer>
 
-    <v-app-bar app clipped fixed class="">
+    <v-app-bar app flat clipped fixed class="">
       <v-toolbar-title>
         <v-img src="/Logo.svg" class="" width="110"></v-img>
       </v-toolbar-title>
@@ -28,6 +28,9 @@
       />
       <AuthButton v-else :items="items" />
       <v-spacer />
+      <v-icon class="pa-2" @click="$router.push(`/notification`)">
+        mdi-bell-outline
+      </v-icon>
       <v-menu offset-y>
         <template #activator="{ on, attrs }">
           <v-card class="rounded-lg px-2" outlined v-bind="attrs" v-on="on">
@@ -35,18 +38,20 @@
               <v-row justify="center" align="center">
                 <v-col cols="auto" style="width: 200px">
                   <v-row align="center" class="pa-0">
-                    <v-col cols="1" class="pa-0" style="max-width: none">
+                    <v-col cols="1" class="pa-0 pr-2" style="max-width: none">
                       <v-img
                         v-if="profile.profile_image != null"
                         :src="profile.profile_image"
                         class="rounded-circle"
                         width="30"
+                        height="30"
                       ></v-img>
                       <v-img
                         v-else
                         src="https://randomuser.me/api/portraits/women/84.jpg"
                         class="rounded-circle"
                         width="30"
+                        height="30"
                       ></v-img>
                     </v-col>
                     <v-col cols="auto">
@@ -57,7 +62,16 @@
                           </div>
                         </v-col>
                         <v-col cols="12" class="pa-0">
-                          <div class="text-capitalize text--disabled caption">
+                          <div
+                            v-if="isAdmin"
+                            class="text-capitalize text--disabled caption"
+                          >
+                            Admin
+                          </div>
+                          <div
+                            v-else
+                            class="text-capitalize text--disabled caption"
+                          >
                             User
                           </div>
                         </v-col>
@@ -91,11 +105,11 @@
           <v-divider />
         </v-list>
         <v-list>
-          <v-list-item to="/">
+          <!-- <v-list-item to="/">
             <v-list-item-content>
               <v-list-item-title class="body-2" v-text="`Settings`" />
             </v-list-item-content>
-          </v-list-item>
+          </v-list-item> -->
           <v-list-item @click="handleLogout">
             <v-list-item-content>
               <v-list-item-title
@@ -108,29 +122,14 @@
         </v-list>
       </v-menu>
     </v-app-bar>
-    <v-main>
-      <v-container>
-        <NuxtChild :search-post="search" />
-      </v-container>
+    <v-main class="global">
+      <NuxtChild :search-post="search" />
     </v-main>
-    <v-navigation-drawer v-model="rightDrawer" :right="right" temporary fixed>
-      <v-list>
-        <v-list-item @click.native="right = !right">
-          <v-list-item-action>
-            <v-icon light> mdi-repeat </v-icon>
-          </v-list-item-action>
-          <v-list-item-title>Switch drawer (click me)</v-list-item-title>
-        </v-list-item>
-      </v-list>
-    </v-navigation-drawer>
-    <v-footer app>
-      <span>&copy; {{ new Date().getFullYear() }}</span>
-    </v-footer>
   </v-app>
 </template>
 
 <script>
-import { mapMutations } from 'vuex'
+import { mapMutations, mapGetters } from 'vuex'
 import AuthButton from '~/components/navbar/AuthButton'
 import AuthButtonSide from '~/components/navbar/AuthButtonSide'
 
@@ -181,47 +180,56 @@ export default {
     }
   },
   computed: {
+    ...mapGetters('lists', ['isAdmin']),
     route() {
       return this.$route.path
     },
     param() {
       return this.$store.state.layouts.layout
     },
-    topics() {
-      if (this.param) {
-        return this.$store.state.lists.topics.filter((item) => {
-          return item.id.toString().includes(this.param)
-        })
-      }
-      return this.$store.state.lists.topics
-    },
     profile() {
       return this.$store.state.lists.profile
     },
   },
   created() {
-    this.$store.dispatch('lists/fetchThreads')
-    this.$store.dispatch('lists/fetchTopics')
-    this.$store.dispatch('lists/fetchUsers')
     this.$store.dispatch('lists/loggedUser')
+    this.$store.dispatch('lists/isAdmin')
   },
   methods: {
     ...mapMutations('auth', ['logout']),
     handleLogout() {
-      fetch('https://virtserver.swaggerhub.com/etrnal70/nomizo/1.0.0/logout', {
-        method: 'POST',
-        headers: {
-          accept: '*/*',
-        },
-      })
       this.logout()
       this.$forceUpdate()
+      this.$router.push('/')
+      // this.$axios
+      //   .post(
+      //     '/logout',
+      //     {},
+      //     {
+      //       headers: {
+      //         'Content-Type': 'application/json',
+      //         Authorization: 'Bearer ' + this.$store.state.auth.accessToken,
+      //       },
+      //     }
+      //   )
+      //   .then((response) => {
+      //     this.logout()
+      //     this.$forceUpdate()
+      //     this.$router.push('/')
+      //   })
+      //   .catch((error) => {
+      //     this.message = error.message
+      //     this.snackbar = true
+      //   })
     },
   },
 }
 </script>
 
-<style scoped>
+<style>
+.global {
+  background-color: #cfcfcf;
+}
 .user-card.v-card.v-sheet.v-sheet--shaped {
   border-radius: 24px;
 }
