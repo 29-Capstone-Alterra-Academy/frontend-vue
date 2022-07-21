@@ -1,5 +1,29 @@
 <template>
   <v-container class="py-0" style="width: 93.67%">
+    <v-snackbar v-model="snackbarStepdown" :timeout="5000">
+      Anda berhasil mengundurkan diri dari moderator
+      <template #action="{ attrs }">
+        <v-btn
+          color="primary"
+          text
+          v-bind="attrs"
+          @click="snackbarStepdown = false"
+          >Close</v-btn
+        >
+      </template>
+    </v-snackbar>
+    <v-snackbar v-model="snackbarStepdownFalse" :timeout="5000">
+      Terjadi kesalahan saat mengundurkan diri
+      <template #action="{ attrs }">
+        <v-btn
+          color="warning"
+          text
+          v-bind="attrs"
+          @click="snackbarStepdownFalse = false"
+          >Close</v-btn
+        >
+      </template>
+    </v-snackbar>
     <v-snackbar v-model="snackbar" :timeout="5000">
       Laporan berhasil diteruskan
       <template #action="{ attrs }">
@@ -23,7 +47,11 @@
     <v-snackbar v-model="snackbarIgnore" :timeout="5000">
       Laporan berhasil ditolak
       <template #action="{ attrs }">
-        <v-btn color="primary" text v-bind="attrs" @click="snackbarIgnore = false"
+        <v-btn
+          color="primary"
+          text
+          v-bind="attrs"
+          @click="snackbarIgnore = false"
           >Close</v-btn
         >
       </template>
@@ -87,25 +115,49 @@
         </v-col>
         <v-spacer />
         <v-col cols="auto">
-          <v-btn color="error" class="text-capitalize"
+          <v-btn color="error" class="text-capitalize" @click="stepdown"
             >Keluar Sebagai Moderator</v-btn
           >
         </v-col>
       </v-row>
       <v-row align="center">
         <v-col cols="auto"> Deskripsi </v-col>
-        <v-col cols="auto"
-          ><v-btn class="text-capitalize" text outlined @click="editDesc"
-            >Ubah</v-btn
-          ></v-col
-        >
+        <v-col cols="auto">
+          <v-btn
+            v-if="!isEditDesc"
+            class="text-capitalize"
+            text
+            outlined
+            @click="editDesc"
+          >
+            Ubah
+          </v-btn>
+          <v-btn
+            v-if="isEditDesc"
+            class="text-capitalize"
+            text
+            outlined
+            @click="editDesc"
+          >
+            Batal
+          </v-btn>
+          <v-btn
+            v-if="isEditDesc"
+            class="text-capitalize"
+            text
+            outlined
+            @click="submitDesc"
+          >
+            Simpan
+          </v-btn>
+        </v-col>
       </v-row>
       <div v-if="!isEditDesc">
         {{ topic.description }}
       </div>
       <v-textarea
         v-else
-        v-model="description"
+        v-model="topic.description"
         rows="6"
         class="rounded-lg"
         placeholder="Ubah Deskripsi"
@@ -117,11 +169,35 @@
       ></v-textarea>
       <v-row align="center">
         <v-col cols="auto"> Rules </v-col>
-        <v-col cols="auto"
-          ><v-btn class="text-capitalize" text outlined @click="editRules"
-            >Ubah</v-btn
-          ></v-col
-        >
+        <v-col cols="auto">
+          <v-btn
+            v-if="!isEditRules"
+            class="text-capitalize"
+            text
+            outlined
+            @click="editRules"
+          >
+            Ubah
+          </v-btn>
+          <v-btn
+            v-if="isEditRules"
+            class="text-capitalize"
+            text
+            outlined
+            @click="editRules"
+          >
+            Batal
+          </v-btn>
+          <v-btn
+            v-if="isEditRules"
+            class="text-capitalize"
+            text
+            outlined
+            @click="submitRules"
+          >
+            Simpan
+          </v-btn>
+        </v-col>
       </v-row>
       <section v-if="!isEditRules">
         <template v-if="topic.rules != ''">
@@ -137,7 +213,7 @@
       </section>
       <v-textarea
         v-else
-        v-model="rules"
+        v-model="topic.rules"
         rows="6"
         class="rounded-lg"
         placeholder="Ubah Rules"
@@ -190,6 +266,7 @@
                                   :username="thread.reporter.username"
                                 />
                               </router-link>
+                              pada
                               {{ thread.created_at | timepost }} yang lalu
                               dengan alasan {{ thread.reason.detail }}
                             </small>
@@ -273,8 +350,20 @@
                       </v-row>
                     </v-card>
                   </v-col>
-                  <v-col>
-                    <div>Laporan Pengguna</div>
+                  <v-col cols="12">
+                    <router-link
+                      :to="`./details/laporan-pengguna`"
+                      style="text-decoration: none; color: black"
+                    >
+                      <v-row align="center">
+                        <v-col cols="auto" class="pr-0">
+                          <v-icon> mdi-menu-down </v-icon>
+                        </v-col>
+                        <v-col cols="auto" class="pl-0">
+                          <div class="text-overline">Laporan Pengguna</div>
+                        </v-col>
+                      </v-row>
+                    </router-link>
                   </v-col>
                 </v-row>
               </v-list-item-content>
@@ -288,15 +377,44 @@
 
 <script>
 import TopicShortener from '~/components/utils/TopicShortener'
+import NameShortener from '~/components/utils/NameShortener'
 import DateShortener from '~/components/utils/DateShortener'
 import FollowerShortener from '~/components/utils/FollowerShortener'
 
 export default {
   name: 'IndexPage',
   components: {
+    NameShortener,
     TopicShortener,
     DateShortener,
     FollowerShortener,
+  },
+  filters: {
+    timepost(date) {
+      const seconds = Math.floor((new Date() - new Date(String(date))) / 1000)
+      let interval = Math.floor(seconds / 31536000)
+
+      if (interval > 1) {
+        return interval + ' tahun'
+      }
+      interval = Math.floor(seconds / 2592000)
+      if (interval > 1) {
+        return interval + ' bulan'
+      }
+      interval = Math.floor(seconds / 86400)
+      if (interval > 1) {
+        return interval + ' hari'
+      }
+      interval = Math.floor(seconds / 3600)
+      if (interval > 1) {
+        return interval + ' jam'
+      }
+      interval = Math.floor(seconds / 60)
+      if (interval > 1) {
+        return interval + ' menit'
+      }
+      return Math.floor(seconds) + ' detik'
+    },
   },
   middleware: ['authenticated', 'moderator'],
   data() {
@@ -308,20 +426,12 @@ export default {
       snackbarFalse: false,
       snackbarIgnore: false,
       snackbarIgnoreFalse: false,
+      snackbarStepdown: false,
+      snackbarStepdownFalse: false,
       items: [{ tab: 'Rekomendasi', icon: 'mdi-fire' }, { tab: 'Mengikuti' }],
     }
   },
   computed: {
-    rules: {
-      get() {
-        return this.topic.rules
-      },
-    },
-    description: {
-      get() {
-        return this.topic.description
-      },
-    },
     threads() {
       return this.$store.state.lists.reportedThreads
     },
@@ -363,11 +473,73 @@ export default {
     this.$store.dispatch('lists/fetchUsers')
   },
   methods: {
+    stepdown() {
+      this.$axios
+        .put(
+          `/topic/${this.$route.params.slug}/stepdown`,
+          {},
+          {
+            headers: {
+              'Content-Type': 'application/json',
+              Authorization: 'Bearer ' + this.$store.state.auth.accessToken,
+            },
+          }
+        )
+        .then((response) => {
+          console.log(response.data)
+          if (response.status === 200) {
+            this.snackbarStepdown = true
+            this.$emit('input', false)
+          }
+        })
+        .catch((error) => {
+          if (error.status) {
+            this.snackbarStepdownFalse = true
+          }
+        })
+    },
     editDesc() {
       this.isEditDesc = !this.isEditDesc
     },
     editRules() {
       this.isEditRules = !this.isEditRules
+    },
+    submitDesc() {
+      //   const formData = new FormData()
+      //   formData.append('username', this.profile.username)
+      //   console.log(this.profile.username)
+      //   formData.append('bio', this.profile.bio)
+      //   console.log(this.profile.bio)
+      //   formData.append('email', this.profile.email)
+      //   console.log(this.profile.email)
+      //   formData.append('gender', this.profile.gender)
+      //   console.log(this.profile.gender)
+      //   formData.append('birth_date', this.profile.birth_date)
+      //   console.log(this.profile.date)
+      //   formData.append('profile_image', this.profile_image)
+      //   console.log(this.profile_image)
+      //   for (const pair of formData.entries()) {
+      //     console.log(pair[0] + ', ' + pair[1])
+      //   }
+      //   this.$axios
+      //     .put('/profile', formData, {
+      //       headers: {
+      //         'Content-Type': 'application/json',
+      //         Authorization: 'Bearer ' + this.$store.state.auth.accessToken,
+      //       },
+      //     })
+      //     .then((response) => {
+      //       console.log(response.data)
+      //       if (response.status === 200) {
+      //         this.snackbar = true
+      //         this.$emit('input', false)
+      //       }
+      //     })
+      //     .catch((error) => {
+      //       if (error.status) {
+      //         this.snackbarFalse = true
+      //       }
+      //     })
     },
     forwardThread(reporterId, threadId) {
       this.$axios

@@ -23,38 +23,40 @@
               </v-row>
             </v-card>
           </v-col>
-          <v-tabs-items
-            v-model="tab"
-            style="background-color: transparent !important"
-          >
-            <v-tab-item v-for="item in items" :key="item.tab">
-              <section v-if="item.tab == `Terpopuler`">
-                <v-col
-                  v-for="thread in threads"
-                  :key="thread.id"
-                  cols="12"
-                  class="py-1"
-                >
-                  <PostCard :thread="thread" />
-                </v-col>
-                <Observer @intersect="intersected" />
-              </section>
-              <section v-if="item.tab == `Terbaru`">
-                <v-col
-                  v-for="(thread, index) in orderThreads.sort(
-                    (a, b) =>
-                      new Date(b.created_at).getTime() -
-                      new Date(a.created_at).getTime()
-                  )"
-                  :key="index"
-                  cols="12"
-                  class="py-1"
-                >
-                  <PostCard :thread="thread" />
-                </v-col>
-              </section>
-            </v-tab-item>
-          </v-tabs-items>
+          <v-col cols="12" class="pa-0 py-1">
+            <v-tabs-items
+              v-model="tab"
+              style="background-color: transparent !important"
+            >
+              <v-tab-item v-for="item in items" :key="item.tab">
+                <section v-if="item.tab == `Terpopuler`">
+                  <v-col
+                    v-for="thread in threads"
+                    :key="thread.id"
+                    cols="12"
+                    class="py-1"
+                  >
+                    <PostCard :thread="thread" />
+                  </v-col>
+                  <Observer @intersect="intersected" />
+                </section>
+                <section v-if="item.tab == `Terbaru`">
+                  <v-col
+                    v-for="(thread, index) in orderThreads.sort(
+                      (a, b) =>
+                        new Date(b.created_at).getTime() -
+                        new Date(a.created_at).getTime()
+                    )"
+                    :key="index"
+                    cols="12"
+                    class="py-1"
+                  >
+                    <PostCard :thread="thread" />
+                  </v-col>
+                </section>
+              </v-tab-item>
+            </v-tabs-items>
+          </v-col>
         </v-row>
       </v-col>
       <v-col cols="4" style="width: 373.75px">
@@ -216,9 +218,30 @@
                         <DateShortener :date="user.created_at" />
                       </div>
                       <v-col v-if="isAdmin" align="center" cols="auto">
-                        <v-btn color="error" class="text-capitalize">
+                        <v-btn
+                          color="error"
+                          :disabled="
+                            !reportedUsers
+                              .filter((item) => {
+                                return item.suspect.id == user.ID
+                              })
+                              .shift()
+                          "
+                          class="text-capitalize rounded-lg"
+                          @click="dialog = true"
+                        >
                           Blokir
                         </v-btn>
+                        <BanUserCard
+                          v-model="dialog"
+                          :user="
+                            reportedUsers
+                              .filter((item) => {
+                                return item.suspect.id == user.ID
+                              })
+                              .shift()
+                          "
+                        />
                       </v-col>
                     </v-col>
                   </v-row>
@@ -297,6 +320,7 @@ import INSERT_UNFOLLOWED_USERS from '~/apollo/mutations/insert-unfollowed-users'
 import UNFOLLOWED_USERS from '~/apollo/mutations/unfollowed-users'
 
 import TopicTableComponent from '~/components/molecules/TopicTableComponent'
+import BanUserCard from '~/components/cards/BanUserCard'
 import ReportUserCard from '~/components/cards/ReportUserCard'
 import Observer from '~/components/ObserverScroll'
 import PostCard from '~/components/cards/PostCard'
@@ -310,6 +334,7 @@ export default {
   components: {
     TopicTableComponent,
     ReportUserCard,
+    BanUserCard,
     Observer,
     PostCard,
     TopicShortener,
@@ -328,6 +353,7 @@ export default {
     return {
       tab: null,
       reportUser: false,
+      dialog: false,
       items: [{ tab: 'Terpopuler', icon: 'mdi-fire' }, { tab: 'Terbaru' }],
       offset: 0,
       threads: [],
@@ -361,6 +387,9 @@ export default {
     },
     topics() {
       return this.$store.state.lists.topics
+    },
+    reportedUsers() {
+      return this.$store.state.lists.reportedUsers
     },
     user() {
       return this.$store.state.lists.detailUser
@@ -411,6 +440,7 @@ export default {
   created() {
     this.$store.dispatch('lists/fetchFollowedTopics', this.$route.params.slug)
     this.$store.dispatch('lists/fetchUserById', this.$route.params.slug)
+    this.$store.dispatch('lists/fetchReportedUsers')
   },
   methods: {
     reportedUser() {

@@ -51,11 +51,27 @@
         <v-col cols="auto">
           <v-btn
             color="error"
-            class="text-capitalize"
+            :disabled="
+              !reportedTopics
+                .filter((item) => {
+                  return item.topic.id == topic.id
+                })
+                .shift()
+            "
+            class="text-capitalize rounded-lg"
             @click="dialog = true"
             >Blokir</v-btn
           >
-          <DeleteTopicCard v-model="dialog" :topic="topic" />
+          <BanTopicCard
+            v-model="dialog"
+            :topic="
+              reportedTopics
+                .filter((item) => {
+                  return item.topic.id == topic.id
+                })
+                .shift()
+            "
+          />
         </v-col>
       </v-row>
       <v-row align="center">
@@ -76,7 +92,6 @@
             dense
             solo
             class="rounded-lg"
-            @keydown.enter.prevent="submit"
           ></v-text-field>
         </v-col>
         <v-spacer />
@@ -93,10 +108,11 @@
         <AddModerators v-model="dialogMod" />
       </v-row>
       <v-row>
-        <v-col>
+        <v-col v-if="moderators">
           <v-data-table
+            v-if="moderators"
             :headers="headers"
-            :items="users"
+            :items="moderators"
             :search="search"
             flat
             class="elevation-1"
@@ -104,12 +120,12 @@
             <template #[`item.username`]="{ item }">
               <div class="d-flex">
                 <v-img
-                  :src="item.profile_image"
+                  :src="item.user.profile_image"
                   max-width="25"
                   class="rounded-circle"
                 ></v-img>
                 <span class="px-2"
-                  ><NameShortener :username="item.username"
+                  ><NameShortener :username="item.user.username"
                 /></span>
               </div>
             </template>
@@ -119,10 +135,8 @@
             <template #[`item.followers`]="{ item }">
               <FollowerShortener :follower="item.followers_count" />
             </template>
-            <template #[`item.status`]="{ item }">
-              <v-chip color="green" outlined>
-                {{ item.status }}
-              </v-chip>
+            <template #[`item.status`]="">
+              <v-chip color="green" outlined> Moderator </v-chip>
             </template>
           </v-data-table>
           <template #[`item.delete`]="{ item }">
@@ -143,7 +157,7 @@
 
 <script>
 import AddModerators from '~/components/cards/AddModerators'
-import DeleteTopicCard from '~/components/cards/DeleteTopicCard'
+import BanTopicCard from '~/components/cards/BanTopicCard'
 import NameShortener from '~/components/utils/NameShortener'
 import TopicShortener from '~/components/utils/TopicShortener'
 import DateShortener from '~/components/utils/DateShortener'
@@ -153,7 +167,7 @@ export default {
   name: 'IndexPage',
   components: {
     AddModerators,
-    DeleteTopicCard,
+    BanTopicCard,
     NameShortener,
     TopicShortener,
     DateShortener,
@@ -195,35 +209,16 @@ export default {
         return this.topic.description
       },
     },
-    threads() {
-      if (this.searchPost) {
-        const threads = this.$store.state.lists.threads.filter((item) => {
-          return item.topic.name
-            .toLowerCase()
-            .includes(this.$route.params.slug.toLowerCase())
-        })
-        return threads.filter((item) => {
-          return (
-            item.title.toLowerCase().includes(this.searchPost.toLowerCase()) ||
-            item.author.username
-              .toLowerCase()
-              .includes(this.searchPost.toLowerCase())
-          )
-        })
-      }
-      return this.$store.state.lists.threads.filter((item) => {
-        return item.topic.name
-          .toLowerCase()
-          .includes(this.$route.params.slug.toLowerCase())
-      })
-    },
     topics() {
       return this.$store.state.lists.topics
     },
     topic() {
       return this.$store.state.lists.detailTopic
     },
-    users() {
+    reportedTopics() {
+      return this.$store.state.lists.reportedTopics
+    },
+    moderators() {
       return this.$store.state.lists.users
     },
     breadcrumbs() {
@@ -247,9 +242,12 @@ export default {
     },
   },
   created() {
-    this.$store.dispatch('lists/fetchThreads')
+    this.$store.dispatch('lists/fetchReportedTopics')
     this.$store.dispatch('lists/fetchTopicById', this.$route.params.slug)
-    this.$store.dispatch('lists/fetchUsers')
+    this.$store.dispatch(
+      'lists/fetchModeratorsByTopic',
+      this.$route.params.slug
+    )
   },
   methods: {
     editDesc() {

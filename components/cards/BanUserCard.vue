@@ -6,7 +6,7 @@
     @input="$emit('input', $event)"
   >
     <v-snackbar v-model="snackbar" :timeout="5000">
-      Postingan berhasil diblokir
+      User berhasil diblokir
       <template #action="{ attrs }">
         <v-btn color="primary" text v-bind="attrs" @click="snackbar = false"
           >Close</v-btn
@@ -14,7 +14,7 @@
       </template>
     </v-snackbar>
     <v-snackbar v-model="snackbarFalse" :timeout="5000">
-      Terjadi kesalahan saat memblokir postingan
+      Terjadi kesalahan saat memblokir user
       <template #action="{ attrs }">
         <v-btn
           color="warning"
@@ -51,7 +51,7 @@
     </v-snackbar>
     <v-card>
       <v-card-title class="text-h5">
-        <v-col cols="auto" class="pa-0"> Blokir postingan ini? </v-col>
+        <v-col cols="auto" class="pa-0"> Blokir user ini? </v-col>
         <v-spacer />
         <v-col cols="auto" class="pa-0">
           <v-btn icon @click.native="$emit('input', false)">
@@ -60,7 +60,7 @@
         </v-col>
       </v-card-title>
       <v-divider></v-divider>
-      <v-card-text class=""> Yakin ingin memblokir postingan ini? </v-card-text>
+      <v-card-text class=""> Yakin ingin memblokir user ini? </v-card-text>
       <v-card-actions>
         <v-list-item>
           <v-list-item-content>
@@ -97,7 +97,7 @@ export default {
       type: Boolean,
       default: false,
     },
-    thread: {
+    user: {
       type: Object,
       required: true,
     },
@@ -124,7 +124,7 @@ export default {
     acceptReport() {
       this.$axios
         .put(
-          `/report?scope=thread&threadId=${this.thread.thread.id}&reporterId=${this.thread.reporter.id}&action=approve`,
+          `/report?scope=user&suspectId=${this.user.suspect.id}&reporterId=${this.user.reporter.id}&action=approve`,
           {},
           {
             headers: {
@@ -146,7 +146,7 @@ export default {
     rejectReport() {
       this.$axios
         .put(
-          `/report?scope=thread&threadId=${this.thread.thread.id}&reporterId=${this.thread.reporter.id}&action=reject`,
+          `/report?scope=user&suspectId=${this.user.suspect.id}&reporterId=${this.user.reporter.id}&action=reject`,
           {},
           {
             headers: {

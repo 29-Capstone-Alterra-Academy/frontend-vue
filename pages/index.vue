@@ -125,6 +125,7 @@
                           :topic="topic"
                           :topicsui="topicsui"
                           :index="index"
+                          :moderating="moderating.includes(topic.id)"
                         />
                       </v-card>
                     </v-col>
@@ -318,10 +319,14 @@ export default {
     profile() {
       return this.$store.state.lists.profile
     },
+    moderating() {
+      return this.$store.state.lists.isModerating
+    },
   },
   mounted() {
     this.$store.dispatch('lists/fetchTopics')
     this.$store.dispatch('lists/fetchUsers')
+    this.$store.dispatch('lists/isModerating')
   },
   methods: {
     nextTopicPage() {

@@ -27,14 +27,13 @@
             <div>
               <small class="text--disabled"
                 >diposting oleh
-                <router-link :to="`/user/${thread.author.id}`"
-                  ><NameShortener
-                    v-if="thread.author.username != null"
-                    :username="thread.author.username"
-                  />
-                  <section v-else>
-                    {{ thread.author.username }}
-                  </section></router-link
+                <router-link
+                  v-if="thread.author.username != null && thread.author.id != 0"
+                  :to="`/user/${thread.author.id}`"
+                  ><NameShortener :username="thread.author.username"
+                /></router-link>
+                <strong v-else class="ma-0" style="display: inline"
+                  >User telah diblokir</strong
                 >
                 {{ timepost }} yang lalu</small
               >
@@ -42,7 +41,7 @@
           </v-col>
         </v-row>
         <div
-          style="width: inherit;"
+          style="width: inherit"
           class="click-cursor"
           @click="toDetails(thread.id, thread.topic.id)"
         >
@@ -114,7 +113,11 @@
                     </p>
                   </template>
                   <v-list class="pa-0">
-                    <v-list-item v-if="isAdmin" to="/" @click="dialogAdmin = true">
+                    <v-list-item
+                      v-if="isAdmin"
+                      to="/"
+                      @click="dialogAdmin = true"
+                    >
                       <v-list-item-action>
                         <v-icon>mdi-bullhorn-outline</v-icon>
                       </v-list-item-action>
@@ -122,7 +125,12 @@
                         <v-list-item-title v-text="`Hapus`" />
                       </v-list-item-content>
                     </v-list-item>
-                    <v-list-item v-if="!isAdmin && thread.author.username !== profile.username" @click="dialog = true">
+                    <v-list-item
+                      v-if="
+                        !isAdmin && thread.author.username !== profile.username
+                      "
+                      @click="dialog = true"
+                    >
                       <v-list-item-action>
                         <v-icon>mdi-bullhorn-outline</v-icon>
                       </v-list-item-action>
@@ -130,7 +138,10 @@
                         <v-list-item-title v-text="`Laporkan`" />
                       </v-list-item-content>
                     </v-list-item>
-                    <v-list-item v-if="thread.author.username === profile.username" @click="dialogEdit = true">
+                    <v-list-item
+                      v-if="thread.author.username === profile.username"
+                      @click="dialogEdit = true"
+                    >
                       <v-list-item-action>
                         <v-icon>mdi-bullhorn-outline</v-icon>
                       </v-list-item-action>
@@ -140,8 +151,8 @@
                     </v-list-item>
                   </v-list>
                 </v-menu>
-                <DeleteCard v-model="dialogAdmin" :thread="thread"/>
-                <ReportCard v-model="dialog" :thread="thread"/>
+                <DeleteCard v-model="dialogAdmin" :thread="thread" />
+                <ReportCard v-model="dialog" :thread="thread" />
               </v-col>
             </v-row>
           </v-col>
@@ -190,7 +201,7 @@ export default {
   },
   computed: {
     ...mapGetters('lists', ['isAdmin']),
-    profile () {
+    profile() {
       return this.$store.state.lists.profile
     },
     timepost() {

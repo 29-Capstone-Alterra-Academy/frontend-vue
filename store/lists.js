@@ -259,6 +259,20 @@ const actions = {
         console.log(err)
       })
   },
+  fetchReportedRepliesByModerator({ commit, rootState }, param) {
+    this.$axios
+      .get(`/topic/${param}/report?scope=reply&limit=100&offset=0`, {
+        headers: {
+          Authorization: 'Bearer ' + rootState.auth.accessToken,
+        },
+      })
+      .then((res) => {
+        commit('setReportedReplies', res.data)
+      })
+      .catch((err) => {
+        console.log(err)
+      })
+  },
   fetchReportedTopics({ commit, rootState }) {
     this.$axios
       .get('/report?scope=topic&limit=100&offset=0', {

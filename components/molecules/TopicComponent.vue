@@ -34,7 +34,7 @@
         >Details
       </v-btn>
       <v-btn
-        v-if="!isAdmin && profile.username === 'moderator'"
+        v-if="!isAdmin && moderating"
         class="text-capitalize"
         text
         outlined
@@ -42,7 +42,7 @@
         @click="$router.push(`/topic/${topic.id}/details`)"
         >Details
       </v-btn>
-      <section v-if="!isAdmin">
+      <section v-if="!isAdmin && !moderating">
         <section
           v-if="
             topicsui.filter((item) => {
@@ -132,6 +132,10 @@ export default {
       type: Array,
       required: true,
     },
+    moderating: {
+      type: Boolean,
+      required: true
+    }
   },
   computed: {
     ...mapGetters('lists', ['isAdmin']),
