@@ -122,6 +122,7 @@
                 <v-img
                   :src="item.user.profile_image"
                   max-width="25"
+                  max-height="25"
                   class="rounded-circle"
                 ></v-img>
                 <span class="px-2"
@@ -135,7 +136,7 @@
             <template #[`item.followers`]="{ item }">
               <FollowerShortener :follower="item.followers_count" />
             </template>
-            <template #[`item.status`]="">
+            <template #[`item.status`]="{}">
               <v-chip color="green" outlined> Moderator </v-chip>
             </template>
           </v-data-table>

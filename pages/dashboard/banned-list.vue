@@ -111,10 +111,7 @@
                                     </v-list-item>
                                   </v-list>
                                 </v-menu>
-                                <BanCard
-                                  v-model="dialogAdmin"
-                                  :thread="item"
-                                />
+                                <BanCard v-model="dialogAdmin" :thread="item" />
                               </v-col>
                             </v-row>
                           </v-col>
@@ -144,7 +141,7 @@
                     </template>
                     <template #[`item.details`]="{ item }">
                       <v-btn
-                        class="text-capitalize"
+                        class="text-capitalize rounded-lg"
                         text
                         outlined
                         @click="
@@ -176,7 +173,7 @@
                     </template>
                     <template #[`item.details`]="{ item }">
                       <v-btn
-                        class="text-capitalize mx-2"
+                        class="text-capitalize rounded-lg mx-2"
                         text
                         outlined
                         @click="$router.push(`/user/${item.suspect.id}`)"

@@ -55,6 +55,7 @@
                     :headers="topic"
                     :items="topics"
                     hide-default-header
+                    :items-per-page="5"
                     class="elevation-1"
                   >
                     <template #[`item.name`]="{ item }">
@@ -80,6 +81,7 @@
                     :items="users"
                     hide-default-header
                     class="elevation-1"
+                    :items-per-page="5"
                   >
                     <template #[`item.username`]="{ item }">
                       <router-link

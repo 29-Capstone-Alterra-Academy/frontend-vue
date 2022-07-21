@@ -46,7 +46,7 @@
               </template>
               <template #[`item.details`]="{ item }">
                 <v-btn
-                  class="mx-2"
+                  class="text-capitalize rounded-lg mx-2"
                   text
                   outlined
                   @click="$router.push(`/topic/${item.id}/details-admin`)"

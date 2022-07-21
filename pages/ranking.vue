@@ -37,6 +37,7 @@
                     :items="topics"
                     :search="search"
                     hide-default-header
+                    :items-per-page="5"
                   >
                     <!-- <template #[`item.id`]="{ item }">
                     <td colspan="1">
@@ -69,6 +70,7 @@
                     :search="search"
                     hide-default-header
                     class="elevation-1"
+                    :items-per-page="5"
                   >
                     <template #[`item.username`]="{ item }">
                       <router-link

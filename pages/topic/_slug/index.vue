@@ -45,7 +45,7 @@
                     >
                       <v-btn
                         v-if="topicdata.subscribe"
-                        class="text-capitalize"
+                        class="text-capitalize rounded-lg"
                         text
                         outlined
                         @click="unfollow(topic.id)"
@@ -54,7 +54,7 @@
                       </v-btn>
                       <v-btn
                         v-else
-                        class="text-capitalize"
+                        class="text-capitalize rounded-lg"
                         text
                         outlined
                         @click="follow(topic.id)"
@@ -66,7 +66,7 @@
                   <section v-else>
                     <v-btn
                       v-if="subscribe"
-                      class="text-capitalize"
+                      class="text-capitalize rounded-lg"
                       text
                       outlined
                       @click="unfollow(topic.id)"
@@ -75,7 +75,7 @@
                     </v-btn>
                     <v-btn
                       v-else
-                      class="text-capitalize"
+                      class="text-capitalize rounded-lg"
                       text
                       outlined
                       @click="follow(topic.id)"
@@ -85,10 +85,14 @@
                   </section>
                 </v-col>
                 <v-spacer v-if="isAdmin || moderating.includes(topic.id)" />
-                <v-col v-if="isAdmin || moderating.includes(topic.id)" cols="auto" style="max-width: 10rem">
+                <v-col
+                  v-if="isAdmin || moderating.includes(topic.id)"
+                  cols="auto"
+                  style="max-width: 10rem"
+                >
                   <v-btn
                     v-if="isAdmin"
-                    class="text-capitalize"
+                    class="text-capitalize rounded-lg"
                     text
                     outlined
                     @click="
@@ -98,7 +102,7 @@
                   </v-btn>
                   <v-btn
                     v-if="moderating.includes(topic.id)"
-                    class="text-capitalize"
+                    class="text-capitalize rounded-lg"
                     text
                     outlined
                     @click="
@@ -443,7 +447,7 @@ export default {
     },
     moderating() {
       return this.$store.state.lists.isModerating
-    }
+    },
   },
   watch: {
     topic() {

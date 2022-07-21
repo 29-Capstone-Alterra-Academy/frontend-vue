@@ -2,7 +2,7 @@
   <section>
     <v-btn
       v-if="isAdmin"
-      class="text-capitalize"
+      class="text-capitalize rounded-lg"
       text
       outlined
       @click="$router.push(`/user/${user.id}`)"
@@ -24,7 +24,7 @@
         >
           <v-btn
             v-if="userdata.follow"
-            class="text-capitalize"
+            class="text-capitalize rounded-lg"
             text
             outlined
             @click="unfollowing(user.id)"
@@ -33,7 +33,7 @@
           </v-btn>
           <v-btn
             v-else
-            class="text-capitalize"
+            class="text-capitalize rounded-lg"
             text
             outlined
             @click="following(user.id)"
@@ -45,7 +45,7 @@
       <section v-else>
         <v-btn
           v-if="follow"
-          class="text-capitalize"
+          class="text-capitalize rounded-lg"
           text
           outlined
           @click="unfollowing(user.id)"
@@ -54,7 +54,7 @@
         </v-btn>
         <v-btn
           v-else
-          class="text-capitalize"
+          class="text-capitalize rounded-lg"
           text
           outlined
           @click="following(user.id)"

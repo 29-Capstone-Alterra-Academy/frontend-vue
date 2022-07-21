@@ -49,7 +49,7 @@
           >
             <v-btn
               v-if="userdata.follow"
-              class="text-capitalize"
+              class="text-capitalize rounded-lg"
               text
               outlined
               small
@@ -59,7 +59,7 @@
             </v-btn>
             <v-btn
               v-else
-              class="text-capitalize"
+              class="text-capitalize rounded-lg"
               text
               outlined
               small
@@ -72,7 +72,7 @@
         <section v-else>
           <v-btn
             v-if="follow"
-            class="text-capitalize"
+            class="text-capitalize rounded-lg"
             text
             outlined
             small
@@ -82,7 +82,7 @@
           </v-btn>
           <v-btn
             v-else
-            class="text-capitalize"
+            class="text-capitalize rounded-lg"
             text
             outlined
             small

@@ -2,7 +2,7 @@
   <section>
     <v-btn
       v-if="isAdmin"
-      class="text-capitalize"
+      class="text-capitalize rounded-lg"
       text
       outlined
       @click="$router.push(`/topic/${topic.id}/details-admin`)"
@@ -10,7 +10,7 @@
     </v-btn>
     <v-btn
       v-if="!isAdmin && profile.username === 'moderator'"
-      class="text-capitalize"
+      class="text-capitalize rounded-lg"
       text
       outlined
       @click="$router.push(`/topic/${topic.id}/details`)"
@@ -32,7 +32,7 @@
         >
           <v-btn
             v-if="topicdata.subscribe"
-            class="text-capitalize"
+            class="text-capitalize rounded-lg"
             text
             outlined
             @click="unfollow(topic.id)"
@@ -41,7 +41,7 @@
           </v-btn>
           <v-btn
             v-else
-            class="text-capitalize"
+            class="text-capitalize rounded-lg"
             text
             outlined
             @click="follow(topic.id)"
@@ -53,7 +53,7 @@
       <section v-else>
         <v-btn
           v-if="subscribe"
-          class="text-capitalize"
+          class="text-capitalize rounded-lg"
           text
           outlined
           @click="unfollow(topic.id)"
@@ -62,7 +62,7 @@
         </v-btn>
         <v-btn
           v-else
-          class="text-capitalize"
+          class="text-capitalize rounded-lg"
           text
           outlined
           @click="follow(topic.id)"

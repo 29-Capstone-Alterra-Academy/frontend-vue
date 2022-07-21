@@ -37,10 +37,10 @@
                         <v-col>
                           <div class="font-weight-bold d-flex pt-5">
                             <span class="mr-5">{{ item.username }}</span>
-                            <span>{{ item.time + ' jam yang lalu' }}</span>
+                            <span>{{ item.time + ' hari yang lalu' }}</span>
                           </div>
                           <div class="d-flex my-3">
-                            <span class="mr-5"> Membalas komentar kamu : </span>
+                            <span class="mr-3"> Membalas komentar kamu : </span>
                             <span class="font-weight-bold">
                               {{ item.reply }}
                             </span>
@@ -83,7 +83,7 @@ export default {
       notification: [
         {
           username: '@timqe1',
-          time: 1,
+          time: 2,
           reply: 'coba tebak dari mana',
           comment: 'Dari mana aja itu?? Pengen juga',
           image: 'https://dummyimage.com/500x500/6e6e6e/fff.jpg',

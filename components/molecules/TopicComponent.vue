@@ -35,7 +35,7 @@
       </v-btn>
       <v-btn
         v-if="!isAdmin && moderating"
-        class="text-capitalize"
+        class="text-capitalize rounded-lg"
         text
         outlined
         small
@@ -58,7 +58,7 @@
           >
             <v-btn
               v-if="topicdata.subscribe"
-              class="text-capitalize"
+              class="text-capitalize rounded-lg"
               text
               outlined
               small
@@ -68,7 +68,7 @@
             </v-btn>
             <v-btn
               v-else
-              class="text-capitalize"
+              class="text-capitalize rounded-lg"
               text
               outlined
               small
@@ -81,7 +81,7 @@
         <section v-else>
           <v-btn
             v-if="subscribe"
-            class="text-capitalize"
+            class="text-capitalize rounded-lg"
             text
             outlined
             small
@@ -91,7 +91,7 @@
           </v-btn>
           <v-btn
             v-else
-            class="text-capitalize"
+            class="text-capitalize rounded-lg"
             text
             outlined
             small
@@ -134,8 +134,8 @@ export default {
     },
     moderating: {
       type: Boolean,
-      required: true
-    }
+      required: true,
+    },
   },
   computed: {
     ...mapGetters('lists', ['isAdmin']),
