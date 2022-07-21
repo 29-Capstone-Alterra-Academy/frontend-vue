@@ -47,9 +47,9 @@
               <v-spacer />
               <small>
                 Lupa
-                <nuxt-link to="/registrasi">Username</nuxt-link>
+                <nuxt-link to="/forgot-password">Username</nuxt-link>
                 atau
-                <nuxt-link to="/registrasi">Password</nuxt-link>?
+                <nuxt-link to="/forgot-password">Password</nuxt-link>?
               </small>
               <v-btn
                 type="submit"

@@ -1,7 +1,7 @@
 <template>
   <v-app>
     <v-snackbar v-model="snackbar" :timeout="5000">
-      Username yang anda masukkan telah digunakan
+      Password yang anda masukkan tidak memenuhi syarat
       <template #action="{ attrs }">
         <v-btn color="warning" text v-bind="attrs" @click="snackbar = false"
           >Close</v-btn
@@ -17,30 +17,8 @@
         </v-row>
         <v-list-item three-line>
           <v-list-item-content>
-            <h1 class="mb-4">Daftar</h1>
-            <v-form v-model="valid" @submit.prevent="register">
-              <v-text-field
-                v-model="email"
-                :rules="emailRules"
-                placeholder="E-mail"
-                required
-                outlined
-                dense
-                clearable
-                class="rounded-lg py-2"
-                hide-details="auto"
-              ></v-text-field>
-              <v-text-field
-                v-model="username"
-                :rules="nameRules"
-                placeholder="Username"
-                required
-                outlined
-                dense
-                clearable
-                class="rounded-lg py-2"
-                hide-details="auto"
-              ></v-text-field>
+            <h1 class="mb-4">Reset Password</h1>
+            <v-form v-model="valid" @submit.prevent="reset">
               <v-text-field
                 id="password"
                 v-model="password"
@@ -78,7 +56,7 @@
                 style="width: 100%"
                 :disabled="!valid"
               >
-                Daftar
+                Reset Password
               </v-btn>
             </v-form>
             <v-spacer />
@@ -102,26 +80,10 @@ export default {
   data() {
     return {
       valid: false,
-      username: '',
       password: '',
       confirmPassword: '',
-      email: '',
       message: '',
       snackbar: false,
-      showPassword: false,
-      showPassword2: false,
-      nameRules: [
-        (v) => !!v || 'Masukkan username anda',
-        (value) =>
-          (value && value.length >= 8) || 'Username minimal 6 karakter',
-      ],
-      emailRules: [
-        (v) => !!v || 'Masukkan alamat e-mail anda',
-        (v) =>
-          !v ||
-          /^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/.test(v) ||
-          'E-mail tidak valid',
-      ],
       rules: [
         (value) => !!value || 'Masukkan password anda',
         (value) =>
@@ -150,15 +112,13 @@ export default {
   },
   methods: {
     ...mapMutations('auth', ['setAccessToken', 'setRefreshToken']),
-    register() {
+    reset() {
       this.message = ''
       this.$axios
         .post(
-          '/register',
+          '/reset/newpassword',
           {
-            email: this.email,
-            username: this.username,
-            password: this.password,
+            newpassword: this.password,
           },
           {
             headers: {
@@ -167,7 +127,7 @@ export default {
           }
         )
         .then((response) => {
-          this.$router.push('/login')
+          this.$router.push('/verify')
         })
         .catch((error) => {
           this.message = error.message
