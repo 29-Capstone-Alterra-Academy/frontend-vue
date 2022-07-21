@@ -133,23 +133,15 @@
             <template #[`item.created_at`]="{ item }">
               <DateShortener :date="item.created_at" />
             </template>
-            <template #[`item.followers`]="{ item }">
-              <FollowerShortener :follower="item.followers_count" />
-            </template>
             <template #[`item.status`]="{}">
               <v-chip color="green" outlined> Moderator </v-chip>
             </template>
+            <template #[`item.delete`]="{}">
+              <v-btn class="rounded-lg" color="error" @click="reject()">
+                <v-icon class=""> mdi-delete </v-icon>
+              </v-btn>
+            </template>
           </v-data-table>
-          <template #[`item.delete`]="{ item }">
-            <v-btn
-              class="mx-2"
-              text
-              outlined
-              @click="$router.push(`/topic/${item.id}/details-admin`)"
-            >
-              Delete
-            </v-btn>
-          </template>
         </v-col>
       </v-row>
     </v-card>
@@ -193,8 +185,6 @@ export default {
         },
         { text: 'Status', align: 'center', value: 'status' },
         { text: 'Post Created', align: 'center', value: 'created_at' },
-        { text: 'Followers', align: 'center', value: 'followers' },
-        { text: 'Likes Received', align: 'center', value: 'likes' },
         { text: 'Actions', align: 'center', value: 'delete' },
       ],
     }
