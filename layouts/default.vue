@@ -105,11 +105,11 @@
           <v-divider />
         </v-list>
         <v-list>
-          <v-list-item to="/">
+          <!-- <v-list-item to="/">
             <v-list-item-content>
               <v-list-item-title class="body-2" v-text="`Settings`" />
             </v-list-item-content>
-          </v-list-item>
+          </v-list-item> -->
           <v-list-item @click="handleLogout">
             <v-list-item-content>
               <v-list-item-title

@@ -6,7 +6,7 @@
         style="text-decoration: none; color: black"
       >
         <v-row>
-          <v-col cols="2" class="pr-0" style="max-width: 3rem">
+          <v-col cols="1" class="pr-0" style="max-width: 3rem">
             <div class="text-overline">{{ index + 1 }}.</div>
           </v-col>
           <v-col cols="2" class="px-2" style="max-width: 45px">
@@ -26,9 +26,10 @@
     <v-col cols="2" class="pr-4" style="max-width: 10rem">
       <v-btn
         v-if="isAdmin"
-        class="text-capitalize"
+        class="text-capitalize rounded-lg"
         text
         outlined
+        small
         @click="$router.push(`/user/${user.id}`)"
         >Details
       </v-btn>
@@ -51,6 +52,7 @@
               class="text-capitalize"
               text
               outlined
+              small
               @click="unfollowing(user.id)"
             >
               Unfollow
@@ -60,6 +62,7 @@
               class="text-capitalize"
               text
               outlined
+              small
               @click="following(user.id)"
             >
               Follow
@@ -72,6 +75,7 @@
             class="text-capitalize"
             text
             outlined
+            small
             @click="unfollowing(user.id)"
           >
             Unfollow
@@ -81,6 +85,7 @@
             class="text-capitalize"
             text
             outlined
+            small
             @click="following(user.id)"
           >
             Follow

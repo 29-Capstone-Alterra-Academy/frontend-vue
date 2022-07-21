@@ -119,7 +119,14 @@
                       :key="topic.id"
                       cols="12"
                     >
-                      <TopicComponent :topic="topic" :topicsui="topicsui" :index="index" />
+                      <v-card class="rounded-lg list-card" flat>
+                        <TopicComponent
+                          class="mx-1 mt-1"
+                          :topic="topic"
+                          :topicsui="topicsui"
+                          :index="index"
+                        />
+                      </v-card>
                     </v-col>
                   </v-row>
                   <v-row justify="center" align="center">
@@ -152,7 +159,14 @@
                       :key="contributor.id"
                       cols="12"
                     >
-                      <UserComponent :user="contributor" :usersui="usersui" :index="index" />
+                      <v-card class="rounded-lg list-card" flat>
+                        <UserComponent
+                          class="mx-1 mt-1"
+                          :user="contributor"
+                          :usersui="usersui"
+                          :index="index"
+                        />
+                      </v-card>
                     </v-col>
                   </v-row>
                   <v-row justify="center" align="center">
@@ -251,7 +265,7 @@ export default {
       query: FETCH_TOPICS,
       variables() {
         return {
-          user_name: this.$store.state.lists.profile.username
+          user_name: this.$store.state.lists.profile.username,
         }
       },
       subscribeToMore: {
@@ -268,7 +282,7 @@ export default {
       query: FETCH_USERS,
       variables() {
         return {
-          user_name: this.$store.state.lists.profile.username
+          user_name: this.$store.state.lists.profile.username,
         }
       },
       subscribeToMore: {
@@ -361,5 +375,9 @@ export default {
 .v-tab.v-tab--active {
   border: 1px solid black;
   border-radius: 15px;
+}
+
+.list-card {
+  background-color: #fafafa;
 }
 </style>
