@@ -39,10 +39,11 @@
                             <span class="mr-5">{{ item.username }}</span>
                             <span>{{ item.time + ' jam yang lalu' }}</span>
                           </div>
-                          <div class="my-3">
-                            <span class="mr-5">{{
-                              'Membalas komentar kamu : ' + item.reply
-                            }}</span>
+                          <div class="d-flex my-3">
+                            <span class="mr-5"> Membalas komentar kamu : </span>
+                            <span class="font-weight-bold">
+                              {{ item.reply }}
+                            </span>
                           </div>
                           <div class="d-flex my-3">
                             <v-divider vertical bold></v-divider>

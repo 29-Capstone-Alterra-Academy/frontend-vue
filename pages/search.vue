@@ -46,7 +46,7 @@
                     :items-per-page="5"
                   >
                     <template #[`item.title`]="{ item }">
-                      <PostCard :thread="item" />
+                      <PostCard :thread="item" class="my-1" />
                     </template>
                   </v-data-table>
                 </section>
