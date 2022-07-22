@@ -106,7 +106,7 @@
             Add Moderators
           </v-btn>
         </v-col>
-        <AddModerators v-model="dialogMod" />
+        <AddModerators v-model="dialogMod" :topic="topic" />
       </v-row>
       <v-row>
         <v-col v-if="moderators">

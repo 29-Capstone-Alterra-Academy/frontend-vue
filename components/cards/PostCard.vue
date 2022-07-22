@@ -100,7 +100,7 @@
                   <FollowerShortener :follower="thread.reply_count" /> Comments
                 </p>
               </v-col>
-              <v-col>
+              <v-col v-if="!isAdmin">
                 <v-menu offset-y>
                   <template #activator="{ on, attrs }">
                     <p
@@ -114,7 +114,7 @@
                   </template>
                   <v-list class="pa-0">
                     <v-list-item
-                      v-if="isAdmin"
+                      v-if="thread.author.username === profile.username"
                       to="/"
                       @click="dialogAdmin = true"
                     >

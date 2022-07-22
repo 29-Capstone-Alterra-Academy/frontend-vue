@@ -1,5 +1,45 @@
 <template>
   <v-container class="py-0" style="width: 93.67%">
+    <v-snackbar v-model="snackbarDesc" :timeout="5000">
+      Deskripsi topik berhasil diubah
+      <template #action="{ attrs }">
+        <v-btn color="primary" text v-bind="attrs" @click="snackbarDesc = false"
+          >Close</v-btn
+        >
+      </template>
+    </v-snackbar>
+    <v-snackbar v-model="snackbarDescFalse" :timeout="5000">
+      Terjadi kesalahan saat mengubah deskripsi topik
+      <template #action="{ attrs }">
+        <v-btn
+          color="warning"
+          text
+          v-bind="attrs"
+          @click="snackbarDescFalse = false"
+          >Close</v-btn
+        >
+      </template>
+    </v-snackbar>
+    <v-snackbar v-model="snackbarRules" :timeout="5000">
+      Rules topik berhasil diubah
+      <template #action="{ attrs }">
+        <v-btn color="primary" text v-bind="attrs" @click="snackbarRules = false"
+          >Close</v-btn
+        >
+      </template>
+    </v-snackbar>
+    <v-snackbar v-model="snackbarRulesFalse" :timeout="5000">
+      Terjadi kesalahan saat mengubah rules topik
+      <template #action="{ attrs }">
+        <v-btn
+          color="warning"
+          text
+          v-bind="attrs"
+          @click="snackbarRulesFalse = false"
+          >Close</v-btn
+        >
+      </template>
+    </v-snackbar>
     <v-snackbar v-model="snackbarStepdown" :timeout="5000">
       Anda berhasil mengundurkan diri dari moderator
       <template #action="{ attrs }">
@@ -73,12 +113,10 @@
       <v-row align="center">
         <v-col cols="auto">
           <v-img
-            :src="
-              'https://staking-spade-production.up.railway.app' +
-              topic.profile_image
-            "
+            :src="topic.profile_image"
             class="rounded-circle"
             width="100"
+            height="100"
           ></v-img>
         </v-col>
         <v-col cols="auto">
@@ -428,6 +466,10 @@ export default {
       snackbarIgnoreFalse: false,
       snackbarStepdown: false,
       snackbarStepdownFalse: false,
+      snackbarDesc: false,
+      snackbarDescFalse: false,
+      snackbarRules: false,
+      snackbarRulesFalse: false,
       items: [{ tab: 'Rekomendasi', icon: 'mdi-fire' }, { tab: 'Mengikuti' }],
     }
   },
@@ -489,7 +531,6 @@ export default {
           console.log(response.data)
           if (response.status === 200) {
             this.snackbarStepdown = true
-            this.$emit('input', false)
           }
         })
         .catch((error) => {
@@ -505,41 +546,52 @@ export default {
       this.isEditRules = !this.isEditRules
     },
     submitDesc() {
-      //   const formData = new FormData()
-      //   formData.append('username', this.profile.username)
-      //   console.log(this.profile.username)
-      //   formData.append('bio', this.profile.bio)
-      //   console.log(this.profile.bio)
-      //   formData.append('email', this.profile.email)
-      //   console.log(this.profile.email)
-      //   formData.append('gender', this.profile.gender)
-      //   console.log(this.profile.gender)
-      //   formData.append('birth_date', this.profile.birth_date)
-      //   console.log(this.profile.date)
-      //   formData.append('profile_image', this.profile_image)
-      //   console.log(this.profile_image)
-      //   for (const pair of formData.entries()) {
-      //     console.log(pair[0] + ', ' + pair[1])
-      //   }
-      //   this.$axios
-      //     .put('/profile', formData, {
-      //       headers: {
-      //         'Content-Type': 'application/json',
-      //         Authorization: 'Bearer ' + this.$store.state.auth.accessToken,
-      //       },
-      //     })
-      //     .then((response) => {
-      //       console.log(response.data)
-      //       if (response.status === 200) {
-      //         this.snackbar = true
-      //         this.$emit('input', false)
-      //       }
-      //     })
-      //     .catch((error) => {
-      //       if (error.status) {
-      //         this.snackbarFalse = true
-      //       }
-      //     })
+      const formData = new FormData()
+      formData.append('description', this.topic.description)
+      formData.append('rules', this.topic.rules)
+      this.$axios
+        .put(`/topic/${this.$route.params.slug}`, formData, {
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: 'Bearer ' + this.$store.state.auth.accessToken,
+          },
+        })
+        .then((response) => {
+          console.log(response.data)
+          if (response.status === 201) {
+            this.snackbarDesc = true
+            this.editDesc()
+          }
+        })
+        .catch((error) => {
+          if (error.status) {
+            this.snackbarDescFalse = true
+          }
+        })
+    },
+    submitRules() {
+      const formData = new FormData()
+      formData.append('description', this.topic.description)
+      formData.append('rules', this.topic.rules)
+      this.$axios
+        .put(`/topic/${this.$route.params.slug}`, formData, {
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: 'Bearer ' + this.$store.state.auth.accessToken,
+          },
+        })
+        .then((response) => {
+          console.log(response.data)
+          if (response.status === 201) {
+            this.snackbarRules = true
+            this.editRules()
+          }
+        })
+        .catch((error) => {
+          if (error.status) {
+            this.snackbarRulesFalse = true
+          }
+        })
     },
     forwardThread(reporterId, threadId) {
       this.$axios

@@ -213,7 +213,7 @@ export default {
           (value && value.length <= 25) || 'Nama topik maksimal 25 karakter',
       ],
       dateRules: [
-        (value) => !!value || 'Masukkan jtanggal lahir anda',
+        (value) => !!value || 'Masukkan tanggal lahir anda',
         (value) =>
           (value && value.length <= 25) || 'Nama topik maksimal 25 karakter',
       ],

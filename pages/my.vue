@@ -43,7 +43,7 @@
               <v-col v-for="thread in threads" :key="thread.id" class="py-1">
                 <PostCard :thread="thread" />
               </v-col>
-              <Observer @intersect="intersected" />
+              <Observer v-if="!isFetching" @intersect="intersected" />
             </section>
             <section v-else>
               <v-tabs-items
@@ -59,7 +59,7 @@
                     >
                       <PostCard :thread="thread" />
                     </v-col>
-                    <Observer @intersect="intersected" />
+                    <Observer v-if="!isFetching" @intersect="intersected" />
                   </section>
                   <section v-if="item.tab == `Terbaru`">
                     <v-col
@@ -69,7 +69,7 @@
                     >
                       <PostCard :thread="thread" />
                     </v-col>
-                    <Observer @intersect="intersected" />
+                    <Observer v-if="!isFetching" @intersect="intersected" />
                   </section>
                 </v-tab-item>
               </v-tabs-items>
@@ -88,7 +88,7 @@
                   </v-list-item>
                 </v-card>
               </v-col>
-              <Observer @intersect="intersected" />
+              <Observer v-if="!isFetching" @intersect="intersected" />
             </section>
           </v-col>
         </v-row>
@@ -173,7 +173,13 @@
               </v-list-item>
             </v-card>
           </v-col>
-          <v-col cols="12" class="py-1">
+          <v-col
+            v-if="
+              topics.filter((item) => moderating.includes(item.id)).length > 0
+            "
+            cols="12"
+            class="py-1"
+          >
             <v-card class="rounded-lg" outlined>
               <v-list-item>
                 <v-list-item-content>
@@ -182,7 +188,13 @@
                     <v-divider />
                   </div>
                   <v-row>
-                    <v-col v-for="topic in topics.filter(item => moderating.includes(item.id))" :key="topic.id" cols="12">
+                    <v-col
+                      v-for="topic in topics.filter((item) =>
+                        moderating.includes(item.id)
+                      )"
+                      :key="topic.id"
+                      cols="12"
+                    >
                       <v-row>
                         <v-col>
                           <router-link
@@ -259,6 +271,7 @@ export default {
   data() {
     return {
       tab: null,
+      isFetching: false,
       items: [{ tab: 'Terpopuler', icon: 'mdi-fire' }, { tab: 'Terbaru' }],
       offset: 0,
       dialog: false,
@@ -317,6 +330,7 @@ export default {
   methods: {
     intersected() {
       if (this.newThreads.length === 5 || this.newThreads.length === 0) {
+        this.isFetching = true
         this.$axios
           .get(
             `/thread?userId=${this.$store.state.lists.profile.id}&limit=5&offset=${this.offset}`
@@ -325,6 +339,7 @@ export default {
             this.offset += 5
             this.newThreads = res.data
             this.threads = [...this.threads, ...this.newThreads]
+            this.isFetching = false
           })
           .catch((err) => {
             console.log(err)

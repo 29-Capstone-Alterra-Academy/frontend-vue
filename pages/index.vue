@@ -43,12 +43,12 @@
               </v-row>
             </v-card>
           </v-col>
-          <v-col v-if="threads.length > 0" cols="12" class="pa-0 pb-1">
+          <v-col cols="12" class="pa-0 pb-1">
             <section v-if="isAdmin" class="py-1 pt-2">
               <v-col v-for="thread in threads" :key="thread.id" class="py-1">
                 <PostCard :thread="thread" />
               </v-col>
-              <Observer @intersect="intersected" />
+              <Observer v-if="!isFetching" @intersect="intersected" />
             </section>
             <section v-else>
               <v-tabs-items
@@ -64,7 +64,7 @@
                     >
                       <PostCard :thread="thread" />
                     </v-col>
-                    <Observer @intersect="intersected" />
+                    <Observer v-if="!isFetching" @intersect="intersected" />
                   </section>
                   <section v-if="item.tab == `Mengikuti`">
                     <v-col
@@ -74,26 +74,10 @@
                     >
                       <PostCard :thread="thread" />
                     </v-col>
-                    <Observer @intersect="intersected" />
+                    <Observer v-if="!isFetching" @intersect="intersected" />
                   </section>
                 </v-tab-item>
               </v-tabs-items>
-            </section>
-          </v-col>
-          <v-col v-else cols="12" class="pa-0 pb-1">
-            <section class="py-1 pt-2">
-              <v-col class="py-0">
-                <v-card class="rounded-lg mx-auto" outlined>
-                  <v-list-item three-line>
-                    <v-list-item-content>
-                      <v-list-item-title class="text-h6 my-2">
-                        Ups ada yang salah nih
-                      </v-list-item-title>
-                    </v-list-item-content>
-                  </v-list-item>
-                </v-card>
-              </v-col>
-              <Observer @intersect="intersected" />
             </section>
           </v-col>
         </v-row>
@@ -249,6 +233,7 @@ export default {
   data() {
     return {
       tab: null,
+      isFetching: false,
       items: [
         { tab: 'Rekomendasi', icon: 'mdi-fire' },
         { tab: 'Mengikuti', icon: 'mdi-account' },
@@ -343,12 +328,14 @@ export default {
     },
     intersected() {
       if (this.newThreads.length === 5 || this.newThreads.length === 0) {
+        this.isFetching = true
         this.$axios
           .get(`/thread?topicId=1&limit=5&offset=${this.offset}`)
           .then((res) => {
             this.offset += 5
             this.newThreads = res.data
             this.threads = [...this.threads, ...this.newThreads]
+            this.isFetching = false
           })
           .catch((err) => {
             console.log(err)

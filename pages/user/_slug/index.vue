@@ -29,7 +29,7 @@
               style="background-color: transparent !important"
             >
               <v-tab-item v-for="item in items" :key="item.tab">
-                <section v-if="item.tab == `Terpopuler`">
+                <section v-if="item.tab == `Terpopuler` && threads.length > 0">
                   <v-col
                     v-for="thread in threads"
                     :key="thread.id"
@@ -38,21 +38,18 @@
                   >
                     <PostCard :thread="thread" />
                   </v-col>
-                  <Observer @intersect="intersected" />
+                  <Observer v-if="!isFetching" @intersect="intersected" />
                 </section>
-                <section v-if="item.tab == `Terbaru`">
+                <section v-if="item.tab == `Terbaru` && threads.length > 0">
                   <v-col
-                    v-for="(thread, index) in orderThreads.sort(
-                      (a, b) =>
-                        new Date(b.created_at).getTime() -
-                        new Date(a.created_at).getTime()
-                    )"
+                    v-for="(thread, index) in threads"
                     :key="index"
                     cols="12"
                     class="py-1"
                   >
                     <PostCard :thread="thread" />
                   </v-col>
+                  <Observer v-if="!isFetching" @intersect="intersected" />
                 </section>
               </v-tab-item>
             </v-tabs-items>
@@ -249,11 +246,11 @@
               </v-list-item>
             </v-card>
           </v-col>
-          <v-col cols="12" class="py-1">
+          <v-col v-if="topics.length > 0" cols="12" class="py-1">
             <v-card class="rounded-lg" outlined>
               <v-list-item three-line>
                 <v-list-item-content>
-                  <h4 class="text-capitalize mb-3">Moderator of</h4>
+                  <h4 class="text-capitalize mb-3">Topik yang diikuti</h4>
                   <div class="pb-5">
                     <v-divider />
                   </div>
@@ -339,17 +336,12 @@ export default {
     FollowerShortener,
   },
   middleware: 'authenticated',
-  props: {
-    searchPost: {
-      type: String,
-      default: '',
-    },
-  },
   data() {
     return {
       tab: null,
       reportUser: false,
       dialog: false,
+      isFetching: false,
       items: [{ tab: 'Terpopuler', icon: 'mdi-fire' }, { tab: 'Terbaru' }],
       offset: 0,
       threads: [],
@@ -359,28 +351,6 @@ export default {
   },
   computed: {
     ...mapGetters('lists', ['isAdmin']),
-    orderThreads() {
-      if (this.searchPost) {
-        const threads = this.$store.state.lists.threads.filter((item) => {
-          return item.author.username
-            .toLowerCase()
-            .includes(this.$route.params.slug.toLowerCase())
-        })
-        return threads.filter((item) => {
-          return (
-            item.title.toLowerCase().includes(this.searchPost.toLowerCase()) ||
-            item.author.username
-              .toLowerCase()
-              .includes(this.searchPost.toLowerCase())
-          )
-        })
-      }
-      return this.$store.state.lists.threads.filter((item) => {
-        return item.author.username
-          .toLowerCase()
-          .includes(this.$route.params.slug.toLowerCase())
-      })
-    },
     topics() {
       return this.$store.state.lists.topics
     },
@@ -431,6 +401,7 @@ export default {
   watch: {
     user() {
       this.reportedUser()
+      this.intersected()
     },
   },
   created() {
@@ -460,6 +431,7 @@ export default {
     },
     intersected() {
       if (this.newThreads.length === 5 || this.newThreads.length === 0) {
+        this.isFetching = true
         this.$axios
           .get(
             `/thread?userId=${this.$route.params.slug}&limit=5&offset=${this.offset}`
@@ -468,6 +440,7 @@ export default {
             this.offset += 5
             this.newThreads = res.data
             this.threads = [...this.threads, ...this.newThreads]
+            this.isFetching = false
           })
           .catch((err) => {
             console.log(err)

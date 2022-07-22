@@ -77,7 +77,10 @@
                         </v-list-item-content>
                       </v-list-item>
                     </v-card>
-                    <Observer v-if="search === '' || search === null" @intersect="intersected" />
+                    <Observer
+                      v-if="search === '' || search === null"
+                      @intersect="intersected"
+                    />
                   </div>
                   <template slot="selection" slot-scope="data">
                     <v-row v-row align="center" class="pa-1">
@@ -322,13 +325,27 @@ export default {
         '1. Selalu ingat postingan Anda akan dibaca banyak orang\n2. Berperilaku seperti yang Anda lakukan di kehidupan nyata\n3. Cari sumber konten asli\n4. Cari duplikat sebelum memposting\n5. Baca aturan Topik\n',
     }
   },
+  computed: {
+    followedTopics() {
+      return this.$store.state.lists.topics
+    },
+    profile() {
+      return this.$store.state.lists.profile
+    },
+  },
   watch: {
     dialog() {
       this.intersected()
     },
+    profile() {
+      this.$store.dispatch(
+        'lists/fetchFollowedTopics',
+        this.$store.state.lists.profile.id
+      )
+    },
   },
-  created() {
-    this.$store.dispatch('lists/fetchTopics')
+  mounted() {
+    this.$store.dispatch('lists/loggedUser')
   },
   methods: {
     onButtonClick() {
@@ -425,7 +442,9 @@ export default {
     intersected() {
       if (this.newTopics.length === 5 || this.newTopics.length === 0) {
         this.$axios
-          .get(`/topic?userId=${this.$store.state.lists.profile.id}&limit=5&offset=${this.offset}`)
+          .get(
+            `/topic?userId=${this.$store.state.lists.profile.id}&limit=5&offset=${this.offset}`
+          )
           .then((res) => {
             if (res.data.length !== 0) {
               this.offset += 5
@@ -448,6 +467,10 @@ export default {
         .get(`/search?scope=topic&keyword=${this.search}&limit=100&offset=0`)
         .then((res) => {
           this.topics = [...res.data]
+          this.topics = this.topics.filter(
+            item =>
+              this.followedTopics.some(subItem => subItem.id === item.id)
+          )
         })
         .catch((err) => {
           console.log(err)

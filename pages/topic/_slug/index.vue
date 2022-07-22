@@ -178,7 +178,7 @@
                       >
                         <PostCard :thread="thread" :istopic="true" />
                       </v-col>
-                      <Observer @intersect="intersected" />
+                      <Observer v-if="!isFetching" @intersect="intersected" />
                     </section>
                     <section v-if="item.tab == `Mengikuti`">
                       <v-col
@@ -189,7 +189,7 @@
                       >
                         <PostCard :thread="thread" :istopic="true" />
                       </v-col>
-                      <Observer @intersect="intersected" />
+                      <Observer v-if="!isFetching" @intersect="intersected" />
                     </section>
                   </v-tab-item>
                 </v-tabs-items>
@@ -407,6 +407,7 @@ export default {
     return {
       tab: null,
       reportTopic: false,
+      isFetching: false,
       items: [{ tab: 'Rekomendasi', icon: 'mdi-fire' }, { tab: 'Mengikuti' }],
       subscribe: false,
       snackbarMod: false,
@@ -509,6 +510,7 @@ export default {
     },
     intersected() {
       if (this.newThreads.length === 2 || this.newThreads.length === 0) {
+        this.isFetching = true
         this.$axios
           .get(
             `/thread?topicId=${this.$route.params.slug}&limit=2&offset=${this.offset}`
@@ -517,6 +519,7 @@ export default {
             this.offset += 2
             this.newThreads = res.data
             this.threads = [...this.threads, ...this.newThreads]
+            this.isFetching = false
           })
           .catch((err) => {
             console.log(err)
