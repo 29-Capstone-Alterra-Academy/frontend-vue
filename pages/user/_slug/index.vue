@@ -587,7 +587,7 @@ export default {
             }
           })
           .catch((error) => {
-            (error)console.log
+            console.log(error)
           })
       }
     },

@@ -169,7 +169,7 @@
                   style="background-color: transparent !important"
                 >
                   <v-tab-item v-for="item in items" :key="item.tab">
-                    <section v-if="item.tab == `Rekomendasi`">
+                    <section v-if="item.tab == `Populer`">
                       <v-col
                         v-for="thread in threads"
                         :key="thread.id"
@@ -180,7 +180,7 @@
                       </v-col>
                       <Observer v-if="!isFetching" @intersect="intersected" />
                     </section>
-                    <section v-if="item.tab == `Mengikuti`">
+                    <section v-if="item.tab == `Terbaru`">
                       <v-col
                         v-for="thread in threads"
                         :key="thread.id"
@@ -408,7 +408,7 @@ export default {
       tab: null,
       reportTopic: false,
       isFetching: false,
-      items: [{ tab: 'Rekomendasi', icon: 'mdi-fire' }, { tab: 'Mengikuti' }],
+      items: [{ tab: 'Populer', icon: 'mdi-fire' }, { tab: 'Terbaru' }],
       subscribe: false,
       snackbarMod: false,
       snackbarFalseMod: false,
