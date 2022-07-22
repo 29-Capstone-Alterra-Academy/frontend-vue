@@ -119,7 +119,7 @@
                       @click="dialogAdmin = true"
                     >
                       <v-list-item-action>
-                        <v-icon>mdi-bullhorn-outline</v-icon>
+                        <v-icon>mdi-delete-outline</v-icon>
                       </v-list-item-action>
                       <v-list-item-content>
                         <v-list-item-title v-text="`Hapus`" />
