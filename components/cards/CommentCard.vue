@@ -113,17 +113,6 @@
                   <v-list-item-title v-text="`Laporkan`" />
                 </v-list-item-content>
               </v-list-item>
-              <v-list-item
-                v-if="reply.author.username === profile.username"
-                @click="dialogEdit = true"
-              >
-                <v-list-item-action>
-                  <v-icon>mdi-bullhorn-outline</v-icon>
-                </v-list-item-action>
-                <v-list-item-content>
-                  <v-list-item-title v-text="`Edit`" />
-                </v-list-item-content>
-              </v-list-item>
             </v-list>
           </v-menu>
           <DeleteComment v-model="dialogAdmin" :reply="reply" />
