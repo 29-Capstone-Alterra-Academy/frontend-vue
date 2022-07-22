@@ -528,7 +528,6 @@ export default {
           }
         )
         .then((response) => {
-          console.log(response.data)
           if (response.status === 200) {
             this.snackbarStepdown = true
           }
@@ -557,7 +556,6 @@ export default {
           },
         })
         .then((response) => {
-          console.log(response.data)
           if (response.status === 201) {
             this.snackbarDesc = true
             this.editDesc()
@@ -581,7 +579,6 @@ export default {
           },
         })
         .then((response) => {
-          console.log(response.data)
           if (response.status === 201) {
             this.snackbarRules = true
             this.editRules()
