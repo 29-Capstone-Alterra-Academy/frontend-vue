@@ -266,11 +266,7 @@
                             style="text-decoration: none; color: black"
                           >
                             <v-row>
-                              <v-col
-                                cols="2"
-                                class="px-2"
-                                style="max-width: 45px"
-                              >
+                              <v-col cols="3" class="mx-2">
                                 <v-img
                                   :src="topic.profile_image"
                                   class="rounded-circle"

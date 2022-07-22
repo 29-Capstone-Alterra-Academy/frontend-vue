@@ -11,6 +11,7 @@
             :src="topic.profile_image"
             class="rounded-circle"
             width="100"
+            height="100"
           ></v-img>
         </v-col>
         <v-col cols="auto">
