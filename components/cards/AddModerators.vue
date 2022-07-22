@@ -60,7 +60,11 @@
       <v-card-text>
         <v-data-table
           :headers="user"
-          :items="users"
+          :items="
+            users.filter((item) => {
+              return item.topic.id === topic.id
+            })
+          "
           :search="search"
           flat
           class="elevation-1"
@@ -108,6 +112,10 @@ export default {
       type: Boolean,
       default: false,
     },
+    topic: {
+      type: Object,
+      required: true,
+    },
   },
   data() {
     return {
@@ -149,11 +157,15 @@ export default {
   methods: {
     acc(param) {
       this.$axios
-        .put(`/modrequest?promotionId=${param}&action=approve`, {}, {
-          headers: {
-            Authorization: 'Bearer ' + this.$store.state.auth.accessToken,
-          },
-        })
+        .put(
+          `/modrequest?promotionId=${param}&action=approve`,
+          {},
+          {
+            headers: {
+              Authorization: 'Bearer ' + this.$store.state.auth.accessToken,
+            },
+          }
+        )
         .then((response) => {
           if (response.status === 200) {
             this.snackbar = true
@@ -167,11 +179,15 @@ export default {
     },
     rej(param) {
       this.$axios
-        .put(`/modrequest?promotionId=${param}&action=reject`, {}, {
-          headers: {
-            Authorization: 'Bearer ' + this.$store.state.auth.accessToken,
-          },
-        })
+        .put(
+          `/modrequest?promotionId=${param}&action=reject`,
+          {},
+          {
+            headers: {
+              Authorization: 'Bearer ' + this.$store.state.auth.accessToken,
+            },
+          }
+        )
         .then((response) => {
           if (response.status === 200) {
             this.snackbarReject = true

@@ -169,7 +169,7 @@
                   style="background-color: transparent !important"
                 >
                   <v-tab-item v-for="item in items" :key="item.tab">
-                    <section v-if="item.tab == `Rekomendasi`">
+                    <section v-if="item.tab == `Populer`">
                       <v-col
                         v-for="thread in threads"
                         :key="thread.id"
@@ -178,9 +178,9 @@
                       >
                         <PostCard :thread="thread" :istopic="true" />
                       </v-col>
-                      <Observer @intersect="intersected" />
+                      <Observer v-if="!isFetching" @intersect="intersected" />
                     </section>
-                    <section v-if="item.tab == `Mengikuti`">
+                    <section v-if="item.tab == `Terbaru`">
                       <v-col
                         v-for="thread in threads"
                         :key="thread.id"
@@ -189,7 +189,7 @@
                       >
                         <PostCard :thread="thread" :istopic="true" />
                       </v-col>
-                      <Observer @intersect="intersected" />
+                      <Observer v-if="!isFetching" @intersect="intersected" />
                     </section>
                   </v-tab-item>
                 </v-tabs-items>
@@ -407,7 +407,8 @@ export default {
     return {
       tab: null,
       reportTopic: false,
-      items: [{ tab: 'Rekomendasi', icon: 'mdi-fire' }, { tab: 'Mengikuti' }],
+      isFetching: false,
+      items: [{ tab: 'Populer', icon: 'mdi-fire' }, { tab: 'Terbaru' }],
       subscribe: false,
       snackbarMod: false,
       snackbarFalseMod: false,
@@ -480,7 +481,6 @@ export default {
           }
         })
         .catch((err) => {
-          console.log(err)
           if (err) {
             this.snackbarFalseMod = true
           }
@@ -509,6 +509,7 @@ export default {
     },
     intersected() {
       if (this.newThreads.length === 2 || this.newThreads.length === 0) {
+        this.isFetching = true
         this.$axios
           .get(
             `/thread?topicId=${this.$route.params.slug}&limit=2&offset=${this.offset}`
@@ -517,6 +518,7 @@ export default {
             this.offset += 2
             this.newThreads = res.data
             this.threads = [...this.threads, ...this.newThreads]
+            this.isFetching = false
           })
           .catch((err) => {
             console.log(err)

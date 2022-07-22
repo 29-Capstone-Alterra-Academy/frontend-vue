@@ -59,16 +59,26 @@
                     class="elevation-1"
                   >
                     <template #[`item.name`]="{ item }">
-                      <router-link
-                        :to="`/topic/${item.id}`"
-                        style="text-decoration: none; color: black"
-                      >
-                        <TopicShortener
-                          v-if="item.name != null"
-                          :name="item.name"
-                        />
-                        <section v-else>{{ item.name }}</section>
-                      </router-link>
+                      <div class="d-flex">
+                        <v-img
+                          :src="item.profile_image"
+                          class="rounded-circle"
+                          max-width="25"
+                          max-height="25"
+                        ></v-img>
+                        <span class="px-2">
+                          <router-link
+                            :to="`/topic/${item.id}`"
+                            style="text-decoration: none; color: black"
+                          >
+                            <TopicShortener
+                              v-if="item.name != null"
+                              :name="item.name"
+                            />
+                            <section v-else>{{ item.name }}</section>
+                          </router-link>
+                        </span>
+                      </div>
                     </template>
                     <template #[`item.details`]="{ item }">
                       <TopicTableComponent :topic="item" :topicsui="topicsui" />
@@ -84,16 +94,26 @@
                     :items-per-page="5"
                   >
                     <template #[`item.username`]="{ item }">
-                      <router-link
-                        :to="`/user/${item.id}`"
-                        style="text-decoration: none; color: black"
-                      >
-                        <NameShortener
-                          v-if="item.username != null"
-                          :username="item.username"
-                        />
-                        <section v-else>{{ item.username }}</section>
-                      </router-link>
+                      <div class="d-flex">
+                        <v-img
+                          :src="item.profile_image"
+                          class="rounded-circle"
+                          max-width="25"
+                          max-height="25"
+                        ></v-img>
+                        <span class="px-2">
+                          <router-link
+                            :to="`/user/${item.id}`"
+                            style="text-decoration: none; color: black"
+                          >
+                            <NameShortener
+                              v-if="item.username != null"
+                              :username="item.username"
+                            />
+                            <section v-else>{{ item.username }}</section>
+                          </router-link>
+                        </span>
+                      </div>
                     </template>
                     <template #[`item.details`]="{ item }">
                       <v-btn

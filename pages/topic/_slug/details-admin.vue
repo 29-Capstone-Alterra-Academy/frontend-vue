@@ -11,6 +11,7 @@
             :src="topic.profile_image"
             class="rounded-circle"
             width="100"
+            height="100"
           ></v-img>
         </v-col>
         <v-col cols="auto">
@@ -105,7 +106,7 @@
             Add Moderators
           </v-btn>
         </v-col>
-        <AddModerators v-model="dialogMod" />
+        <AddModerators v-model="dialogMod" :topic="topic" />
       </v-row>
       <v-row>
         <v-col v-if="moderators">
@@ -133,23 +134,15 @@
             <template #[`item.created_at`]="{ item }">
               <DateShortener :date="item.created_at" />
             </template>
-            <template #[`item.followers`]="{ item }">
-              <FollowerShortener :follower="item.followers_count" />
-            </template>
             <template #[`item.status`]="{}">
               <v-chip color="green" outlined> Moderator </v-chip>
             </template>
+            <template #[`item.delete`]="{}">
+              <v-btn class="rounded-lg" color="error" @click="reject()">
+                <v-icon class=""> mdi-delete </v-icon>
+              </v-btn>
+            </template>
           </v-data-table>
-          <template #[`item.delete`]="{ item }">
-            <v-btn
-              class="mx-2"
-              text
-              outlined
-              @click="$router.push(`/topic/${item.id}/details-admin`)"
-            >
-              Delete
-            </v-btn>
-          </template>
         </v-col>
       </v-row>
     </v-card>
@@ -193,8 +186,6 @@ export default {
         },
         { text: 'Status', align: 'center', value: 'status' },
         { text: 'Post Created', align: 'center', value: 'created_at' },
-        { text: 'Followers', align: 'center', value: 'followers' },
-        { text: 'Likes Received', align: 'center', value: 'likes' },
         { text: 'Actions', align: 'center', value: 'delete' },
       ],
     }

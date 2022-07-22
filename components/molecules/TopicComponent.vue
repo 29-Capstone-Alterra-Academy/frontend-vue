@@ -23,7 +23,7 @@
         </v-row>
       </router-link>
     </v-col>
-    <v-col cols="2" class="pr-4" style="max-width: 10rem">
+    <v-col cols="2" class="" style="max-width: 10rem">
       <v-btn
         v-if="isAdmin"
         class="text-capitalize rounded-lg"

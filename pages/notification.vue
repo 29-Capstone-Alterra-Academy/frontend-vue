@@ -68,7 +68,7 @@
 <script>
 export default {
   name: 'NotificationList',
-  middleware: ['authenticated', 'admin'],
+  middleware: 'authenticated',
   data() {
     return {
       search: '',

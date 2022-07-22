@@ -64,7 +64,7 @@
               <v-col v-if="!isAdmin" cols="auto">
                 <v-icon> mdi-bell-outline </v-icon>
               </v-col>
-              <v-col cols="auto">
+              <v-col v-if="!isAdmin" cols="auto">
                 <v-menu offset-y>
                   <template #activator="{ on, attrs }">
                     <p
@@ -78,12 +78,12 @@
                   </template>
                   <v-list class="pa-0">
                     <v-list-item
-                      v-if="isAdmin"
+                      v-if="thread.author.username === profile.username"
                       to="/"
                       @click="dialogAdmin = true"
                     >
                       <v-list-item-action>
-                        <v-icon>mdi-bullhorn-outline</v-icon>
+                        <v-icon>mdi-delete-outline</v-icon>
                       </v-list-item-action>
                       <v-list-item-content>
                         <v-list-item-title v-text="`Hapus`" />
@@ -100,17 +100,6 @@
                       </v-list-item-action>
                       <v-list-item-content>
                         <v-list-item-title v-text="`Laporkan`" />
-                      </v-list-item-content>
-                    </v-list-item>
-                    <v-list-item
-                      v-if="thread.author.username === profile.username"
-                      @click="dialogEdit = true"
-                    >
-                      <v-list-item-action>
-                        <v-icon>mdi-bullhorn-outline</v-icon>
-                      </v-list-item-action>
-                      <v-list-item-content>
-                        <v-list-item-title v-text="`Edit`" />
                       </v-list-item-content>
                     </v-list-item>
                   </v-list>
@@ -295,7 +284,7 @@
               <CommentCard :reply="reply" @change="refetchReplies" />
             </v-col>
           </div>
-          <Observer @intersect="intersected" />
+          <Observer v-if="!isFetching" @intersect="intersected" />
         </v-list-item-content>
       </v-list-item>
     </v-card-actions>
@@ -343,6 +332,7 @@ export default {
       comment: null,
       addedImages: [],
       images: [],
+      isFetching: false,
       liked: false,
       unliked: false,
       dialog: false,
@@ -450,6 +440,7 @@ export default {
     },
     intersected() {
       if (this.newReplies.length === 5 || this.newReplies.length === 0) {
+        this.isFetching = true
         this.$axios
           .get(
             `reply?scope=thread&limit=5&offset=${this.offset}&threadId=${this.$route.params.post}`,
@@ -465,6 +456,7 @@ export default {
               this.offset += 5
               this.newReplies = res.data
               this.replies = [...this.replies, ...this.newReplies]
+              this.isFetching = false
             }
           })
           .catch((err) => {

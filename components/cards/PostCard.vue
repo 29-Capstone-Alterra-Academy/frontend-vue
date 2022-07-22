@@ -100,7 +100,7 @@
                   <FollowerShortener :follower="thread.reply_count" /> Comments
                 </p>
               </v-col>
-              <v-col>
+              <v-col v-if="!isAdmin">
                 <v-menu offset-y>
                   <template #activator="{ on, attrs }">
                     <p
@@ -114,12 +114,12 @@
                   </template>
                   <v-list class="pa-0">
                     <v-list-item
-                      v-if="isAdmin"
+                      v-if="thread.author.username === profile.username"
                       to="/"
                       @click="dialogAdmin = true"
                     >
                       <v-list-item-action>
-                        <v-icon>mdi-bullhorn-outline</v-icon>
+                        <v-icon>mdi-delete-outline</v-icon>
                       </v-list-item-action>
                       <v-list-item-content>
                         <v-list-item-title v-text="`Hapus`" />
@@ -136,17 +136,6 @@
                       </v-list-item-action>
                       <v-list-item-content>
                         <v-list-item-title v-text="`Laporkan`" />
-                      </v-list-item-content>
-                    </v-list-item>
-                    <v-list-item
-                      v-if="thread.author.username === profile.username"
-                      @click="dialogEdit = true"
-                    >
-                      <v-list-item-action>
-                        <v-icon>mdi-bullhorn-outline</v-icon>
-                      </v-list-item-action>
-                      <v-list-item-content>
-                        <v-list-item-title v-text="`Edit`" />
                       </v-list-item-content>
                     </v-list-item>
                   </v-list>

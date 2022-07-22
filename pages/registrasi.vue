@@ -113,7 +113,7 @@ export default {
       nameRules: [
         (v) => !!v || 'Masukkan username anda',
         (value) =>
-          (value && value.length >= 8) || 'Username minimal 6 karakter',
+          (value && value.length >= 6) || 'Username minimal 6 karakter',
       ],
       emailRules: [
         (v) => !!v || 'Masukkan alamat e-mail anda',

@@ -30,13 +30,15 @@
               :items="users"
               :search="search"
               class="elevation-1"
+              :items-per-page="5"
             >
               <template #[`item.username`]="{ item }">
                 <div class="d-flex">
                   <v-img
                     :src="item.profile_image"
-                    max-width="25"
                     class="rounded-circle"
+                    max-width="25"
+                    max-height="25"
                   ></v-img>
                   <span class="px-2">
                     <router-link
@@ -52,16 +54,18 @@
                   </span>
                 </div>
               </template>
-              <template #[`item.created_at`]="{ item }">
-                <DateShortener :date="item.created_at" />
-              </template>
               <template #[`item.followers`]="{ item }">
                 <FollowerShortener :follower="item.followers_count" />
               </template>
-              <template #[`item.status`]="{ item }">
-                <v-chip color="green" outlined>
-                  {{ item.status }}
-                </v-chip>
+              <template #[`item.details`]="{ item }">
+                <v-btn
+                  class="text-capitalize rounded-lg mx-2"
+                  text
+                  outlined
+                  @click="$router.push(`/user/${item.id}`)"
+                >
+                  Details
+                </v-btn>
               </template>
             </v-data-table>
           </v-card>
@@ -73,14 +77,12 @@
 
 <script>
 import NameShortener from '~/components/utils/NameShortener'
-import DateShortener from '~/components/utils/DateShortener'
 import FollowerShortener from '~/components/utils/FollowerShortener'
 
 export default {
   name: 'UserList',
   components: {
     NameShortener,
-    DateShortener,
     FollowerShortener,
   },
   middleware: ['authenticated', 'admin'],
@@ -94,10 +96,8 @@ export default {
           sortable: false,
           value: 'username',
         },
-        { text: 'Status', align: 'center', value: 'status' },
-        { text: 'Post Created', align: 'center', value: 'created_at' },
         { text: 'Followers', align: 'center', value: 'followers' },
-        { text: 'Likes Received', align: 'center', value: 'likes' },
+        { text: 'Actions', align: 'center', value: 'details' },
       ],
     }
   },
