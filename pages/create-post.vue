@@ -26,94 +26,92 @@
         <v-row>
           <v-col cols="auto" class="pb-1">
             <v-card class="rounded-lg" flat>
-              <v-form v-model="valid">
-                <v-select
-                  v-model="selectedTopic"
-                  :items="topics"
-                  item-text="name"
-                  item-value="id"
-                  label="Choose Topic"
-                  class="rounded-lg"
-                  menu-props="{ top: true, offsetY: true }"
-                  dense
-                  outlined
-                  :rules="topicRules"
-                  hide-details="auto"
-                  style="width: 321px"
-                >
-                  <div slot="prepend-item" class="px-3 py-1">
-                    <v-text-field
-                      v-model="search"
-                      clearable
-                      outlined
-                      dense
-                      flat
-                      hide-details
-                      class="rounded-lg"
-                      prepend-inner-icon="mdi-magnify"
-                      label="Search"
-                      @keydown.enter.prevent="submit"
-                    ></v-text-field>
-                    <v-list-item-title
-                      class="text--disabled body-2 pt-2"
-                      v-text="`Following`"
-                    />
-                  </div>
-                  <div slot="append-item" class="px-3 py-1">
-                    <v-card
-                      class="rounded-lg"
-                      outlined
-                      dense
-                      @click="dialog = true"
-                    >
-                      <v-list-item>
-                        <v-list-item-content>
-                          <v-row align="center">
-                            <v-col cols="auto">
-                              <v-icon>mdi-plus</v-icon>
-                            </v-col>
-                            <v-col cols="auto"> Tambah Topic </v-col>
-                          </v-row>
-                        </v-list-item-content>
-                      </v-list-item>
-                    </v-card>
-                    <Observer
-                      v-if="search === '' || search === null"
-                      @intersect="intersected"
-                    />
-                  </div>
-                  <template slot="selection" slot-scope="data">
-                    <v-row v-row align="center" class="pa-1">
-                      <v-col cols="auto" class="pa-1">
-                        <v-img
-                          :src="data.item.profile_image"
-                          class="rounded-circle"
-                          width="30"
-                          height="30"
-                        ></v-img>
-                      </v-col>
-                      <v-col cols="auto" class="pa-1">
-                        <TopicShortener :name="data.item.name" />
-                      </v-col>
-                    </v-row>
-                  </template>
-                  <template slot="item" slot-scope="data">
-                    <v-row align="center" class="pa-1">
-                      <v-col cols="auto" class="pa-1">
-                        <v-img
-                          :src="data.item.profile_image"
-                          class="rounded-circle"
-                          width="30"
-                          height="30"
-                        ></v-img>
-                      </v-col>
-                      <v-col cols="auto" class="pa-1">
-                        <TopicShortener :name="data.item.name" />
-                      </v-col>
-                    </v-row>
-                  </template>
-                </v-select>
-              </v-form>
+              <v-select
+                v-model="selectedTopic"
+                :items="topics"
+                item-text="name"
+                item-value="id"
+                label="Choose Topic"
+                class="rounded-lg"
+                menu-props="{ top: true, offsetY: true }"
+                dense
+                outlined
+                :rules="topicRules"
+                hide-details="auto"
+                style="width: 321px"
+              >
+                <div slot="prepend-item" class="px-3 py-1">
+                  <v-text-field
+                    v-model="search"
+                    clearable
+                    outlined
+                    dense
+                    flat
+                    hide-details
+                    class="rounded-lg"
+                    prepend-inner-icon="mdi-magnify"
+                    label="Search"
+                    @keydown.enter.prevent="submit"
+                  ></v-text-field>
+                  <v-list-item-title
+                    class="text--disabled body-2 pt-2"
+                    v-text="`Following`"
+                  />
+                </div>
+                <div slot="append-item" class="px-3 py-1">
+                  <v-card
+                    class="rounded-lg"
+                    outlined
+                    dense
+                    @click="dialog = true"
+                  >
+                    <v-list-item>
+                      <v-list-item-content>
+                        <v-row align="center">
+                          <v-col cols="auto">
+                            <v-icon>mdi-plus</v-icon>
+                          </v-col>
+                          <v-col cols="auto"> Tambah Topic </v-col>
+                        </v-row>
+                      </v-list-item-content>
+                    </v-list-item>
+                  </v-card>
+                  <Observer
+                    v-if="search === '' || search === null"
+                    @intersect="intersected"
+                  />
+                </div>
+                <template slot="selection" slot-scope="data">
+                  <v-row v-row align="center" class="pa-1">
+                    <v-col cols="auto" class="pa-1">
+                      <v-img
+                        :src="data.item.profile_image"
+                        class="rounded-circle"
+                        width="30"
+                        height="30"
+                      ></v-img>
+                    </v-col>
+                    <v-col cols="auto" class="pa-1">
+                      <TopicShortener :name="data.item.name" />
+                    </v-col>
+                  </v-row>
+                </template>
+                <template slot="item" slot-scope="data">
+                  <v-row align="center" class="pa-1">
+                    <v-col cols="auto" class="pa-1">
+                      <v-img
+                        :src="data.item.profile_image"
+                        class="rounded-circle"
+                        width="30"
+                        height="30"
+                      ></v-img>
+                    </v-col>
+                    <v-col cols="auto" class="pa-1">
+                      <TopicShortener :name="data.item.name" />
+                    </v-col>
+                  </v-row>
+                </template>
+              </v-select>
             </v-card>
             <AddTopic v-model="dialog" />
           </v-col>
@@ -467,9 +465,8 @@ export default {
         .get(`/search?scope=topic&keyword=${this.search}&limit=100&offset=0`)
         .then((res) => {
           this.topics = [...res.data]
-          this.topics = this.topics.filter(
-            item =>
-              this.followedTopics.some(subItem => subItem.id === item.id)
+          this.topics = this.topics.filter((item) =>
+            this.followedTopics.some((subItem) => subItem.id === item.id)
           )
         })
         .catch((err) => {
